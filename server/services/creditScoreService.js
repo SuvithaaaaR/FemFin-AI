@@ -73,7 +73,10 @@ function calculateCreditScore(financialData) {
   const debtToIncomeRatio = income > 0 ? (totalDebt / income) * 100 : 100;
   if (debtToIncomeRatio < 30) {
     score += 10;
-    factors.debtToIncomeBonus = { ratio: debtToIncomeRatio.toFixed(2), bonus: 10 };
+    factors.debtToIncomeBonus = {
+      ratio: debtToIncomeRatio.toFixed(2),
+      bonus: 10,
+    };
   }
 
   if (savingsBalance > income * 3) {
@@ -101,9 +104,15 @@ function calculatePaymentHistoryScore(paymentHistory) {
     return 50; // Neutral score for no history
   }
 
-  const onTimePayments = paymentHistory.filter((p) => p.status === "on-time" || p.onTime === true).length;
-  const latePayments = paymentHistory.filter((p) => p.status === "late" || p.late === true).length;
-  const missedPayments = paymentHistory.filter((p) => p.status === "missed" || p.missed === true).length;
+  const onTimePayments = paymentHistory.filter(
+    (p) => p.status === "on-time" || p.onTime === true,
+  ).length;
+  const latePayments = paymentHistory.filter(
+    (p) => p.status === "late" || p.late === true,
+  ).length;
+  const missedPayments = paymentHistory.filter(
+    (p) => p.status === "missed" || p.missed === true,
+  ).length;
 
   const totalPayments = paymentHistory.length;
   const onTimeRate = onTimePayments / totalPayments;
@@ -186,7 +195,8 @@ function generateRecommendations(score, factors) {
     recommendations.push({
       priority: "high",
       category: "Payment History",
-      action: "Make all payments on time. Set up automatic payments to avoid late payments.",
+      action:
+        "Make all payments on time. Set up automatic payments to avoid late payments.",
       potentialImpact: "+50 points",
     });
   }
@@ -213,7 +223,8 @@ function generateRecommendations(score, factors) {
     recommendations.push({
       priority: "low",
       category: "Account Mix",
-      action: "Consider diversifying with different types of credit (installment, revolving).",
+      action:
+        "Consider diversifying with different types of credit (installment, revolving).",
       potentialImpact: "+15 points",
     });
   }
@@ -281,26 +292,33 @@ function analyzeTransactionPatterns(transactions) {
     .reduce((sum, t) => sum + t.amount, 0);
 
   const billPayments = transactions.filter(
-    (t) => t.category === "bill" || t.category === "loan" || t.description?.toLowerCase().includes("payment")
+    (t) =>
+      t.category === "bill" ||
+      t.category === "loan" ||
+      t.description?.toLowerCase().includes("payment"),
   );
 
   const onTimeBills = billPayments.filter((b) => b.onTime !== false).length;
-  const paymentConsistency = billPayments.length > 0 ? (onTimeBills / billPayments.length) * 100 : 0;
+  const paymentConsistency =
+    billPayments.length > 0 ? (onTimeBills / billPayments.length) * 100 : 0;
 
   return {
     totalTransactions: transactions.length,
     totalSpending: totalSpending.toFixed(2),
     totalIncome: totalIncome.toFixed(2),
     averageMonthlySpending: (totalSpending / 12).toFixed(2),
-    savingsRate: totalIncome > 0 ? (((totalIncome - totalSpending) / totalIncome) * 100).toFixed(2) : 0,
+    savingsRate:
+      totalIncome > 0
+        ? (((totalIncome - totalSpending) / totalIncome) * 100).toFixed(2)
+        : 0,
     paymentConsistency:
       paymentConsistency >= 95
         ? "Excellent"
         : paymentConsistency >= 80
-        ? "Good"
-        : paymentConsistency >= 60
-        ? "Fair"
-        : "Poor",
+          ? "Good"
+          : paymentConsistency >= 60
+            ? "Fair"
+            : "Poor",
     billPayments: {
       total: billPayments.length,
       onTime: onTimeBills,
@@ -314,13 +332,25 @@ function analyzeTransactionPatterns(transactions) {
  */
 function generateMockTransactions() {
   const transactions = [];
-  const categories = ["bill", "groceries", "utilities", "loan", "income", "entertainment"];
+  const categories = [
+    "bill",
+    "groceries",
+    "utilities",
+    "loan",
+    "income",
+    "entertainment",
+  ];
 
   for (let i = 0; i < 50; i++) {
     transactions.push({
       id: `txn_${i}`,
-      date: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
-      amount: Math.random() > 0.3 ? -(Math.random() * 500 + 50) : Math.random() * 2000 + 500,
+      date: new Date(
+        Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000,
+      ).toISOString(),
+      amount:
+        Math.random() > 0.3
+          ? -(Math.random() * 500 + 50)
+          : Math.random() * 2000 + 500,
       type: Math.random() > 0.3 ? "debit" : "credit",
       category: categories[Math.floor(Math.random() * categories.length)],
       description: "Mock transaction",
@@ -361,7 +391,10 @@ async function calculateComprehensiveCreditScore(userId, userFinancialData) {
       },
     };
   } catch (error) {
-    console.error("Error calculating comprehensive credit score:", error.message);
+    console.error(
+      "Error calculating comprehensive credit score:",
+      error.message,
+    );
     throw error;
   }
 }

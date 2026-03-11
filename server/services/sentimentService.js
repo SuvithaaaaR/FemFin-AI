@@ -55,7 +55,8 @@ function analyzeMultipleReviews(reviews) {
   return {
     totalReviews: reviews.length,
     averageScore: averageScore,
-    averageComparative: results.reduce((sum, r) => sum + r.comparative, 0) / results.length,
+    averageComparative:
+      results.reduce((sum, r) => sum + r.comparative, 0) / results.length,
     sentiment: {
       positive: positiveCount,
       negative: negativeCount,
@@ -66,7 +67,8 @@ function analyzeMultipleReviews(reviews) {
       negative: ((negativeCount / reviews.length) * 100).toFixed(2),
       neutral: ((neutralCount / reviews.length) * 100).toFixed(2),
     },
-    overallSentiment: averageScore > 0 ? "positive" : averageScore < 0 ? "negative" : "neutral",
+    overallSentiment:
+      averageScore > 0 ? "positive" : averageScore < 0 ? "negative" : "neutral",
   };
 }
 
@@ -92,7 +94,10 @@ function calculateTrustScore(reviews) {
   const positiveRatio = analysis.sentiment.positive / analysis.totalReviews;
   const volumeBonus = Math.min(analysis.totalReviews / 100, 0.2); // Max 20% bonus for volume
 
-  const trustScore = Math.min(100, (positiveRatio * 80 + volumeBonus * 100)).toFixed(2);
+  const trustScore = Math.min(
+    100,
+    positiveRatio * 80 + volumeBonus * 100,
+  ).toFixed(2);
 
   return {
     trustScore: parseFloat(trustScore),
@@ -105,10 +110,10 @@ function calculateTrustScore(reviews) {
       trustScore >= 75
         ? "Highly Trustworthy"
         : trustScore >= 50
-        ? "Generally Trustworthy"
-        : trustScore >= 25
-        ? "Moderately Trustworthy"
-        : "Requires Caution",
+          ? "Generally Trustworthy"
+          : trustScore >= 25
+            ? "Moderately Trustworthy"
+            : "Requires Caution",
   };
 }
 
@@ -127,8 +132,8 @@ function analyzeCampaignDescription(description) {
       analysis.score > 0
         ? "Description has positive sentiment - good for attracting investors"
         : analysis.score < 0
-        ? "Consider revising to use more positive language"
-        : "Description is neutral - consider adding more compelling language",
+          ? "Consider revising to use more positive language"
+          : "Description is neutral - consider adding more compelling language",
   };
 }
 
@@ -151,8 +156,13 @@ function analyzeInvestorFeedback(feedbacks) {
     ...analysis,
     insights: {
       investorConfidence:
-        analysis.sentiment.positive > analysis.sentiment.negative ? "High" : "Low",
-      concerns: analysis.sentiment.negative > 0 ? "Some negative feedback detected" : "No major concerns",
+        analysis.sentiment.positive > analysis.sentiment.negative
+          ? "High"
+          : "Low",
+      concerns:
+        analysis.sentiment.negative > 0
+          ? "Some negative feedback detected"
+          : "No major concerns",
       recommendation:
         analysis.overallSentiment === "positive"
           ? "Strong investor sentiment - continue current strategy"

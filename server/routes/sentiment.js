@@ -21,7 +21,10 @@ router.post("/analyze-reviews", sentimentController.analyzeReviews);
 router.post("/trust-score", sentimentController.calculateTrustScore);
 
 // Analyze campaign description
-router.post("/campaign-description", sentimentController.analyzeCampaignDescription);
+router.post(
+  "/campaign-description",
+  sentimentController.analyzeCampaignDescription,
+);
 
 // Analyze investor feedback
 router.post("/investor-feedback", sentimentController.analyzeInvestorFeedback);
