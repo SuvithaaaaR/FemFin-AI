@@ -88,22 +88,72 @@ function CreditScoring() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      // Convert string values to numbers for the backend
+      const payload = {
+        ...form.values,
+        yearsInBusiness: parseFloat(form.values.yearsInBusiness) || 0,
+        monthlyRevenue: parseFloat(form.values.monthlyRevenue) || 0,
+        annualRevenue: parseFloat(form.values.annualRevenue) || 0,
+        upiTransactions: parseInt(form.values.upiTransactions) || 0,
+        onlineSales: parseFloat(form.values.onlineSales) || 0,
+        digitalPayments: parseFloat(form.values.digitalPayments) || 0,
+        activeCustomers: parseInt(form.values.activeCustomers) || 0,
+        repeatCustomers: parseInt(form.values.repeatCustomers) || 0,
+        averageOrderValue: parseFloat(form.values.averageOrderValue) || 0,
+        googleRating: parseFloat(form.values.googleRating) || 0,
+        totalReviews: parseInt(form.values.totalReviews) || 0,
+        gstRegistered:
+          form.values.gstRegistered === "yes" ||
+          form.values.gstRegistered === true,
+      };
+
       const response = await apiClient.post(
-        "/credit-scoring/analyze",
-        form.values,
+        "/credit-scoring/calculate",
+        payload,
       );
-      setCreditScore(response.data.creditScore);
+
+      // Transform backend response to match frontend structure
+      const backendData = response.data.data;
+      const transformedScore = {
+        totalScore: backendData.overallScore,
+        digitalTransactions: backendData.breakdown.digitalTransactions.score,
+        businessActivity: backendData.breakdown.businessActivity.score,
+        socialTrust: backendData.breakdown.socialTrust.score,
+        financialHealth: backendData.breakdown.financialHealth.score,
+        loanEligibility: backendData.loanEligibility,
+        savedToDatabase: response.data.savedToDatabase,
+        creditScoreId: response.data.creditScoreId,
+      };
+
+      setCreditScore(transformedScore);
       setActive(3);
-      notifications.show({
-        title: "Credit Score Generated!",
-        message: "Your AI-powered credit assessment is complete",
-        color: "green",
-        icon: <IconCheck size={rem(18)} />,
-      });
+
+      // Show appropriate notification based on save status
+      if (response.data.savedToDatabase) {
+        notifications.show({
+          title: "Credit Score Generated & Saved!",
+          message:
+            "Your credit score has been calculated and saved to your account history",
+          color: "green",
+          icon: <IconCheck size={rem(18)} />,
+        });
+      } else {
+        notifications.show({
+          title: "Credit Score Generated!",
+          message: "Login to save your credit score history",
+          color: "blue",
+          icon: <IconCheck size={rem(18)} />,
+        });
+      }
     } catch (error) {
+      console.error(
+        "Credit score error:",
+        error.response?.data || error.message,
+      );
       notifications.show({
         title: "Error",
-        message: "Failed to generate credit score",
+        message:
+          error.response?.data?.error || "Failed to generate credit score",
         color: "red",
       });
     } finally {
@@ -148,6 +198,21 @@ function CreditScoring() {
     };
 
     const getLoanEligibility = (score) => {
+      // Use backend data if available, otherwise calculate locally
+      if (
+        creditScore.loanEligibility &&
+        creditScore.loanEligibility.isEligible
+      ) {
+        // Add tenure based on score (backend doesn't provide this)
+        const tenure =
+          score >= 750 ? 60 : score >= 650 ? 48 : score >= 550 ? 36 : 24;
+        return {
+          amount: creditScore.loanEligibility.maxLoanAmount,
+          interest: creditScore.loanEligibility.recommendedInterestRate,
+          tenure: tenure,
+        };
+      }
+      // Fallback to local calculation
       if (score >= 750) return { amount: 2000000, interest: 8.5, tenure: 60 };
       if (score >= 650) return { amount: 1000000, interest: 10.5, tenure: 48 };
       if (score >= 550) return { amount: 500000, interest: 12.5, tenure: 36 };
@@ -158,6 +223,27 @@ function CreditScoring() {
 
     return (
       <Stack gap="xl">
+        {/* Save Status Alert */}
+        {creditScore.savedToDatabase ? (
+          <Alert
+            icon={<IconCheck size={rem(16)} />}
+            color="green"
+            title="Saved to Your Account"
+          >
+            Your credit score has been saved to your account history. You can
+            view it anytime from your dashboard.
+          </Alert>
+        ) : (
+          <Alert
+            icon={<IconAlertCircle size={rem(16)} />}
+            color="blue"
+            title="Login to Save"
+          >
+            This credit score was calculated successfully but not saved. Login
+            to automatically save your credit history.
+          </Alert>
+        )}
+
         <Card shadow="lg" padding="xl" radius="md" withBorder>
           <Stack gap="xl" align="center">
             <Group>

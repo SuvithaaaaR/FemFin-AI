@@ -202,53 +202,67 @@ exports.calculateScore = asyncHandler(async (req, res, next) => {
   const result = calculateCreditScore(userData);
 
   // If user is authenticated, save to database
-  if (req.user) {
-    const creditScoreData = {
-      user: req.user.id,
-      business: req.body.businessId,
-      digitalTransactions: {
-        upiTransactions: userData.upiTransactions,
-        onlinePayments: userData.digitalPayments,
-        averageTransactionValue: userData.averageOrderValue || 0,
-        score: result.scores.digitalTransactions,
-      },
-      businessActivity: {
-        yearsInBusiness: userData.yearsInBusiness,
-        monthlyRevenue: userData.monthlyRevenue,
-        consistencyScore: result.scores.businessActivity,
-        growthRate: 0,
-        score: result.scores.businessActivity,
-      },
-      socialTrust: {
-        customerReviews: userData.googleRating || 0,
-        socialMediaPresence:
-          userData.socialMediaPresence === "Excellent" ? 100 : 50,
-        businessReferences: userData.totalReviews || 0,
-        score: result.scores.socialTrust,
-      },
-      financialHealth: {
-        averageMonthlySales: userData.monthlyRevenue,
-        profitMargin: 0,
-        debtToIncomeRatio: 0,
-        existingLoans: false,
-        score: result.scores.financialHealth,
-      },
-      overallScore: result.scores.totalScore,
-      loanEligibility: result.loanEligibility,
-      scoreHistory: [
-        {
-          score: result.scores.totalScore,
-          calculatedAt: new Date(),
-        },
-      ],
-    };
+  let savedToDatabase = false;
+  let creditScoreId = null;
 
-    await CreditScore.create(creditScoreData);
+  if (req.user) {
+    try {
+      const creditScoreData = {
+        user: req.user.id,
+        business: req.body.businessId,
+        digitalTransactions: {
+          upiTransactions: userData.upiTransactions,
+          onlinePayments: userData.digitalPayments,
+          averageTransactionValue: userData.averageOrderValue || 0,
+          score: result.scores.digitalTransactions,
+        },
+        businessActivity: {
+          yearsInBusiness: userData.yearsInBusiness,
+          monthlyRevenue: userData.monthlyRevenue,
+          consistencyScore: result.scores.businessActivity,
+          growthRate: 0,
+          score: result.scores.businessActivity,
+        },
+        socialTrust: {
+          customerReviews: userData.googleRating || 0,
+          socialMediaPresence:
+            userData.socialMediaPresence === "Excellent" ? 100 : 50,
+          businessReferences: userData.totalReviews || 0,
+          score: result.scores.socialTrust,
+        },
+        financialHealth: {
+          averageMonthlySales: userData.monthlyRevenue,
+          profitMargin: 0,
+          debtToIncomeRatio: 0,
+          existingLoans: false,
+          score: result.scores.financialHealth,
+        },
+        overallScore: result.scores.totalScore,
+        loanEligibility: result.loanEligibility,
+        scoreHistory: [
+          {
+            score: result.scores.totalScore,
+            calculatedAt: new Date(),
+          },
+        ],
+      };
+
+      const savedScore = await CreditScore.create(creditScoreData);
+      savedToDatabase = true;
+      creditScoreId = savedScore._id;
+    } catch (error) {
+      console.error("Error saving credit score to database:", error);
+      // Continue even if DB save fails - user still gets the calculation
+    }
   }
 
   res.status(200).json({
     success: true,
-    message: "Credit score calculated successfully",
+    message: savedToDatabase
+      ? "Credit score calculated and saved successfully"
+      : "Credit score calculated successfully",
+    savedToDatabase,
+    creditScoreId,
     data: {
       overallScore: result.scores.totalScore,
       breakdown: {
