@@ -52,11 +52,15 @@ const authRoutes = require("./routes/auth");
 const fundRecommendationRoutes = require("./routes/fundRecommendation");
 const crowdfundingRoutes = require("./routes/crowdfunding");
 const creditScoringRoutes = require("./routes/creditScoring");
+const aiRoutes = require("./routes/ai");
+const sentimentRoutes = require("./routes/sentiment");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/fund-recommendations", fundRecommendationRoutes);
 app.use("/api/crowdfunding", crowdfundingRoutes);
 app.use("/api/credit-scoring", creditScoringRoutes);
+app.use("/api/ai", aiRoutes);
+app.use("/api/sentiment", sentimentRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {
@@ -102,6 +106,22 @@ app.get("/api", (req, res) => {
         calculate: "POST /api/credit-scoring/calculate",
         history: "GET /api/credit-scoring/history",
         latest: "GET /api/credit-scoring/latest",
+      },
+      ai: {
+        financialAdvice: "POST /api/ai/financial-advice",
+        analyzeBusinessPlan: "POST /api/ai/analyze-business-plan",
+        fundRecommendations: "POST /api/ai/fund-recommendations",
+        creditScoreTips: "POST /api/ai/credit-score-tips",
+        analyzePitch: "POST /api/ai/analyze-pitch",
+        chat: "POST /api/ai/chat",
+        query: "POST /api/ai/query",
+      },
+      sentiment: {
+        analyze: "POST /api/sentiment/analyze",
+        analyzeReviews: "POST /api/sentiment/analyze-reviews",
+        trustScore: "POST /api/sentiment/trust-score",
+        campaignDescription: "POST /api/sentiment/campaign-description",
+        investorFeedback: "POST /api/sentiment/investor-feedback",
       },
     },
   });
