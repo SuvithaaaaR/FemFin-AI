@@ -20,13 +20,24 @@ import {
   IconDashboard,
   IconSun,
   IconMoon,
+  IconLogin,
+  IconUserPlus,
+  IconLogout,
+  IconUser,
 } from "@tabler/icons-react";
+import { useAuth } from "../../contexts/AuthContext";
 
 function Header() {
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
   const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme("light");
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   const toggleColorScheme = () => {
     setColorScheme(computedColorScheme === "dark" ? "light" : "dark");
@@ -67,13 +78,62 @@ function Header() {
             Credit Score
           </Button>
 
-          <Button
-            variant="filled"
-            leftSection={<IconDashboard size={rem(16)} />}
-            onClick={() => navigate("/dashboard")}
-          >
-            Dashboard
-          </Button>
+          {user ? (
+            <>
+              <Button
+                variant="filled"
+                leftSection={<IconDashboard size={rem(16)} />}
+                onClick={() => navigate("/dashboard")}
+              >
+                Dashboard
+              </Button>
+
+              <Menu shadow="md" width={200}>
+                <Menu.Target>
+                  <Button
+                    variant="default"
+                    leftSection={<IconUser size={rem(16)} />}
+                  >
+                    {user.name}
+                  </Button>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Menu.Label>Account</Menu.Label>
+                  <Menu.Item
+                    leftSection={<IconUser size={rem(16)} />}
+                    onClick={() => navigate("/dashboard")}
+                  >
+                    Profile
+                  </Menu.Item>
+                  <Menu.Divider />
+                  <Menu.Item
+                    leftSection={<IconLogout size={rem(16)} />}
+                    color="red"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="default"
+                leftSection={<IconLogin size={rem(16)} />}
+                onClick={() => navigate("/login")}
+              >
+                Login
+              </Button>
+              <Button
+                variant="filled"
+                leftSection={<IconUserPlus size={rem(16)} />}
+                onClick={() => navigate("/register")}
+              >
+                Register
+              </Button>
+            </>
+          )}
 
           <ActionIcon
             onClick={toggleColorScheme}
@@ -138,15 +198,50 @@ function Header() {
                 Credit Scoring
               </Menu.Item>
               <Menu.Divider />
-              <Menu.Item
-                leftSection={<IconDashboard size={rem(16)} />}
-                onClick={() => {
-                  navigate("/dashboard");
-                  toggle();
-                }}
-              >
-                Dashboard
-              </Menu.Item>
+              {user ? (
+                <>
+                  <Menu.Item
+                    leftSection={<IconDashboard size={rem(16)} />}
+                    onClick={() => {
+                      navigate("/dashboard");
+                      toggle();
+                    }}
+                  >
+                    Dashboard
+                  </Menu.Item>
+                  <Menu.Item
+                    leftSection={<IconLogout size={rem(16)} />}
+                    color="red"
+                    onClick={() => {
+                      handleLogout();
+                      toggle();
+                    }}
+                  >
+                    Logout
+                  </Menu.Item>
+                </>
+              ) : (
+                <>
+                  <Menu.Item
+                    leftSection={<IconLogin size={rem(16)} />}
+                    onClick={() => {
+                      navigate("/login");
+                      toggle();
+                    }}
+                  >
+                    Login
+                  </Menu.Item>
+                  <Menu.Item
+                    leftSection={<IconUserPlus size={rem(16)} />}
+                    onClick={() => {
+                      navigate("/register");
+                      toggle();
+                    }}
+                  >
+                    Register
+                  </Menu.Item>
+                </>
+              )}
             </Menu.Dropdown>
           </Menu>
         </Group>

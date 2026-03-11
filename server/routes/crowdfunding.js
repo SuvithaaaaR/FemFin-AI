@@ -1,191 +1,62 @@
 const express = require("express");
 const router = express.Router();
+const { crowdfunding } = require("../controllers");
+const { protect, createLimiter } = require("../middleware");
 
-// In-memory storage for campaigns (use database in production)
-let campaigns = [];
-let campaignIdCounter = 1;
+/**
+ * @route   GET /api/crowdfunding/campaigns
+ * @desc    Get all campaigns
+ * @access  Public
+ */
+router.get("/campaigns", crowdfunding.getCampaigns);
 
-// POST /api/crowdfunding/create
-router.post("/create", async (req, res) => {
-  try {
-    const {
-      title,
-      description,
-      targetAmount,
-      duration,
-      category,
-      milestone1,
-      milestone1Amount,
-      milestone2,
-      milestone2Amount,
-      milestone3,
-      milestone3Amount,
-    } = req.body;
+/**
+ * @route   POST /api/crowdfunding/campaigns
+ * @desc    Create new campaign
+ * @access  Private
+ */
+router.post("/campaigns", protect, createLimiter, crowdfunding.createCampaign);
 
-    if (!title || !description || !targetAmount || !duration) {
-      return res.status(400).json({
-        success: false,
-        message: "Missing required fields",
-      });
-    }
+/**
+ * @route   GET /api/crowdfunding/campaigns/:id
+ * @desc    Get single campaign
+ * @access  Public
+ */
+router.get("/campaigns/:id", crowdfunding.getCampaign);
 
-    const milestones = [];
-    if (milestone1 && milestone1Amount) {
-      milestones.push({
-        title: milestone1,
-        amount: milestone1Amount,
-        status: "pending",
-      });
-    }
-    if (milestone2 && milestone2Amount) {
-      milestones.push({
-        title: milestone2,
-        amount: milestone2Amount,
-        status: "pending",
-      });
-    }
-    if (milestone3 && milestone3Amount) {
-      milestones.push({
-        title: milestone3,
-        amount: milestone3Amount,
-        status: "pending",
-      });
-    }
+/**
+ * @route   PUT /api/crowdfunding/campaigns/:id
+ * @desc    Update campaign
+ * @access  Private (Owner only)
+ */
+router.put("/campaigns/:id", protect, crowdfunding.updateCampaign);
 
-    const newCampaign = {
-      id: campaignIdCounter++,
-      title,
-      description,
-      targetAmount: parseFloat(targetAmount),
-      raisedAmount: 0,
-      duration: parseInt(duration),
-      category,
-      milestones,
-      investors: [],
-      createdAt: new Date(),
-      status: "active",
-      verified: false, // Would be verified through blockchain
-    };
+/**
+ * @route   DELETE /api/crowdfunding/campaigns/:id
+ * @desc    Delete campaign
+ * @access  Private (Owner only)
+ */
+router.delete("/campaigns/:id", protect, crowdfunding.deleteCampaign);
 
-    campaigns.push(newCampaign);
+/**
+ * @route   POST /api/crowdfunding/campaigns/:id/invest
+ * @desc    Invest in a campaign
+ * @access  Private
+ */
+router.post("/campaigns/:id/invest", protect, crowdfunding.investInCampaign);
 
-    res.status(201).json({
-      success: true,
-      message: "Campaign created successfully",
-      campaign: newCampaign,
-    });
-  } catch (error) {
-    console.error("Error creating campaign:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to create campaign",
-      error: error.message,
-    });
-  }
-});
+/**
+ * @route   GET /api/crowdfunding/my-campaigns
+ * @desc    Get user's campaigns
+ * @access  Private
+ */
+router.get("/my-campaigns", protect, crowdfunding.getMyCampaigns);
 
-// GET /api/crowdfunding/campaigns
-router.get("/campaigns", async (req, res) => {
-  try {
-    res.json({
-      success: true,
-      campaigns: campaigns.filter((c) => c.status === "active"),
-    });
-  } catch (error) {
-    console.error("Error fetching campaigns:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch campaigns",
-      error: error.message,
-    });
-  }
-});
-
-// POST /api/crowdfunding/invest/:campaignId
-router.post("/invest/:campaignId", async (req, res) => {
-  try {
-    const { campaignId } = req.params;
-    const { amount, investorName, email } = req.body;
-
-    if (!amount || !investorName || !email) {
-      return res.status(400).json({
-        success: false,
-        message: "Missing required fields",
-      });
-    }
-
-    const campaign = campaigns.find((c) => c.id === parseInt(campaignId));
-
-    if (!campaign) {
-      return res.status(404).json({
-        success: false,
-        message: "Campaign not found",
-      });
-    }
-
-    // In production, this would integrate with blockchain smart contracts
-    const investment = {
-      investorName,
-      email,
-      amount: parseFloat(amount),
-      timestamp: new Date(),
-      txHash: `0x${Math.random().toString(36).substring(2, 15)}`, // Mock transaction hash
-    };
-
-    campaign.investors.push(investment);
-    campaign.raisedAmount += parseFloat(amount);
-
-    // Check if campaign reached its target
-    if (campaign.raisedAmount >= campaign.targetAmount) {
-      campaign.status = "funded";
-    }
-
-    res.json({
-      success: true,
-      message: "Investment successful",
-      investment,
-      campaign: {
-        id: campaign.id,
-        raisedAmount: campaign.raisedAmount,
-        targetAmount: campaign.targetAmount,
-        status: campaign.status,
-      },
-    });
-  } catch (error) {
-    console.error("Error processing investment:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to process investment",
-      error: error.message,
-    });
-  }
-});
-
-// GET /api/crowdfunding/campaign/:campaignId
-router.get("/campaign/:campaignId", async (req, res) => {
-  try {
-    const { campaignId } = req.params;
-    const campaign = campaigns.find((c) => c.id === parseInt(campaignId));
-
-    if (!campaign) {
-      return res.status(404).json({
-        success: false,
-        message: "Campaign not found",
-      });
-    }
-
-    res.json({
-      success: true,
-      campaign,
-    });
-  } catch (error) {
-    console.error("Error fetching campaign:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch campaign",
-      error: error.message,
-    });
-  }
-});
+/**
+ * @route   GET /api/crowdfunding/my-investments
+ * @desc    Get user's investments
+ * @access  Private
+ */
+router.get("/my-investments", protect, crowdfunding.getMyInvestments);
 
 module.exports = router;

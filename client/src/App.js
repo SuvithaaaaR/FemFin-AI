@@ -2,11 +2,14 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AppShell, Container } from "@mantine/core";
 import Header from "./components/Layout/Header";
+import ProtectedRoute from "./components/ProtectedRoute";
 import HomePage from "./pages/HomePage";
 import FundRecommendation from "./pages/FundRecommendation";
 import Crowdfunding from "./pages/Crowdfunding";
 import CreditScoring from "./pages/CreditScoring";
 import Dashboard from "./pages/Dashboard";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
 
 function App() {
   return (
@@ -20,13 +23,40 @@ function App() {
           <Container size="xl" py="xl">
             <Routes>
               <Route path="/" element={<HomePage />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/login" element={<Login />} />
               <Route
                 path="/fund-recommendation"
-                element={<FundRecommendation />}
+                element={
+                  <ProtectedRoute>
+                    <FundRecommendation />
+                  </ProtectedRoute>
+                }
               />
-              <Route path="/crowdfunding" element={<Crowdfunding />} />
-              <Route path="/credit-scoring" element={<CreditScoring />} />
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route
+                path="/crowdfunding"
+                element={
+                  <ProtectedRoute>
+                    <Crowdfunding />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/credit-scoring"
+                element={
+                  <ProtectedRoute>
+                    <CreditScoring />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
             </Routes>
           </Container>
         </AppShell.Main>
