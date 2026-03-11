@@ -23,7 +23,8 @@ const theme = createTheme({
     ],
   },
   defaultRadius: "md",
-  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+  fontFamily:
+    '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
   breakpoints: {
     xs: "30em",
     sm: "48em",

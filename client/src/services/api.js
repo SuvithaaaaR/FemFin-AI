@@ -1,7 +1,8 @@
 import axios from "axios";
 
 // Get API URL from environment variables
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+const API_BASE_URL =
+  process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -22,7 +23,7 @@ apiClient.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // Response interceptor for error handling
@@ -35,7 +36,7 @@ apiClient.interceptors.response.use(
       // You can add redirect logic here
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default apiClient;

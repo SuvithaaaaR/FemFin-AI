@@ -1,6 +1,7 @@
 # Environment Variables Configuration Guide
 
 ## Overview
+
 FemFin AI uses environment variables to manage configuration across different environments (development, staging, production). This guide explains how to set up and use them properly.
 
 ## 📁 File Structure
@@ -20,6 +21,7 @@ FemFin-AI/
 ## 🔐 Security Best Practices
 
 ### DO ✅
+
 - Keep `.env` files in `.gitignore` (already configured)
 - Use `.env.example` files to share structure without values
 - Use strong, unique secrets for JWT and API keys
@@ -28,6 +30,7 @@ FemFin-AI/
 - Store production secrets in secure vault services (AWS Secrets Manager, Azure Key Vault, etc.)
 
 ### DON'T ❌
+
 - Never commit `.env` files to git
 - Never use default/example values in production
 - Never expose sensitive keys in client-side code
@@ -69,6 +72,7 @@ RATE_LIMIT_MAX=100
 ## 💻 Client Environment Variables
 
 ### Important Notes
+
 - All client variables **MUST** start with `REACT_APP_`
 - Changes require restarting the dev server
 - Only variables starting with `REACT_APP_` are embedded in the build
@@ -98,6 +102,7 @@ REACT_APP_GOOGLE_MAPS_API_KEY=your_maps_key
 ### Development Setup
 
 1. **Server Setup**
+
    ```bash
    cd server
    cp .env.example .env
@@ -106,6 +111,7 @@ REACT_APP_GOOGLE_MAPS_API_KEY=your_maps_key
    ```
 
 2. **Client Setup**
+
    ```bash
    cd client
    cp .env.example .env
@@ -114,6 +120,7 @@ REACT_APP_GOOGLE_MAPS_API_KEY=your_maps_key
    ```
 
 3. **Verify Configuration**
+
    ```bash
    # Start server
    cd server
@@ -127,13 +134,14 @@ REACT_APP_GOOGLE_MAPS_API_KEY=your_maps_key
 ### Production Setup
 
 1. **Server**
+
    ```bash
    # Use production template
    cp .env.production.example .env
-   
+
    # Set strong values
    JWT_SECRET=$(openssl rand -base64 32)
-   
+
    # Add to your deployment platform
    # Heroku: heroku config:set KEY=value
    # Vercel: vercel env add KEY
@@ -141,13 +149,14 @@ REACT_APP_GOOGLE_MAPS_API_KEY=your_maps_key
    ```
 
 2. **Client**
+
    ```bash
    # Create production .env
    cp .env.production.example .env.production
-   
+
    # Edit with production values
    REACT_APP_API_URL=https://api.yourdomain.com/api
-   
+
    # Build
    npm run build
    ```
@@ -155,6 +164,7 @@ REACT_APP_GOOGLE_MAPS_API_KEY=your_maps_key
 ## 🔍 Using Environment Variables in Code
 
 ### Server-side (Node.js)
+
 ```javascript
 // Access variables directly
 const port = process.env.PORT || 5000;
@@ -163,19 +173,20 @@ const mongoUri = process.env.MONGODB_URI;
 
 // Check if required variables exist
 if (!process.env.JWT_SECRET) {
-  throw new Error('JWT_SECRET is required');
+  throw new Error("JWT_SECRET is required");
 }
 ```
 
 ### Client-side (React)
+
 ```javascript
 // Access variables with REACT_APP_ prefix
 const apiUrl = process.env.REACT_APP_API_URL;
 const appName = process.env.REACT_APP_NAME;
-const isDarkModeEnabled = process.env.REACT_APP_ENABLE_DARK_MODE === 'true';
+const isDarkModeEnabled = process.env.REACT_APP_ENABLE_DARK_MODE === "true";
 
 // Check availability
-console.log('Available env vars:', {
+console.log("Available env vars:", {
   apiUrl: process.env.REACT_APP_API_URL,
   appName: process.env.REACT_APP_NAME,
 });
@@ -184,6 +195,7 @@ console.log('Available env vars:', {
 ## 🌍 Different Environments
 
 ### Local Development
+
 ```bash
 # Server
 PORT=5000
@@ -195,6 +207,7 @@ REACT_APP_API_URL=http://localhost:5000/api
 ```
 
 ### Staging
+
 ```bash
 # Server
 PORT=5000
@@ -206,6 +219,7 @@ REACT_APP_API_URL=https://api-staging.yourdomain.com/api
 ```
 
 ### Production
+
 ```bash
 # Server
 PORT=5000
@@ -221,15 +235,19 @@ REACT_APP_ENABLE_ANALYTICS=true
 ## 🔧 Common Issues & Solutions
 
 ### Issue: Changes not reflecting
+
 **Solution:** Restart the development server after .env changes
+
 ```bash
 # Stop server (Ctrl+C)
 npm start
 ```
 
 ### Issue: Variables undefined in React
+
 **Problem:** Variable doesn't start with `REACT_APP_`
 **Solution:** Rename the variable
+
 ```bash
 # Wrong
 API_URL=http://localhost:5000
@@ -239,15 +257,19 @@ REACT_APP_API_URL=http://localhost:5000
 ```
 
 ### Issue: CORS errors
+
 **Problem:** CLIENT_URL doesn't match actual client URL
 **Solution:** Update server .env
+
 ```bash
 CLIENT_URL=http://localhost:3000
 ```
 
 ### Issue: API calls failing
+
 **Problem:** Wrong API URL in client
 **Solution:** Check and update client .env
+
 ```bash
 REACT_APP_API_URL=http://localhost:5000/api
 ```
@@ -255,6 +277,7 @@ REACT_APP_API_URL=http://localhost:5000/api
 ## 📝 Deployment Platforms
 
 ### Heroku
+
 ```bash
 heroku config:set PORT=5000
 heroku config:set NODE_ENV=production
@@ -262,18 +285,22 @@ heroku config:set JWT_SECRET=your_secret
 ```
 
 ### Vercel
+
 ```bash
 vercel env add REACT_APP_API_URL production
 vercel env add REACT_APP_NAME production
 ```
 
 ### Netlify
+
 Add in Netlify dashboard: Site settings → Build & deploy → Environment variables
 
 ### Railway
+
 Add in Railway dashboard: Variables tab
 
 ### AWS
+
 Use AWS Secrets Manager or Parameter Store
 
 ## 🧪 Testing Configuration
@@ -299,7 +326,7 @@ console.log(process.env.REACT_APP_API_URL)
 2. **Use `.env.example` files** - to show structure without exposing secrets
 3. **Rotate secrets regularly** - especially JWT_SECRET in production
 4. **Use different secrets** - for development and production
-5. **Client variables are public** - never put sensitive data in REACT_APP_ variables
+5. **Client variables are public** - never put sensitive data in REACT*APP* variables
 6. **Restart after changes** - environment variables are loaded at startup
 
 ## 🎯 Quick Reference

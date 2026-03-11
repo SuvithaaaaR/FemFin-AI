@@ -1,5 +1,16 @@
 import React from "react";
-import { Group, Button, Title, Container, rem, ActionIcon, useMantineColorScheme, useComputedColorScheme, Menu, Burger } from "@mantine/core";
+import {
+  Group,
+  Button,
+  Title,
+  Container,
+  rem,
+  ActionIcon,
+  useMantineColorScheme,
+  useComputedColorScheme,
+  Menu,
+  Burger,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useNavigate } from "react-router-dom";
 import {
@@ -8,7 +19,7 @@ import {
   IconCreditCard,
   IconDashboard,
   IconSun,
-  IconMoon
+  IconMoon,
 } from "@tabler/icons-react";
 
 function Header() {
@@ -101,26 +112,38 @@ function Header() {
             <Menu.Dropdown>
               <Menu.Item
                 leftSection={<IconChartBar size={rem(16)} />}
-                onClick={() => { navigate("/fund-recommendation"); toggle(); }}
+                onClick={() => {
+                  navigate("/fund-recommendation");
+                  toggle();
+                }}
               >
                 Fund Recommendations
               </Menu.Item>
               <Menu.Item
                 leftSection={<IconCoins size={rem(16)} />}
-                onClick={() => { navigate("/crowdfunding"); toggle(); }}
+                onClick={() => {
+                  navigate("/crowdfunding");
+                  toggle();
+                }}
               >
                 Crowdfunding
               </Menu.Item>
               <Menu.Item
                 leftSection={<IconCreditCard size={rem(16)} />}
-                onClick={() => { navigate("/credit-scoring"); toggle(); }}
+                onClick={() => {
+                  navigate("/credit-scoring");
+                  toggle();
+                }}
               >
                 Credit Scoring
               </Menu.Item>
               <Menu.Divider />
               <Menu.Item
                 leftSection={<IconDashboard size={rem(16)} />}
-                onClick={() => { navigate("/dashboard"); toggle(); }}
+                onClick={() => {
+                  navigate("/dashboard");
+                  toggle();
+                }}
               >
                 Dashboard
               </Menu.Item>
