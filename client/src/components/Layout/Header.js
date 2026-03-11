@@ -79,43 +79,53 @@ function Header() {
           </Button>
 
           {user ? (
-            <>
-              <Button
-                variant="filled"
-                leftSection={<IconDashboard size={rem(16)} />}
-                onClick={() => navigate("/dashboard")}
-              >
-                Dashboard
-              </Button>
-
-              <Menu shadow="md" width={200}>
-                <Menu.Target>
-                  <Button
-                    variant="default"
-                    leftSection={<IconUser size={rem(16)} />}
-                  >
-                    {user.name}
-                  </Button>
-                </Menu.Target>
-                <Menu.Dropdown>
-                  <Menu.Label>Account</Menu.Label>
-                  <Menu.Item
-                    leftSection={<IconUser size={rem(16)} />}
-                    onClick={() => navigate("/dashboard")}
-                  >
-                    Profile
-                  </Menu.Item>
-                  <Menu.Divider />
-                  <Menu.Item
-                    leftSection={<IconLogout size={rem(16)} />}
-                    color="red"
-                    onClick={handleLogout}
-                  >
-                    Logout
-                  </Menu.Item>
-                </Menu.Dropdown>
-              </Menu>
-            </>
+            <Menu shadow="md" width={220}>
+              <Menu.Target>
+                <Button
+                  variant="default"
+                  leftSection={<IconUser size={rem(16)} />}
+                >
+                  {user.name}
+                </Button>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Label>Account</Menu.Label>
+                <Menu.Item
+                  leftSection={<IconDashboard size={rem(16)} />}
+                  onClick={() => navigate("/dashboard")}
+                >
+                  Dashboard
+                </Menu.Item>
+                <Menu.Item
+                  leftSection={<IconUser size={rem(16)} />}
+                  onClick={() => navigate("/dashboard")}
+                >
+                  Profile
+                </Menu.Item>
+                <Menu.Divider />
+                <Menu.Label>Settings</Menu.Label>
+                <Menu.Item
+                  leftSection={
+                    computedColorScheme === "dark" ? (
+                      <IconSun size={rem(16)} />
+                    ) : (
+                      <IconMoon size={rem(16)} />
+                    )
+                  }
+                  onClick={toggleColorScheme}
+                >
+                  {computedColorScheme === "dark" ? "Light Mode" : "Dark Mode"}
+                </Menu.Item>
+                <Menu.Divider />
+                <Menu.Item
+                  leftSection={<IconLogout size={rem(16)} />}
+                  color="red"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
           ) : (
             <>
               <Button
@@ -132,44 +142,31 @@ function Header() {
               >
                 Register
               </Button>
+              <ActionIcon
+                onClick={toggleColorScheme}
+                variant="default"
+                size="lg"
+                aria-label="Toggle color scheme"
+              >
+                {computedColorScheme === "dark" ? (
+                  <IconSun size={rem(18)} />
+                ) : (
+                  <IconMoon size={rem(18)} />
+                )}
+              </ActionIcon>
             </>
           )}
-
-          <ActionIcon
-            onClick={toggleColorScheme}
-            variant="default"
-            size="lg"
-            aria-label="Toggle color scheme"
-          >
-            {computedColorScheme === "dark" ? (
-              <IconSun size={rem(18)} />
-            ) : (
-              <IconMoon size={rem(18)} />
-            )}
-          </ActionIcon>
         </Group>
 
         {/* Mobile Navigation */}
         <Group gap="xs" hiddenFrom="md">
-          <ActionIcon
-            onClick={toggleColorScheme}
-            variant="default"
-            size="lg"
-            aria-label="Toggle color scheme"
-          >
-            {computedColorScheme === "dark" ? (
-              <IconSun size={rem(18)} />
-            ) : (
-              <IconMoon size={rem(18)} />
-            )}
-          </ActionIcon>
-
-          <Menu shadow="md" width={200}>
+          <Menu shadow="md" width={220}>
             <Menu.Target>
               <Burger opened={opened} onClick={toggle} />
             </Menu.Target>
 
             <Menu.Dropdown>
+              <Menu.Label>Navigation</Menu.Label>
               <Menu.Item
                 leftSection={<IconChartBar size={rem(16)} />}
                 onClick={() => {
@@ -200,6 +197,7 @@ function Header() {
               <Menu.Divider />
               {user ? (
                 <>
+                  <Menu.Label>Account</Menu.Label>
                   <Menu.Item
                     leftSection={<IconDashboard size={rem(16)} />}
                     onClick={() => {
@@ -209,6 +207,35 @@ function Header() {
                   >
                     Dashboard
                   </Menu.Item>
+                  <Menu.Item
+                    leftSection={<IconUser size={rem(16)} />}
+                    onClick={() => {
+                      navigate("/dashboard");
+                      toggle();
+                    }}
+                  >
+                    Profile
+                  </Menu.Item>
+                  <Menu.Divider />
+                  <Menu.Label>Settings</Menu.Label>
+                  <Menu.Item
+                    leftSection={
+                      computedColorScheme === "dark" ? (
+                        <IconSun size={rem(16)} />
+                      ) : (
+                        <IconMoon size={rem(16)} />
+                      )
+                    }
+                    onClick={() => {
+                      toggleColorScheme();
+                      toggle();
+                    }}
+                  >
+                    {computedColorScheme === "dark"
+                      ? "Light Mode"
+                      : "Dark Mode"}
+                  </Menu.Item>
+                  <Menu.Divider />
                   <Menu.Item
                     leftSection={<IconLogout size={rem(16)} />}
                     color="red"
@@ -222,6 +249,7 @@ function Header() {
                 </>
               ) : (
                 <>
+                  <Menu.Label>Account</Menu.Label>
                   <Menu.Item
                     leftSection={<IconLogin size={rem(16)} />}
                     onClick={() => {
@@ -239,6 +267,25 @@ function Header() {
                     }}
                   >
                     Register
+                  </Menu.Item>
+                  <Menu.Divider />
+                  <Menu.Label>Settings</Menu.Label>
+                  <Menu.Item
+                    leftSection={
+                      computedColorScheme === "dark" ? (
+                        <IconSun size={rem(16)} />
+                      ) : (
+                        <IconMoon size={rem(16)} />
+                      )
+                    }
+                    onClick={() => {
+                      toggleColorScheme();
+                      toggle();
+                    }}
+                  >
+                    {computedColorScheme === "dark"
+                      ? "Light Mode"
+                      : "Dark Mode"}
                   </Menu.Item>
                 </>
               )}
