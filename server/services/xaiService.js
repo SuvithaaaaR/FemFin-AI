@@ -71,15 +71,39 @@ Focus on:
  * @param {Object} businessProfile - Business profile data
  * @returns {Promise<string>} - Fund recommendations
  */
-async function generateFundRecommendations(businessProfile) {
-  const prompt = `Recommend suitable funding sources for this business:
+async function generateFundRecommendations(
+  businessProfile,
+  fundCatalogContext = "",
+) {
+  const catalogSection = fundCatalogContext
+    ? `Use ONLY the following FemFin fund catalog entries when recommending matches. Reference the fund names exactly as provided and avoid inventing new programs.\n\n${fundCatalogContext}`
+    : "No catalog provided. Give general guidance but note that the live catalog is unavailable.";
+
+  const prompt = `You are FemFin AI, guiding women founders toward the best available funds. Analyze the applicant profile and recommend up to three funding options from the catalog.
+
+Applicant Profile:
 - Industry: ${businessProfile.industry || "Not specified"}
 - Stage: ${businessProfile.stage || "Not specified"}
-- Funding Amount Needed: $${businessProfile.fundingAmount || "Not specified"}
+- Funding Need: ₹${businessProfile.fundingAmount || "Not specified"}
 - Location: ${businessProfile.location || "Not specified"}
 - Business Model: ${businessProfile.businessModel || "Not specified"}
 
-Suggest specific grant programs, VCs, angel investors, or crowdfunding platforms that would be a good fit.`;
+${catalogSection}
+
+Response instructions:
+1. Recommend up to three funds from the catalog (no made-up names).
+2. For each, include Match Score (/100), why it fits, indicative funding window, and immediate next steps (application portal or documentation focus).
+3. Close with a short summary that reinforces the best next action.
+4. Format as:
+Recommendation 1: <Fund Name>
+- Match Score: xx/100
+- Why: ...
+- Funding Window: ...
+- Next Steps: ...
+
+Recommendation 2: ...
+
+Summary: ...`;
 
   return await generateGrokResponse(prompt);
 }

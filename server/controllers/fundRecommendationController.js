@@ -52,6 +52,26 @@ const analyzeFundRecommendations = (userData) => {
     });
   }
 
+  if (budgetRequired <= 2500000) {
+    recommendations.governmentSchemes.push({
+      name: "SBI Stree Shakti Package",
+      description:
+        "Women entrepreneur-focused SBI package for retail, services, professionals, and SSI segments.",
+      fundingRange: "50K - 25L",
+      timeline: "15-30 days",
+      matchScore: 97,
+      eligibility: [
+        "Minimum 51% women ownership",
+        "Business in retail/services/professional/SSI segment",
+        "MSME/Udyam and business documentation",
+      ],
+      applyNote:
+        "Apply at SBI branch or SBI SME loans portal with MSME registration and ownership proof.",
+      integrationPrompt:
+        "Retail/Service: 50K-2L, SSI/Professional: up to 25L, ensure 51% women ownership.",
+    });
+  }
+
   // Angel Investors
   if (budgetRequired >= 1000000 && budgetRequired <= 10000000) {
     recommendations.angelInvestors.push({
@@ -197,6 +217,7 @@ exports.getFundingSources = asyncHandler(async (req, res, next) => {
     governmentSchemes: [
       "Startup India Seed Fund",
       "MUDRA Loan Scheme",
+      "SBI Stree Shakti Package",
       "Stand Up India Scheme",
       "TREAD Scheme",
       "Women Entrepreneurship Platform",

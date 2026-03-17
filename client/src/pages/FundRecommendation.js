@@ -1,33 +1,33 @@
 import React, { useState } from "react";
 import {
-  Container,
-  Title,
-  Text,
+  Badge,
+  Button,
   Card,
+  Container,
+  Grid,
+  Group,
+  List,
+  NumberInput,
+  Paper,
+  Select,
   Stack,
+  Stepper,
+  Text,
   TextInput,
   Textarea,
-  Select,
-  NumberInput,
-  Button,
-  Grid,
-  Badge,
-  Group,
   ThemeIcon,
-  Stepper,
+  Title,
   rem,
-  Paper,
-  List,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import {
   IconBuildingBank,
-  IconUsers,
-  IconTrendingUp,
+  IconCheck,
   IconGift,
   IconSparkles,
-  IconCheck,
+  IconTrendingUp,
+  IconUsers,
 } from "@tabler/icons-react";
 import apiClient from "../services/api";
 
@@ -60,6 +60,7 @@ function FundRecommendation() {
           phone: values.phone.length === 10 ? null : "Phone must be 10 digits",
         };
       }
+
       if (active === 1) {
         return {
           businessIdea:
@@ -74,6 +75,7 @@ function FundRecommendation() {
             values.businessStage === null ? "Select business stage" : null,
         };
       }
+
       return {};
     },
   });
@@ -221,18 +223,10 @@ function FundRecommendation() {
                           </Badge>
                         </Group>
                         <List size="sm" spacing="xs">
-                          {item.eligibility?.map((criteria, i) => (
-                            <List.Item key={i}>{criteria}</List.Item>
+                          {item.eligibility?.map((criteria, itemIndex) => (
+                            <List.Item key={itemIndex}>{criteria}</List.Item>
                           ))}
                         </List>
-                        <Button
-                          variant="light"
-                          color={category.color}
-                          fullWidth
-                          mt="xs"
-                        >
-                          Apply Now
-                        </Button>
                       </Stack>
                     </Paper>
                   </Grid.Col>
@@ -263,7 +257,7 @@ function FundRecommendation() {
       <Stack gap="xl">
         <div>
           <Title order={1} mb="xs">
-            AI-Powered Fund Recommendations
+            AI Recommendation
           </Title>
           <Text c="dimmed" size="lg">
             Get personalized funding recommendations based on your business
@@ -272,114 +266,123 @@ function FundRecommendation() {
         </div>
 
         <Card shadow="lg" padding="xl" radius="md" withBorder>
-          <Stepper
-            active={active}
-            onStepClick={setActive}
-            allowNextStepsSelect={false}
-          >
-            <Stepper.Step label="Personal Info" description="Your details">
-              <Stack gap="md" mt="xl">
-                <TextInput
-                  label="Full Name"
-                  placeholder="Enter your full name"
-                  required
-                  {...form.getInputProps("fullName")}
-                />
-                <TextInput
-                  label="Email"
-                  placeholder="your.email@example.com"
-                  required
-                  {...form.getInputProps("email")}
-                />
-                <TextInput
-                  label="Phone Number"
-                  placeholder="10-digit mobile number"
-                  required
-                  maxLength={10}
-                  {...form.getInputProps("phone")}
-                />
-                <TextInput
-                  label="Location"
-                  placeholder="City, State"
-                  {...form.getInputProps("location")}
-                />
-              </Stack>
-            </Stepper.Step>
+          <Stack gap="md">
+            <div>
+              <Title order={3}>AI Recommendation</Title>
+              <Text c="dimmed" size="sm">
+                Fill in your business profile to get personalized fund matches
+              </Text>
+            </div>
 
-            <Stepper.Step label="Business Info" description="Your business">
-              <Stack gap="md" mt="xl">
-                <Textarea
-                  label="Business Idea"
-                  placeholder="Describe your business idea in detail..."
-                  required
-                  minRows={4}
-                  {...form.getInputProps("businessIdea")}
-                />
-                <NumberInput
-                  label="Budget Required"
-                  placeholder="Enter amount in INR"
-                  required
-                  min={0}
-                  prefix="₹ "
-                  thousandSeparator=","
-                  {...form.getInputProps("budgetRequired")}
-                />
-                <Select
-                  label="Industry Type"
-                  placeholder="Select your industry"
-                  required
-                  data={industryOptions}
-                  searchable
-                  {...form.getInputProps("industryType")}
-                />
-                <Select
-                  label="Business Stage"
-                  placeholder="Select your current stage"
-                  required
-                  data={businessStageOptions}
-                  {...form.getInputProps("businessStage")}
-                />
-                <NumberInput
-                  label="Years of Experience"
-                  placeholder="Your relevant experience"
-                  min={0}
-                  max={50}
-                  {...form.getInputProps("experience")}
-                />
-                <NumberInput
-                  label="Team Size"
-                  placeholder="Number of team members"
-                  min={1}
-                  {...form.getInputProps("teamSize")}
-                />
-              </Stack>
-            </Stepper.Step>
+            <Stepper
+              active={active}
+              onStepClick={setActive}
+              allowNextStepsSelect={false}
+            >
+              <Stepper.Step label="Personal Info" description="Your details">
+                <Stack gap="md" mt="xl">
+                  <TextInput
+                    label="Full Name"
+                    placeholder="Enter your full name"
+                    required
+                    {...form.getInputProps("fullName")}
+                  />
+                  <TextInput
+                    label="Email"
+                    placeholder="your.email@example.com"
+                    required
+                    {...form.getInputProps("email")}
+                  />
+                  <TextInput
+                    label="Phone Number"
+                    placeholder="10-digit mobile number"
+                    required
+                    maxLength={10}
+                    {...form.getInputProps("phone")}
+                  />
+                  <TextInput
+                    label="Location"
+                    placeholder="City, State"
+                    {...form.getInputProps("location")}
+                  />
+                </Stack>
+              </Stepper.Step>
 
-            <Stepper.Step label="Results" description="View recommendations">
-              {renderRecommendations()}
-            </Stepper.Step>
+              <Stepper.Step label="Business Info" description="Your business">
+                <Stack gap="md" mt="xl">
+                  <Textarea
+                    label="Business Idea"
+                    placeholder="Describe your business idea in detail..."
+                    required
+                    minRows={4}
+                    {...form.getInputProps("businessIdea")}
+                  />
+                  <NumberInput
+                    label="Budget Required"
+                    placeholder="Enter amount in INR"
+                    required
+                    min={0}
+                    prefix="₹ "
+                    thousandSeparator=","
+                    {...form.getInputProps("budgetRequired")}
+                  />
+                  <Select
+                    label="Industry Type"
+                    placeholder="Select your industry"
+                    required
+                    data={industryOptions}
+                    searchable
+                    {...form.getInputProps("industryType")}
+                  />
+                  <Select
+                    label="Business Stage"
+                    placeholder="Select your current stage"
+                    required
+                    data={businessStageOptions}
+                    {...form.getInputProps("businessStage")}
+                  />
+                  <NumberInput
+                    label="Years of Experience"
+                    placeholder="Your relevant experience"
+                    min={0}
+                    max={50}
+                    {...form.getInputProps("experience")}
+                  />
+                  <NumberInput
+                    label="Team Size"
+                    placeholder="Number of team members"
+                    min={1}
+                    {...form.getInputProps("teamSize")}
+                  />
+                </Stack>
+              </Stepper.Step>
 
-            <Stepper.Completed>{renderRecommendations()}</Stepper.Completed>
-          </Stepper>
+              <Stepper.Step label="Results" description="View recommendations">
+                {renderRecommendations()}
+              </Stepper.Step>
 
-          {active < 2 && (
-            <Group justify="space-between" mt="xl">
-              <Button
-                variant="default"
-                onClick={prevStep}
-                disabled={active === 0}
-              >
-                Back
-              </Button>
-              {active === 1 ? (
-                <Button onClick={handleSubmit} loading={loading}>
-                  Analyze & Get Recommendations
+              <Stepper.Completed>{renderRecommendations()}</Stepper.Completed>
+            </Stepper>
+
+            {active < 2 && (
+              <Group justify="space-between" mt="xl">
+                <Button
+                  variant="default"
+                  onClick={prevStep}
+                  disabled={active === 0}
+                >
+                  Back
                 </Button>
-              ) : (
-                <Button onClick={nextStep}>Next Step</Button>
-              )}
-            </Group>
-          )}
+                {active === 1 ? (
+                  <Button onClick={handleSubmit} loading={loading}>
+                    Analyze & Get Recommendations
+                  </Button>
+                ) : (
+                  <Button onClick={nextStep}>Next Step</Button>
+                )}
+              </Group>
+            )}
+          </Stack>
         </Card>
       </Stack>
     </Container>

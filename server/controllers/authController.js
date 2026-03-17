@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const User = require("../models/User");
 const { asyncHandler, ErrorResponse } = require("../middleware/errorHandler");
 

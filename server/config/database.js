@@ -1,28 +1,35 @@
 const mongoose = require("mongoose");
 
+let cachedConnection = null;
+let connectingPromise = null;
+
 const connectDB = async () => {
+  if (cachedConnection && cachedConnection.connection?.readyState === 1) {
+    return cachedConnection;
+  }
+
+  if (connectingPromise) {
+    return connectingPromise;
+  }
+
+  const uri = process.env.MONGODB_URI;
+
+  if (!uri) {
+    throw new Error(
+      "MONGODB_URI is not defined. Set it in server/.env before starting the API.",
+    );
+  }
+
   try {
-    const uri = process.env.MONGODB_URI;
-
-    if (!uri) {
-      console.log(
-        "⚠️  MongoDB URI not found in environment variables. Skipping database connection.",
-      );
-      console.log(
-        "   The app will run without database functionality. Add MONGODB_URI to .env to enable database.",
-      );
-      return null;
-    }
-
-    const conn = await mongoose.connect(uri, {
+    connectingPromise = mongoose.connect(uri, {
       // Options for mongoose 6.x+
-      // useNewUrlParser and useUnifiedTopology are no longer needed
     });
 
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-    console.log(`📊 Database: ${conn.connection.name}`);
+    cachedConnection = await connectingPromise;
 
-    // Handle connection events
+    console.log(`✅ MongoDB Connected: ${cachedConnection.connection.host}`);
+    console.log(`📊 Database: ${cachedConnection.connection.name}`);
+
     mongoose.connection.on("error", (err) => {
       console.error(`❌ MongoDB connection error: ${err}`);
     });
@@ -31,19 +38,16 @@ const connectDB = async () => {
       console.log("⚠️  MongoDB disconnected");
     });
 
-    // Graceful shutdown
     process.on("SIGINT", async () => {
       await mongoose.connection.close();
       console.log("MongoDB connection closed through app termination");
       process.exit(0);
     });
 
-    return conn;
+    return cachedConnection;
   } catch (error) {
-    console.error(`❌ Error connecting to MongoDB: ${error.message}`);
-    console.log("   The app will continue without database functionality.");
-    console.log(`   Please check your MONGODB_URI in .env file`);
-    return null;
+    connectingPromise = null;
+    throw new Error(`Failed to connect to MongoDB: ${error.message}`);
   }
 };
 

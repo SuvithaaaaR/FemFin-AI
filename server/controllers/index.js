@@ -4,4 +4,7 @@ module.exports = {
   fundRecommendation: require("./fundRecommendationController"),
   crowdfunding: require("./crowdfundingController"),
   creditScoring: require("./creditScoringController"),
+  fund: require("./fundController"),
+  ai: require("./aiController"),
+  sentiment: require("./sentimentController"),
 };

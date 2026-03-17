@@ -15,6 +15,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { useNavigate } from "react-router-dom";
 import {
   IconChartBar,
+  IconChevronDown,
   IconCoins,
   IconCreditCard,
   IconDashboard,
@@ -54,13 +55,39 @@ function Header() {
 
         {/* Desktop Navigation */}
         <Group gap="xs" visibleFrom="md">
-          <Button
-            variant="subtle"
-            leftSection={<IconChartBar size={rem(16)} />}
-            onClick={() => navigate("/fund-recommendation")}
-          >
-            Funds
-          </Button>
+          <Menu shadow="md" width={240} position="bottom-start">
+            <Menu.Target>
+              <Button
+                variant="subtle"
+                leftSection={<IconChartBar size={rem(16)} />}
+                rightSection={<IconChevronDown size={rem(14)} />}
+              >
+                Fund
+              </Button>
+            </Menu.Target>
+
+            <Menu.Dropdown>
+              <Menu.Label>Fund</Menu.Label>
+              <Menu.Item
+                leftSection={<IconChartBar size={rem(16)} />}
+                onClick={() => navigate("/fund-details")}
+              >
+                Fund Details
+              </Menu.Item>
+              <Menu.Item
+                leftSection={<IconChartBar size={rem(16)} />}
+                onClick={() => navigate("/apply-fund")}
+              >
+                Apply Fund
+              </Menu.Item>
+              <Menu.Item
+                leftSection={<IconChartBar size={rem(16)} />}
+                onClick={() => navigate("/fund-recommendation")}
+              >
+                AI Recommendation
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
 
           <Button
             variant="subtle"
@@ -167,6 +194,25 @@ function Header() {
 
             <Menu.Dropdown>
               <Menu.Label>Navigation</Menu.Label>
+              <Menu.Label>Fund</Menu.Label>
+              <Menu.Item
+                leftSection={<IconChartBar size={rem(16)} />}
+                onClick={() => {
+                  navigate("/fund-details");
+                  toggle();
+                }}
+              >
+                Fund Details
+              </Menu.Item>
+              <Menu.Item
+                leftSection={<IconChartBar size={rem(16)} />}
+                onClick={() => {
+                  navigate("/apply-fund");
+                  toggle();
+                }}
+              >
+                Apply Fund
+              </Menu.Item>
               <Menu.Item
                 leftSection={<IconChartBar size={rem(16)} />}
                 onClick={() => {
@@ -174,8 +220,9 @@ function Header() {
                   toggle();
                 }}
               >
-                Fund Recommendations
+                AI Recommendation
               </Menu.Item>
+              <Menu.Divider />
               <Menu.Item
                 leftSection={<IconCoins size={rem(16)} />}
                 onClick={() => {

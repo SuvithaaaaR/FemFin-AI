@@ -4,6 +4,8 @@ import { AppShell, Container } from "@mantine/core";
 import Header from "./components/Layout/Header";
 import ProtectedRoute from "./components/ProtectedRoute";
 import HomePage from "./pages/HomePage";
+import FundDetails from "./pages/FundDetails";
+import ApplyFund from "./pages/ApplyFund";
 import FundRecommendation from "./pages/FundRecommendation";
 import Crowdfunding from "./pages/Crowdfunding";
 import CreditScoring from "./pages/CreditScoring";
@@ -25,6 +27,22 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
+              <Route
+                path="/fund-details"
+                element={
+                  <ProtectedRoute>
+                    <FundDetails />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/apply-fund"
+                element={
+                  <ProtectedRoute>
+                    <ApplyFund />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/fund-recommendation"
                 element={

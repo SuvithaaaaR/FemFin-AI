@@ -1,5 +1,99 @@
 const { asyncHandler } = require("../middleware/errorHandler");
+const { Fund } = require("../models");
+const { FALLBACK_FUNDS } = require("../data/fundCatalog");
 const xaiService = require("../services/xaiService");
+
+const INR_FORMATTER = new Intl.NumberFormat("en-IN", {
+  maximumFractionDigits: 0,
+});
+
+const formatInr = (value) => {
+  if (typeof value !== "number" || Number.isNaN(value)) {
+    return null;
+  }
+  return `₹${INR_FORMATTER.format(value)}`;
+};
+
+const formatFundingRange = (fund) => {
+  const min =
+    fund?.fundingRange?.min ??
+    fund?.loanQuantum?.compositeLoanMin ??
+    fund?.loanQuantum?.manufacturingMax ??
+    fund?.amount;
+  const max =
+    fund?.fundingRange?.max ??
+    fund?.loanQuantum?.compositeLoanMax ??
+    fund?.loanQuantum?.manufacturingMax ??
+    fund?.amount;
+
+  if (min && max) {
+    return `${formatInr(min) || min} - ${formatInr(max) || max}`;
+  }
+
+  if (max) {
+    return `Up to ${formatInr(max) || max}`;
+  }
+
+  if (min) {
+    return `From ${formatInr(min) || min}`;
+  }
+
+  return "Not specified";
+};
+
+const sanitizeFundsForPrompt = (funds, limit = 12) =>
+  funds
+    .map((fund) =>
+      typeof fund?.toObject === "function" ? fund.toObject() : fund,
+    )
+    .map((fund) => ({
+      name: fund.name || fund.title,
+      category: fund.category,
+      description: fund.description,
+      fundingRangeText: formatFundingRange(fund),
+      industries: fund.industryFocus,
+      stages: fund.businessStageApplicable,
+      eligibility: fund.eligibility || fund.beneficiaries,
+      timeline:
+        fund.timeline || fund.repaymentPeriod || fund.loanTimeline || "N/A",
+      targetAudience: fund.targetAudience,
+      applicationLink: fund.applicationLink || fund.portal?.url,
+    }))
+    .filter((fund) => Boolean(fund.name))
+    .slice(0, limit);
+
+const buildFundCatalogContext = (funds) =>
+  funds
+    .map((fund, index) => {
+      const eligibility = Array.isArray(fund.eligibility)
+        ? fund.eligibility.slice(0, 3).join("; ")
+        : fund.eligibility || "Eligibility not specified";
+      const industries = Array.isArray(fund.industries)
+        ? fund.industries.join(", ")
+        : fund.industries || "All";
+      const stages = Array.isArray(fund.stages)
+        ? fund.stages.join(", ")
+        : fund.stages || "All";
+      return `${index + 1}. ${fund.name} [${fund.category || "General"}] - Funding: ${fund.fundingRangeText}. Industries: ${industries}. Stages: ${stages}. Timeline: ${fund.timeline}. Eligibility: ${eligibility}. Summary: ${fund.description || "No description"}.`;
+    })
+    .join("\n");
+
+const fetchFundCatalogSnapshot = async (limit = 12) => {
+  try {
+    const liveFunds = await Fund.find({ status: "Active" })
+      .sort({ updatedAt: -1 })
+      .limit(limit)
+      .lean();
+
+    if (liveFunds.length) {
+      return liveFunds;
+    }
+  } catch (error) {
+    console.warn("AI fund catalog fallback used due to DB issue:", error);
+  }
+
+  return FALLBACK_FUNDS.slice(0, limit);
+};
 
 /**
  * @desc    Get financial advice from Grok AI
@@ -70,12 +164,19 @@ exports.getFundRecommendations = asyncHandler(async (req, res) => {
     businessModel,
   };
 
-  const recommendations =
-    await xaiService.generateFundRecommendations(businessProfile);
+  const availableFunds = await fetchFundCatalogSnapshot(12);
+  const fundSnapshot = sanitizeFundsForPrompt(availableFunds, 12);
+  const catalogContext = buildFundCatalogContext(fundSnapshot);
+
+  const recommendations = await xaiService.generateFundRecommendations(
+    businessProfile,
+    catalogContext,
+  );
 
   res.status(200).json({
     success: true,
     data: recommendations,
+    context: fundSnapshot,
   });
 });
 

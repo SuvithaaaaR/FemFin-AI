@@ -18,9 +18,6 @@ dotenv.config();
 // Initialize express app
 const app = express();
 
-// Connect to database (optional)
-connectDB();
-
 // CORS configuration
 const corsOptions = {
   origin: process.env.CLIENT_URL || "http://localhost:3000",
@@ -54,6 +51,7 @@ const crowdfundingRoutes = require("./routes/crowdfunding");
 const creditScoringRoutes = require("./routes/creditScoring");
 const aiRoutes = require("./routes/ai");
 const sentimentRoutes = require("./routes/sentiment");
+const fundRoutes = require("./routes/funds");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/fund-recommendations", fundRecommendationRoutes);
@@ -61,6 +59,7 @@ app.use("/api/crowdfunding", crowdfundingRoutes);
 app.use("/api/credit-scoring", creditScoringRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/sentiment", sentimentRoutes);
+app.use("/api/funds", fundRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {
@@ -93,6 +92,15 @@ app.get("/api", (req, res) => {
       fundRecommendations: {
         analyze: "POST /api/fund-recommendations/analyze",
         sources: "GET /api/fund-recommendations/sources",
+      },
+      funds: {
+        getAll: "GET /api/funds",
+        getById: "GET /api/funds/:id",
+        create: "POST /api/funds",
+        update: "PUT /api/funds/:id",
+        delete: "DELETE /api/funds/:id",
+        categories: "GET /api/funds/categories",
+        seed: "POST /api/funds/seed",
       },
       crowdfunding: {
         getCampaigns: "GET /api/crowdfunding/campaigns",
@@ -135,10 +143,24 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`🚀 FemFin AI Server running on port ${PORT}`);
-  console.log(`📍 Health check: http://localhost:${PORT}/api/health`);
-  console.log(`📚 API documentation: http://localhost:${PORT}/api`);
-});
+const startServer = async () => {
+  try {
+    await connectDB();
+
+    app.listen(PORT, () => {
+      console.log(`🚀 FemFin AI Server running on port ${PORT}`);
+      console.log(`📍 Health check: http://localhost:${PORT}/api/health`);
+      console.log(`📚 API documentation: http://localhost:${PORT}/api`);
+    });
+  } catch (error) {
+    console.error("❌ Unable to start server: ", error.message);
+    console.error(
+      "   Ensure MongoDB is reachable and MONGODB_URI is configured.",
+    );
+    process.exit(1);
+  }
+};
+
+startServer();
 
 module.exports = app;
