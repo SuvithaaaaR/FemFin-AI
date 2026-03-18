@@ -223,8 +223,16 @@ function FundRecommendation() {
                           </Badge>
                         </Group>
                         {item.comparisonText && (
-                          <Paper p="xs" bg="gray.0" style={{ borderLeft: `3px solid var(--mantine-color-${category.color}-filled)` }}>
-                            <Text size="xs" fw={500} c="dimmed">Comparison to your profile:</Text>
+                          <Paper
+                            p="xs"
+                            bg="gray.0"
+                            style={{
+                              borderLeft: `3px solid var(--mantine-color-${category.color}-filled)`,
+                            }}
+                          >
+                            <Text size="xs" fw={500} c="dimmed">
+                              Comparison to your profile:
+                            </Text>
                             <Text size="sm">{item.comparisonText}</Text>
                           </Paper>
                         )}
