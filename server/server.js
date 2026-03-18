@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const dotenv = require("dotenv");
+const path = require("path");
 const connectDB = require("./config/database");
 const {
   errorHandler,
@@ -13,7 +14,7 @@ const {
 } = require("./middleware");
 
 // Load environment variables
-dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, ".env") });
 
 // Initialize express app
 const app = express();
