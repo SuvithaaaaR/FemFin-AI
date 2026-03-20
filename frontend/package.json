@@ -2,7 +2,7 @@
   "name": "femfin-frontend",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://suvithaaaar.github.io/FemFin-AI",
+  "homepage": "https://femfin.app",
   "dependencies": {
     "@mantine/core": "^7.5.0",
     "@mantine/form": "^7.5.0",
