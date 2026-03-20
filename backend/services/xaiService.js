@@ -12,7 +12,7 @@ const xai = createXai({
   apiKey: RESOLVED_XAI_API_KEY,
 });
 
-const AI_PROVIDER = (process.env.AI_PROVIDER || "ollama").toLowerCase();
+const AI_PROVIDER = (process.env.AI_PROVIDER || "auto").toLowerCase();
 const OLLAMA_URL = process.env.OLLAMA_URL || "http://127.0.0.1:11434";
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "llama3.1:8b";
 const DEFAULT_MODEL = process.env.XAI_MODEL || "grok-2-latest";
