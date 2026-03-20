@@ -593,12 +593,31 @@ function PitchDeckPage() {
 
       if (useGrokEnhancement) {
         let aiReady = true;
+        let ollamaActive = false;
         try {
           const statusResponse = await apiClient.get("/ai/status");
-          aiReady = Boolean(statusResponse.data?.data?.ready);
+          const statusData = statusResponse.data?.data || {};
+          aiReady = Boolean(statusData.ready);
+          ollamaActive = statusData.activeProvider === "ollama";
+
+          if (!ollamaActive) {
+            aiReady = false;
+            notifications.show({
+              title: "Ollama not active",
+              message:
+                "Connected backend is not using Ollama. Point the app to your local backend where /api/ai/status shows activeProvider=ollama.",
+              color: "red",
+            });
+          }
         } catch (error) {
-          // If status endpoint is unavailable on an older backend, still try AI query.
-          aiReady = true;
+          // Require explicit status when Ollama-only enhancement is enabled.
+          aiReady = false;
+          notifications.show({
+            title: "AI status unavailable",
+            message:
+              "Could not verify backend AI status. Ensure local backend is running and Ollama is active.",
+            color: "red",
+          });
         }
 
         const prompt = `You are a top-tier venture fundraising strategist and market analyst. Rewrite this 12-slide pitch deck so it reads like a real institutional-grade investor deck.
@@ -644,7 +663,7 @@ Output schema:
   ]
 }`;
 
-        if (aiReady) {
+        if (aiReady && ollamaActive) {
           try {
             const response = await apiClient.post(
               "/ai/query",
@@ -686,9 +705,9 @@ Output schema:
               });
 
               notifications.show({
-                title: "Grok Enhanced",
+                title: "Ollama Enhanced",
                 message:
-                  "Slides were deeply enriched with Grok investor-grade analysis.",
+                  "Slides were deeply enriched with Ollama investor-grade analysis.",
                 color: "grape",
               });
             } else {
@@ -710,6 +729,13 @@ Output schema:
               color: "yellow",
             });
           }
+        } else if (!ollamaActive) {
+          notifications.show({
+            title: "Using local template",
+            message:
+              "Ollama enhancement skipped because active backend provider is not Ollama.",
+            color: "yellow",
+          });
         } else {
           notifications.show({
             title: "AI not configured",

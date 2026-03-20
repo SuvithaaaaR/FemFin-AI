@@ -21,9 +21,9 @@ services:
       - key: CLIENT_URL
         value: https://femfin.app
       - key: AI_PROVIDER
-        value: grok
+        value: auto
       - key: XAI_MODEL
-        value: grok-beta
+        value: grok-2-latest
       - key: AI_TIMEOUT_MS
         value: 120000
       - key: XAI_API_KEY
