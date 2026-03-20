@@ -69,6 +69,41 @@ const normalizeText = (value, fallback) => {
   return trimmed || fallback;
 };
 
+const normalizeNumericSeries = (series = []) =>
+  series
+    .map((item) => {
+      const label =
+        typeof item?.label === "string" ? item.label.trim() : String(item?.label || "").trim();
+      const value = Number(item?.value);
+
+      if (!label || Number.isNaN(value)) {
+        return null;
+      }
+
+      return { label, value };
+    })
+    .filter(Boolean)
+    .slice(0, 6);
+
+const normalizeChartData = (chartData) => {
+  if (!chartData || typeof chartData !== "object") {
+    return null;
+  }
+
+  const title =
+    typeof chartData.title === "string" && chartData.title.trim()
+      ? chartData.title.trim()
+      : "Key Metrics";
+  const type = chartData.type === "line" ? "line" : "bar";
+  const series = normalizeNumericSeries(chartData.series || []);
+
+  if (!series.length) {
+    return null;
+  }
+
+  return { title, type, series };
+};
+
 const parseJsonFromResponse = (rawText) => {
   if (!rawText || typeof rawText !== "string") {
     return null;
@@ -293,7 +328,7 @@ function PitchDeckPage() {
     };
   };
 
-  const buildSlidePoints = (title) => {
+  const buildSlidePayload = (title) => {
     const industryStoryIndexMap = {
       agritech: 0,
       social: 1,
@@ -341,89 +376,191 @@ function PitchDeckPage() {
       formValues.traction,
       "Pilot traction details not provided",
     );
-    const taglineText = normalizeText(
-      formValues.tagline,
-      "Building high-impact outcomes with a women-led execution engine",
-    );
+
+    const marketSeries = [
+      { label: "TAM", value: 100 },
+      { label: "SAM", value: 22 },
+      { label: "SOM Yr3", value: 2.5 },
+    ];
+
+    const revenueSeries = [
+      { label: "Year 1", value: year1Revenue },
+      { label: "Year 2", value: year2Revenue },
+      { label: "Year 3", value: year3Revenue },
+    ];
+
+    const useOfFundsSeries = [
+      { label: "Product", value: 45 },
+      { label: "GTM", value: 35 },
+      { label: "Ops+Talent", value: 20 },
+    ];
 
     const map = {
-      Cover: [
-        companyName,
-        taglineText,
-        `Industry (as entered): ${normalizeText(formValues.industry, "Not provided")}`,
-        `Funding ask (as entered): ${askLabel}`,
-        `One-line pitch: ${solutionNarrative}`,
-        `Contact (as entered): ${contactText}`,
-      ],
-      Problem: [
-        `Problem statement (as entered): ${problemText}`,
-        `${industryInsight.tnLoss} lost annually in this segment in Tamil Nadu alone`,
-        "Current alternatives are fragmented, manual, and too slow for high-frequency decisions",
-        "Women-led MSMEs face an additional trust and access gap in early-stage capital",
-      ],
-      Solution: [
-        `Solution statement (as entered): ${solutionNarrative}`,
-        "Product stack: data capture, intelligence layer, and decision dashboard in one workflow",
-        "Designed for fast onboarding with low training overhead and clear ROI tracking",
-        "Defensibility comes from localized data, implementation playbooks, and network effects",
-      ],
-      Market: [
-        `TAM: ${industryInsight.market}`,
-        `SAM: 22% of TAM reachable through regional category focus and partner channels`,
-        `SOM (3-year target): 2.5% of SAM with phased execution across top districts`,
-        `Market context: ${formValues.marketInsight || `${industryInsight.market} opportunity with measurable demand-side urgency`}`,
-      ],
-      "Business Model": [
-        "Revenue model: subscription + onboarding + premium analytics",
-        "Indicative pricing: core SaaS around Rs 5,000/month/customer with annual plans",
-        "Expansion revenue from enterprise integrations and workflow automation modules",
-        "Unit economics focus: strong gross margin with scalable implementation operations",
-      ],
-      Traction: [
-        `Live traction (as entered): ${tractionText}`,
-        "Pipeline includes channel-led deals with institutional and ecosystem partners",
-        "Early customer feedback indicates measurable productivity and cost improvement",
-        "Execution cadence: pilot-to-paid conversion framework with quarterly expansion targets",
-      ],
-      Competition: [
-        "Competitive set includes legacy manual operators and horizontal software tools",
-        "Our positioning: high local relevance, faster deployment, and outcomes-first onboarding",
-        "2x2 advantage: affordability + measurable ROI + founder-driven customer success",
-        "Switching moat grows with proprietary workflow data and partner integrations",
-      ],
-      "Go-to-Market": [
-        "Primary channels: women entrepreneur networks, district business communities, and ecosystem partnerships",
-        "Geographic strategy: start with Tamil Nadu clusters, then replicate via playbook-led expansion",
-        "Demand engine: demos, partner-led onboarding, and high-trust founder storytelling",
-        `Investor access via curated introductions to ${investors}`,
-      ],
-      Team: [
-        `Founder thesis (as entered): ${teamText}`,
-        "Core team capability spans product, operations, and market development",
-        "Advisory support planned across finance, sector strategy, and institutional growth",
-        "Execution style: data-driven weekly review cadence and milestone-led governance",
-      ],
-      Financials: [
-        `Year 1 projected revenue: ${formatInr(year1Revenue)}`,
-        `Year 2 projected revenue: ${formatInr(year2Revenue)}`,
-        `Year 3 projected revenue: ${formatInr(year3Revenue)}`,
-        `Planned monthly burn: ${formatInr(monthlyBurn)} | Runway: ~${runwayMonths} months on current ask`,
-      ],
-      Ask: [
-        `Fundraise ask (as entered): ${askLabel}`,
-        "Use of funds: product and platform 45%, go-to-market 35%, operations and talent 20%",
-        "Target outcome in 18 months: scale pilots, improve conversion, and institutionalize repeatable growth",
-        "Investor proposition: efficient capital deployment with milestone-based de-risking",
-      ],
-      "Contact / Thank You": [
-        `Target investors: ${investors}`,
-        `Founder story signal: ${story}`,
-        "We are building a category-defining, women-led company with scalable execution discipline",
-        `Reach us (as entered): ${contactText}`,
-      ],
+      Cover: {
+        points: [
+          `${companyName} is positioned as a high-conviction ${normalizeText(formValues.industry, "technology-enabled")} venture designed to solve a large, recurring, and measurable business pain point in India.`,
+          `Core proposition: ${solutionNarrative}. This directly addresses the founder-identified problem: ${problemText}.`,
+          `Fundraise target: ${askLabel}. Capital is intended to accelerate product readiness, commercial execution, and repeatable growth systems with disciplined governance.`,
+          `Investment thesis: a women-led execution team, clear regional wedge, and scalable operating playbooks that reduce go-to-market uncertainty in early expansion cycles.`,
+          `Contact: ${contactText}.`,
+        ],
+      },
+      Problem: {
+        points: [
+          `Primary pain point: ${problemText}.`,
+          `Market inefficiency signal: ${industryInsight.tnLoss} in economic value is impacted annually in the target context, indicating urgency and budget availability for better solutions.`,
+          "Legacy options are fragmented and operationally slow, which increases decision lag, avoidable loss, and inconsistent quality outcomes for customers and channel partners.",
+          "Women founders also face trust and access friction in early commercialization, making structured, data-backed execution an important competitive advantage.",
+          "Without intervention, customers continue to incur hidden costs in rework, delayed action, and missed revenue opportunities; this creates a strong willingness-to-pay dynamic.",
+        ],
+      },
+      Solution: {
+        points: [
+          `Solution architecture: ${solutionNarrative}.`,
+          "Product stack combines structured data capture, insight generation, and operator-friendly dashboards to enable faster and higher-quality decisions at the point of execution.",
+          "Deployment model prioritizes low onboarding friction, regionally adapted workflows, and measurable KPI tracking from day one to improve adoption and retention outcomes.",
+          "Differentiation is built through domain-specific data loops, implementation templates, and continuously improving recommendations that compound over time.",
+          "The roadmap supports modular expansion so enterprise clients can start with a focused use-case and scale adoption across adjacent operational functions.",
+        ],
+      },
+      Market: {
+        points: [
+          `Top-down opportunity sizing: ${industryInsight.market} TAM with staged penetration through a focused SAM and pragmatic SOM trajectory.`,
+          "Execution model assumes concentrated district-level entry, partner-led trust building, and category-specific messaging to shorten sales cycles in early geographies.",
+          "SAM planning uses operationally reachable customer clusters and prioritized vertical segments where pain intensity and budget alignment are both high.",
+          "Three-year SOM target is conservative by design, with growth driven by repeatable acquisition channels and improving conversion/retention economics.",
+          `Market context note: ${formValues.marketInsight || `${industryInsight.market} with sustained structural demand signals`}.`,
+        ],
+        chartData: {
+          title: "Market Funnel (Indexed)",
+          type: "bar",
+          series: marketSeries,
+        },
+      },
+      "Business Model": {
+        points: [
+          "Revenue architecture blends recurring subscription, onboarding services, and higher-value premium analytics modules for enterprise and growth-stage customers.",
+          "Pricing strategy is designed to be affordable for first adoption while preserving expansion headroom through volume, feature, and workflow depth upgrades.",
+          "Unit economics improve as implementation playbooks mature, reducing support intensity and increasing gross margin contribution across each additional customer cohort.",
+          "Sales model combines direct founder-led enterprise closes in early stages with channel-assisted acquisition to scale coverage efficiently.",
+          "Retention strategy is outcome-led: customers continue because the platform improves measurable business KPIs, not because of short-term discounts.",
+        ],
+      },
+      Traction: {
+        points: [
+          `Current traction signal: ${tractionText}.`,
+          `Category validation: ${story}`,
+          "Pipeline quality has improved through warm ecosystem introductions and problem-first positioning, enabling higher-probability conversations with decision-makers.",
+          "Early usage feedback indicates quantifiable productivity and cost improvements, supporting stronger case studies for enterprise and partner distribution.",
+          "Execution cadence emphasizes milestone tracking, weekly metric reviews, and tight founder involvement to accelerate pilot-to-paid conversion learning cycles.",
+        ],
+      },
+      Competition: {
+        points: [
+          "Competitive landscape includes legacy manual workflows, generic software tools, and emerging vertical operators with limited local execution depth.",
+          "Positioning advantage: tailored domain relevance, faster implementation timelines, and measurable ROI communication that resonates with budget owners.",
+          "Strategic moat compounds through proprietary workflow data, contextual recommendations, and implementation know-how embedded into operating playbooks.",
+          "Our comparative edge is strongest where customers need reliability and measurable outcomes rather than feature-heavy but operationally shallow alternatives.",
+          "Defensive strategy includes customer success rigor, partner ecosystems, and staged product depth that increases switching friction over time.",
+        ],
+      },
+      "Go-to-Market": {
+        points: [
+          "Primary channels: women founder networks, district entrepreneurship ecosystems, and targeted institutional partnerships with high-trust community anchors.",
+          "Geographic sequencing starts with high-intensity Tamil Nadu clusters, followed by replication to similar demand pockets using proven onboarding and conversion playbooks.",
+          "Demand generation combines demos, founder storytelling, and problem economics content to establish urgency and shorten time-to-value in sales cycles.",
+          `Investor and ecosystem bridge opportunities include: ${investors}.`,
+          "Distribution strategy is phased: founder-led precision first, partner-assisted scale second, and operational automation third for sustainable expansion economics.",
+        ],
+      },
+      Team: {
+        points: [
+          `Team narrative: ${teamText}.`,
+          "Leadership combines domain expertise with execution discipline, creating strong alignment between product priorities, field realities, and commercial outcomes.",
+          "Advisory depth is intentionally structured around finance, sector strategy, and institutional partnerships to improve strategic decision quality during scale-up.",
+          "Operating model uses data-led governance with clear weekly, monthly, and quarterly accountability metrics across product, growth, and customer success.",
+          "The team is designed for speed and learning velocity, enabling rapid iteration without compromising quality, compliance, or customer trust.",
+        ],
+      },
+      Financials: {
+        points: [
+          `Projected revenue trajectory: Year 1 ${formatInr(year1Revenue)}, Year 2 ${formatInr(year2Revenue)}, Year 3 ${formatInr(year3Revenue)}.`,
+          `Cost discipline baseline: monthly burn around ${formatInr(monthlyBurn)} with approximately ${runwayMonths} months runway at the current ask level.`,
+          "Growth assumptions are milestone-based and tied to conversion, retention, and channel productivity improvements rather than aggressive top-line optimism.",
+          "Capital efficiency strategy prioritizes revenue-critical product milestones, repeatable acquisition loops, and early signals of contribution margin resilience.",
+          "The model is built to demonstrate de-risking over time through stronger customer cohorts, lower acquisition friction, and better unit economics visibility.",
+        ],
+        chartData: {
+          title: "Projected Revenue Growth",
+          type: "bar",
+          series: revenueSeries,
+        },
+      },
+      Ask: {
+        points: [
+          `Raise objective: ${askLabel}.`,
+          "Proposed allocation is milestone-led with clear accountability: product and platform scale-up, go-to-market acceleration, and operating foundation build-out.",
+          "Use-of-funds is sequenced to maximize investor capital efficiency: first de-risk product adoption, then scale distribution, then strengthen operating resilience.",
+          "Target 18-month outcomes include expanded pilot conversion, improved retention economics, and stronger institutional credibility for follow-on capital.",
+          "Investor value proposition combines measurable progress checkpoints, transparent reporting cadence, and disciplined founder-led execution.",
+        ],
+        chartData: {
+          title: "Use of Funds (%)",
+          type: "bar",
+          series: useOfFundsSeries,
+        },
+      },
+      "Contact / Thank You": {
+        points: [
+          `Priority investor profiles include networks aligned to this stage and thesis, such as: ${investors}.`,
+          "Next-step ask: strategic investor conversations focused on milestone-fit, sector network leverage, and operating support beyond capital.",
+          "We are building a category-defining, women-led company with disciplined execution, measurable impact, and scalable growth architecture.",
+          `Founder contact: ${contactText}.`,
+          "Thank you for reviewing this deck. We welcome diligence discussions, customer evidence walkthroughs, and milestone-specific funding alignment conversations.",
+        ],
+      },
     };
 
-    return map[title] || ["Data not available"];
+    return map[title] || { points: ["Data not available"] };
+  };
+
+  const validateEnhancedSlides = (aiSlides, baseSlides) => {
+    if (!Array.isArray(aiSlides) || aiSlides.length !== baseSlides.length) {
+      return false;
+    }
+
+    const byTitle = new Map(aiSlides.map((slide) => [slide?.title, slide]));
+    const requiredTitles = baseSlides.map((slide) => slide.title);
+
+    for (const title of requiredTitles) {
+      const candidate = byTitle.get(title);
+      if (!candidate) {
+        return false;
+      }
+
+      const points = Array.isArray(candidate.points)
+        ? candidate.points
+            .map((point) => (typeof point === "string" ? point.trim() : ""))
+            .filter(Boolean)
+        : [];
+
+      if (points.length < 6) {
+        return false;
+      }
+
+      const longPoints = points.filter((point) => point.length >= 45);
+      if (longPoints.length < 4) {
+        return false;
+      }
+    }
+
+    const cover = byTitle.get("Cover");
+    const coverText = (cover?.points || []).join(" ").toLowerCase();
+    if (!coverText.includes((formValues.companyName || "").toLowerCase())) {
+      return false;
+    }
+
+    return true;
   };
 
   const handleGenerate = async () => {
@@ -449,13 +586,13 @@ function PitchDeckPage() {
       const baseSlides = template.slides.map((slide) => ({
         id: slide.id,
         title: slide.title,
-        points: buildSlidePoints(slide.title),
+        ...buildSlidePayload(slide.title),
       }));
 
       let slides = baseSlides;
 
       if (useGrokEnhancement) {
-        const prompt = `You are a startup fundraising expert. Improve this 12-slide pitch deck for investor quality while staying accurate to the provided founder inputs.
+        const prompt = `You are a top-tier venture fundraising strategist and market analyst. Rewrite this 12-slide pitch deck so it reads like a real institutional-grade investor deck.
 
 Founder Inputs (must preserve):
 - Company Name: ${formValues.companyName}
@@ -473,9 +610,14 @@ ${JSON.stringify(baseSlides, null, 2)}
 Rules:
 1. Return JSON only.
 2. Keep exactly 12 slides with same id and title.
-3. For each slide, provide 4 to 6 concise bullet points.
-4. Do not invent contradictory facts; if unknown, state assumption clearly.
-5. Keep bullets professional and investor-friendly.
+3. For each slide, provide 7 to 10 high-quality, investor-facing bullet points (not short one-liners).
+4. Every slide must include deep analysis, quantified framing, and strategic rationale.
+5. Use latest publicly available India startup ecosystem patterns and benchmarks where relevant; if a number is uncertain, mark it clearly as "assumption".
+6. Add source cues in bullet text such as "industry benchmark" or "public startup reports" when using external-style analysis.
+7. Keep all content aligned with founder inputs; no contradictions.
+8. Include chartData for these titles only when useful: Market, Financials, Ask.
+9. chartData schema must be: {"title":"...","type":"bar","series":[{"label":"...","value":123}]}
+10. Keep charts to max 6 data points.
 
 Output schema:
 {
@@ -483,7 +625,12 @@ Output schema:
     {
       "id": 1,
       "title": "Cover",
-      "points": ["...", "..."]
+      "points": ["...", "..."],
+      "chartData": {
+        "title": "optional",
+        "type": "bar",
+        "series": [{ "label": "...", "value": 1 }]
+      }
     }
   ]
 }`;
@@ -492,12 +639,14 @@ Output schema:
           const response = await apiClient.post("/ai/query", {
             prompt,
             model: "grok-beta",
+            maxTokens: 2800,
+            temperature: 0.55,
           });
 
           const parsed = parseJsonFromResponse(response.data?.data);
           const aiSlides = Array.isArray(parsed?.slides) ? parsed.slides : [];
 
-          if (aiSlides.length === baseSlides.length) {
+          if (validateEnhancedSlides(aiSlides, baseSlides)) {
             const aiByTitle = new Map(
               aiSlides.map((slide) => [slide.title, slide]),
             );
@@ -509,26 +658,28 @@ Output schema:
                       typeof point === "string" ? point.trim() : "",
                     )
                     .filter(Boolean)
-                    .slice(0, 6)
+                    .slice(0, 10)
                 : [];
+              const aiChartData = normalizeChartData(aiSlide?.chartData);
 
               return {
                 ...slide,
                 points: aiPoints.length ? aiPoints : slide.points,
+                chartData: aiChartData || slide.chartData || null,
               };
             });
 
             notifications.show({
               title: "Grok Enhanced",
               message:
-                "Slides were enriched with AI-generated investor content.",
+                "Slides were deeply enriched with Grok investor-grade analysis.",
               color: "grape",
             });
           } else {
             notifications.show({
               title: "Using base content",
               message:
-                "Grok response format was not valid. Generated with local professional template.",
+                "Grok response quality checks failed. Generated with local professional template.",
               color: "yellow",
             });
           }

@@ -33,7 +33,56 @@ const drawFooter = (doc, companyName) => {
   doc.text("Generated via FemFin AI", 160, 290);
 };
 
-const drawBody = (doc, points) => {
+const drawBarChart = (doc, chartData, startX = 14, startY = 188) => {
+  const series = Array.isArray(chartData?.series) ? chartData.series : [];
+  if (!series.length) {
+    return;
+  }
+
+  const width = 182;
+  const height = 72;
+  const chartTop = startY + 10;
+  const chartBottom = chartTop + height;
+
+  doc.setFillColor(249, 245, 255);
+  doc.roundedRect(startX - 2, startY, width + 4, height + 20, 2, 2, "F");
+
+  doc.setTextColor(80, 35, 120);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+  doc.text(chartData.title || "Key Metrics", startX, startY + 6);
+
+  doc.setDrawColor(210, 210, 220);
+  doc.setLineWidth(0.2);
+  doc.line(startX, chartBottom, startX + width, chartBottom);
+  doc.line(startX, chartTop, startX, chartBottom);
+
+  const maxValue = Math.max(...series.map((item) => Number(item.value) || 0), 1);
+  const barSlot = width / series.length;
+  const barWidth = Math.max(barSlot * 0.55, 8);
+
+  series.forEach((item, index) => {
+    const value = Number(item.value) || 0;
+    const barHeight = (value / maxValue) * (height - 10);
+    const barX = startX + index * barSlot + (barSlot - barWidth) / 2;
+    const barY = chartBottom - barHeight;
+
+    doc.setFillColor(...primaryPurple);
+    doc.rect(barX, barY, barWidth, barHeight, "F");
+
+    doc.setTextColor(70, 70, 70);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    const label = String(item.label || "").slice(0, 16);
+    doc.text(label, barX, chartBottom + 4, { maxWidth: barWidth + 6 });
+
+    doc.setFontSize(7);
+    const valueLabel = value >= 1000000 ? `${(value / 1000000).toFixed(1)}M` : String(Math.round(value));
+    doc.text(valueLabel, barX, barY - 1, { maxWidth: barWidth + 4 });
+  });
+};
+
+const drawBody = (doc, points, chartData) => {
   doc.setFillColor(252, 243, 250);
   doc.roundedRect(12, 34, 186, 18, 2, 2, "F");
   doc.setDrawColor(...primaryPurple);
@@ -53,13 +102,21 @@ const drawBody = (doc, points) => {
 
   doc.setTextColor(35, 35, 35);
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(12);
+  doc.setFontSize(10.5);
   let y = 60;
-  points.slice(1).forEach((point) => {
-    const wrapped = doc.splitTextToSize(`- ${point}`, 180);
+  for (const point of points.slice(1, 9)) {
+    const wrapped = doc.splitTextToSize(`- ${point}`, 178);
     doc.text(wrapped, 14, y);
-    y += wrapped.length * 6 + 2;
-  });
+    y += wrapped.length * 5 + 1.5;
+
+    if (y > 178) {
+      break;
+    }
+  }
+
+  if (chartData?.series?.length) {
+    drawBarChart(doc, chartData, 14, 188);
+  }
 };
 
 export const generatePitchDeckPdf = ({
@@ -77,7 +134,7 @@ export const generatePitchDeckPdf = ({
     }
 
     drawHeader(doc, slide.title, idx + 1, slides.length);
-    drawBody(doc, slide.points || []);
+    drawBody(doc, slide.points || [], slide.chartData);
 
     if (slide.title === "Financials" && financialTable?.length) {
       autoTable(doc, {

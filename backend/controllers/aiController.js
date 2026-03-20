@@ -281,7 +281,7 @@ exports.chat = asyncHandler(async (req, res) => {
  * @access  Private
  */
 exports.query = asyncHandler(async (req, res) => {
-  const { prompt, model } = req.body;
+  const { prompt, model, maxTokens, temperature } = req.body;
 
   if (!prompt) {
     return res.status(400).json({
@@ -290,7 +290,10 @@ exports.query = asyncHandler(async (req, res) => {
     });
   }
 
-  const response = await xaiService.generateGrokResponse(prompt, model);
+  const response = await xaiService.generateGrokResponse(prompt, model, {
+    maxTokens,
+    temperature,
+  });
 
   res.status(200).json({
     success: true,

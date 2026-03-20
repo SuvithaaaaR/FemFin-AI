@@ -89,20 +89,28 @@ const chatWithOllama = async (
  * @param {string} model - The model to use (default: grok-beta)
  * @returns {Promise<string>} - The AI response
  */
-async function generateGrokResponse(prompt, model = "grok-beta") {
+async function generateGrokResponse(
+  prompt,
+  model = "grok-beta",
+  options = {},
+) {
+  const resolvedMaxTokens = Number(options?.maxTokens || 1000);
+  const resolvedTemperature =
+    typeof options?.temperature === "number" ? options.temperature : 0.7;
+
   try {
     if (useOllama()) {
       return await generateOllamaResponse(prompt, {
-        temperature: 0.7,
-        maxTokens: 1000,
+        temperature: resolvedTemperature,
+        maxTokens: resolvedMaxTokens,
       });
     }
 
     const { text } = await generateText({
       model: resolveModel(model || DEFAULT_MODEL),
       prompt,
-      temperature: 0.7,
-      maxTokens: 1000,
+      temperature: resolvedTemperature,
+      maxTokens: resolvedMaxTokens,
     });
 
     return text;
