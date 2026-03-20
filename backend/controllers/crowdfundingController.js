@@ -33,12 +33,18 @@ const createRazorpayOrder = async ({ amountInRupees, campaignId, userId }) => {
 
   const authHeader = Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString("base64");
 
+  // Razorpay receipt must be <= 40 chars.
+  const compactCampaignId = String(campaignId || "")
+    .replace(/[^a-zA-Z0-9]/g, "")
+    .slice(0, 12);
+  const receipt = `cmp_${compactCampaignId}_${Date.now().toString().slice(-10)}`;
+
   const { data } = await axios.post(
     `${RAZORPAY_BASE_URL}/orders`,
     {
       amount: amountInPaise,
       currency: "INR",
-      receipt: `camp_${campaignId}_${Date.now()}`,
+      receipt,
       notes: {
         campaignId,
         investorId: String(userId),
