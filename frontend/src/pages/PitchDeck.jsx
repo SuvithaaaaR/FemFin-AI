@@ -73,7 +73,9 @@ const normalizeNumericSeries = (series = []) =>
   series
     .map((item) => {
       const label =
-        typeof item?.label === "string" ? item.label.trim() : String(item?.label || "").trim();
+        typeof item?.label === "string"
+          ? item.label.trim()
+          : String(item?.label || "").trim();
       const value = Number(item?.value);
 
       if (!label || Number.isNaN(value)) {
@@ -136,6 +138,60 @@ const parseJsonFromResponse = (rawText) => {
   }
 
   return null;
+};
+
+const STOP_WORDS = new Set([
+  "the",
+  "and",
+  "that",
+  "with",
+  "this",
+  "from",
+  "have",
+  "into",
+  "your",
+  "for",
+  "are",
+  "was",
+  "were",
+  "has",
+  "had",
+  "will",
+  "shall",
+  "can",
+  "could",
+  "would",
+  "should",
+  "about",
+  "their",
+  "there",
+  "where",
+  "while",
+  "through",
+  "using",
+  "used",
+  "our",
+  "they",
+  "them",
+  "you",
+  "not",
+  "but",
+]);
+
+const extractFocusTerms = (text) => {
+  const tokens = String(text || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .map((token) => token.trim())
+    .filter((token) => token.length >= 4 && !STOP_WORDS.has(token));
+
+  return [...new Set(tokens)].slice(0, 14);
+};
+
+const containsFocusTerm = (text, terms) => {
+  const normalized = String(text || "").toLowerCase();
+  return terms.some((term) => normalized.includes(term));
 };
 
 const getInitialInvestorData = () => {
@@ -531,6 +587,10 @@ function PitchDeckPage() {
 
     const byTitle = new Map(aiSlides.map((slide) => [slide?.title, slide]));
     const requiredTitles = baseSlides.map((slide) => slide.title);
+    const problemTerms = extractFocusTerms(formValues.problem);
+    const solutionTerms = extractFocusTerms(formValues.solution);
+    const groundingTerms = [...new Set([...problemTerms, ...solutionTerms])];
+    let groundedSlides = 0;
 
     for (const title of requiredTitles) {
       const candidate = byTitle.get(title);
@@ -552,11 +612,35 @@ function PitchDeckPage() {
       if (longPoints.length < 4) {
         return false;
       }
+
+      const groundedPointCount = points.filter((point) =>
+        containsFocusTerm(point, groundingTerms),
+      ).length;
+      if (groundedPointCount >= 2) {
+        groundedSlides += 1;
+      }
     }
 
     const cover = byTitle.get("Cover");
     const coverText = (cover?.points || []).join(" ").toLowerCase();
     if (!coverText.includes((formValues.companyName || "").toLowerCase())) {
+      return false;
+    }
+
+    const problemSlideText = (byTitle.get("Problem")?.points || []).join(" ");
+    const solutionSlideText = (byTitle.get("Solution")?.points || []).join(
+      " ",
+    );
+
+    if (!containsFocusTerm(problemSlideText, problemTerms.slice(0, 6))) {
+      return false;
+    }
+
+    if (!containsFocusTerm(solutionSlideText, solutionTerms.slice(0, 6))) {
+      return false;
+    }
+
+    if (groundedSlides < 8) {
       return false;
     }
 
@@ -620,6 +704,11 @@ function PitchDeckPage() {
           });
         }
 
+        const groundingTerms = [
+          ...extractFocusTerms(formValues.problem),
+          ...extractFocusTerms(formValues.solution),
+        ].slice(0, 12);
+
         const prompt = `You are a top-tier venture fundraising strategist and market analyst. Rewrite this 12-slide pitch deck so it reads like a real institutional-grade investor deck.
 
 Founder Inputs (must preserve):
@@ -646,6 +735,9 @@ Rules:
 8. Include chartData for these titles only when useful: Market, Financials, Ask.
 9. chartData schema must be: {"title":"...","type":"bar","series":[{"label":"...","value":123}]}
 10. Keep charts to max 6 data points.
+11. Do not use generic boilerplate advice. Every slide must reference founder-specific context.
+12. In every slide, include at least 2 bullets that explicitly anchor to this founder's problem/solution words: ${groundingTerms.join(", ")}.
+13. Problem slide must directly describe the exact founder problem. Solution slide must directly describe the exact founder solution.
 
 Output schema:
 {
@@ -670,8 +762,8 @@ Output schema:
               {
                 prompt,
                 model: "grok-2-latest",
-                maxTokens: 2800,
-                temperature: 0.55,
+                maxTokens: 2200,
+                temperature: 0.35,
               },
               {
                 timeout: 120000,
@@ -714,7 +806,7 @@ Output schema:
               notifications.show({
                 title: "Using base content",
                 message:
-                  "Grok response quality checks failed. Generated with local professional template.",
+                  "Ollama response quality checks failed. Generated with local professional template.",
                 color: "yellow",
               });
             }
@@ -722,7 +814,7 @@ Output schema:
             const backendMessage =
               error.response?.data?.message ||
               error.response?.data?.error ||
-              "Grok is temporarily unavailable.";
+              "Ollama is temporarily unavailable.";
             notifications.show({
               title: "AI fallback enabled",
               message: `${backendMessage} Generated with advanced local investor template.`,
@@ -745,7 +837,8 @@ Output schema:
           });
         }
 
-        try {
+        const runInvestorMatching = async () => {
+          try {
           const investorPromptCatalog = (investorData.networks || []).map(
             (item) => ({
               id: item.id,
@@ -793,7 +886,7 @@ Output schema:
               model: "grok-2-latest",
             },
             {
-              timeout: 90000,
+              timeout: 30000,
             },
           );
 
@@ -843,7 +936,7 @@ Output schema:
               notifications.show({
                 title: "AI Investor Matching Ready",
                 message:
-                  "Grok ranked investor networks with reasons and next steps.",
+                  "Ollama ranked investor networks with reasons and next steps.",
                 color: "grape",
               });
             } else {
@@ -852,9 +945,12 @@ Output schema:
           } else {
             setAiMatchedInvestors([]);
           }
-        } catch (error) {
-          setAiMatchedInvestors([]);
-        }
+          } catch (error) {
+            setAiMatchedInvestors([]);
+          }
+        };
+
+        void runInvestorMatching();
       } else {
         setAiMatchedInvestors([]);
       }
