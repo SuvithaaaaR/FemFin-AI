@@ -646,12 +646,18 @@ Output schema:
 
         if (aiReady) {
           try {
-            const response = await apiClient.post("/ai/query", {
-              prompt,
-              model: "grok-2-latest",
-              maxTokens: 2800,
-              temperature: 0.55,
-            });
+            const response = await apiClient.post(
+              "/ai/query",
+              {
+                prompt,
+                model: "grok-2-latest",
+                maxTokens: 2800,
+                temperature: 0.55,
+              },
+              {
+                timeout: 120000,
+              },
+            );
 
             const parsed = parseJsonFromResponse(response.data?.data);
             const aiSlides = Array.isArray(parsed?.slides) ? parsed.slides : [];
@@ -751,10 +757,16 @@ Output schema:
   ]
 }`;
 
-          const investorResponse = await apiClient.post("/ai/query", {
-            prompt: investorPrompt,
-            model: "grok-beta",
-          });
+          const investorResponse = await apiClient.post(
+            "/ai/query",
+            {
+              prompt: investorPrompt,
+              model: "grok-2-latest",
+            },
+            {
+              timeout: 90000,
+            },
+          );
 
           const parsedInvestor = parseJsonFromResponse(
             investorResponse.data?.data,
