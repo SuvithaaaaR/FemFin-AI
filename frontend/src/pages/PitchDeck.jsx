@@ -592,6 +592,15 @@ function PitchDeckPage() {
       let slides = baseSlides;
 
       if (useGrokEnhancement) {
+        let aiReady = true;
+        try {
+          const statusResponse = await apiClient.get("/ai/status");
+          aiReady = Boolean(statusResponse.data?.data?.ready);
+        } catch (error) {
+          // If status endpoint is unavailable on an older backend, still try AI query.
+          aiReady = true;
+        }
+
         const prompt = `You are a top-tier venture fundraising strategist and market analyst. Rewrite this 12-slide pitch deck so it reads like a real institutional-grade investor deck.
 
 Founder Inputs (must preserve):
@@ -635,60 +644,68 @@ Output schema:
   ]
 }`;
 
-        try {
-          const response = await apiClient.post("/ai/query", {
-            prompt,
-            model: "grok-beta",
-            maxTokens: 2800,
-            temperature: 0.55,
-          });
-
-          const parsed = parseJsonFromResponse(response.data?.data);
-          const aiSlides = Array.isArray(parsed?.slides) ? parsed.slides : [];
-
-          if (validateEnhancedSlides(aiSlides, baseSlides)) {
-            const aiByTitle = new Map(
-              aiSlides.map((slide) => [slide.title, slide]),
-            );
-            slides = baseSlides.map((slide) => {
-              const aiSlide = aiByTitle.get(slide.title);
-              const aiPoints = Array.isArray(aiSlide?.points)
-                ? aiSlide.points
-                    .map((point) =>
-                      typeof point === "string" ? point.trim() : "",
-                    )
-                    .filter(Boolean)
-                    .slice(0, 10)
-                : [];
-              const aiChartData = normalizeChartData(aiSlide?.chartData);
-
-              return {
-                ...slide,
-                points: aiPoints.length ? aiPoints : slide.points,
-                chartData: aiChartData || slide.chartData || null,
-              };
+        if (aiReady) {
+          try {
+            const response = await apiClient.post("/ai/query", {
+              prompt,
+              model: "grok-2-latest",
+              maxTokens: 2800,
+              temperature: 0.55,
             });
 
+            const parsed = parseJsonFromResponse(response.data?.data);
+            const aiSlides = Array.isArray(parsed?.slides) ? parsed.slides : [];
+
+            if (validateEnhancedSlides(aiSlides, baseSlides)) {
+              const aiByTitle = new Map(
+                aiSlides.map((slide) => [slide.title, slide]),
+              );
+              slides = baseSlides.map((slide) => {
+                const aiSlide = aiByTitle.get(slide.title);
+                const aiPoints = Array.isArray(aiSlide?.points)
+                  ? aiSlide.points
+                      .map((point) =>
+                        typeof point === "string" ? point.trim() : "",
+                      )
+                      .filter(Boolean)
+                      .slice(0, 10)
+                  : [];
+                const aiChartData = normalizeChartData(aiSlide?.chartData);
+
+                return {
+                  ...slide,
+                  points: aiPoints.length ? aiPoints : slide.points,
+                  chartData: aiChartData || slide.chartData || null,
+                };
+              });
+
+              notifications.show({
+                title: "Grok Enhanced",
+                message:
+                  "Slides were deeply enriched with Grok investor-grade analysis.",
+                color: "grape",
+              });
+            } else {
+              notifications.show({
+                title: "Using base content",
+                message:
+                  "Grok response quality checks failed. Generated with local professional template.",
+                color: "yellow",
+              });
+            }
+          } catch (error) {
             notifications.show({
-              title: "Grok Enhanced",
+              title: "AI fallback enabled",
               message:
-                "Slides were deeply enriched with Grok investor-grade analysis.",
-              color: "grape",
-            });
-          } else {
-            notifications.show({
-              title: "Using base content",
-              message:
-                "Grok response quality checks failed. Generated with local professional template.",
+                "Grok is temporarily unavailable. Generated with advanced local investor template.",
               color: "yellow",
             });
           }
-        } catch (error) {
+        } else {
           notifications.show({
-            title: "Grok unavailable",
+            title: "AI not configured",
             message:
-              error.response?.data?.message ||
-              "Generated deck with local content because AI enhancement failed.",
+              "Generated with advanced local investor template because AI is not configured on backend.",
             color: "yellow",
           });
         }

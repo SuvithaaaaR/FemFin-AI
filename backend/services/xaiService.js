@@ -11,7 +11,7 @@ const xai = createXai({
 const AI_PROVIDER = (process.env.AI_PROVIDER || "grok").toLowerCase();
 const OLLAMA_URL = process.env.OLLAMA_URL || "http://127.0.0.1:11434";
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "llama3.1:8b";
-const DEFAULT_MODEL = process.env.XAI_MODEL || "grok-beta";
+const DEFAULT_MODEL = process.env.XAI_MODEL || "grok-2-latest";
 const AI_TIMEOUT_MS = Number(process.env.AI_TIMEOUT_MS || 120000);
 
 const useOllama = () => AI_PROVIDER === "ollama";
@@ -25,6 +25,20 @@ const resolveModel = (modelName) => {
     );
     return xai(DEFAULT_MODEL);
   }
+};
+
+const buildModelCandidates = (requestedModel) => {
+  const candidates = [
+    requestedModel,
+    process.env.XAI_MODEL,
+    "grok-2-latest",
+    "grok-2",
+    "grok-beta",
+  ]
+    .map((item) => (typeof item === "string" ? item.trim() : ""))
+    .filter(Boolean);
+
+  return [...new Set(candidates)];
 };
 
 const generateOllamaResponse = async (
@@ -106,14 +120,25 @@ async function generateGrokResponse(
       });
     }
 
-    const { text } = await generateText({
-      model: resolveModel(model || DEFAULT_MODEL),
-      prompt,
-      temperature: resolvedTemperature,
-      maxTokens: resolvedMaxTokens,
-    });
+    const modelCandidates = buildModelCandidates(model || DEFAULT_MODEL);
+    const failures = [];
 
-    return text;
+    for (const candidate of modelCandidates) {
+      try {
+        const { text } = await generateText({
+          model: resolveModel(candidate),
+          prompt,
+          temperature: resolvedTemperature,
+          maxTokens: resolvedMaxTokens,
+        });
+
+        return text;
+      } catch (modelError) {
+        failures.push(`${candidate}: ${modelError.message}`);
+      }
+    }
+
+    throw new Error(`All Grok model attempts failed. ${failures.join(" | ")}`);
   } catch (error) {
     const providerName = useOllama() ? "Ollama" : "Grok";
     console.error(`Error calling ${providerName} AI:`, error.message);
@@ -125,10 +150,12 @@ async function generateGrokResponse(
 
 const getAiStatus = () => {
   const grokConfigured = Boolean(process.env.XAI_API_KEY);
+  const modelCandidates = buildModelCandidates(DEFAULT_MODEL);
   return {
     provider: AI_PROVIDER,
     ready: useOllama() || grokConfigured,
-    model: useOllama() ? OLLAMA_MODEL : DEFAULT_MODEL,
+    model: useOllama() ? OLLAMA_MODEL : modelCandidates[0],
+    modelCandidates: useOllama() ? [OLLAMA_MODEL] : modelCandidates,
     grokConfigured,
     ollamaUrl: useOllama() ? OLLAMA_URL : null,
   };
