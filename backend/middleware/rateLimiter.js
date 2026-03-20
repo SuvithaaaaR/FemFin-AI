@@ -18,12 +18,12 @@ exports.apiLimiter = rateLimit({
  * Stricter rate limiter for authentication routes
  */
 exports.authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // Limit each IP to 5 requests per windowMs
+  windowMs: (process.env.AUTH_RATE_LIMIT_WINDOW || 15) * 60 * 1000, // 15 minutes default
+  max: process.env.AUTH_RATE_LIMIT_MAX || 20, // Default 20 attempts per window
   skipSuccessfulRequests: true, // Don't count successful requests
   message: {
     success: false,
-    message: "Too many login attempts, please try again after 15 minutes.",
+    message: "Too many auth attempts, please try again in a few minutes.",
   },
 });
 

@@ -22,3 +22,7 @@ services:
         value: https://femfin.app
       - key: XAI_API_KEY
         value: xai-tG0aM3KpSlhQxA6UcuBDfdGmQHS22P38AEMsMVVxU5soSZwIpaOPOZvUdlCVvREMs4uwUU2KQm6aB6no
+      - key: AUTH_RATE_LIMIT_WINDOW
+        value: 15
+      - key: AUTH_RATE_LIMIT_MAX
+        value: 20
