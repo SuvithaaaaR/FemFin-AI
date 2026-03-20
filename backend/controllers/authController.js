@@ -3,8 +3,12 @@ const jwt = require("jsonwebtoken");
 const { getSupabase } = require("../config/supabase");
 const { asyncHandler, ErrorResponse } = require("../middleware/errorHandler");
 
+const JWT_SECRET =
+  process.env.JWT_SECRET ||
+  "FemFin_AI_JWT_2026_Production_Ready_Key_At_Least_32_Chars";
+
 const signToken = (id) =>
-  jwt.sign({ id }, process.env.JWT_SECRET, {
+  jwt.sign({ id }, JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE || "30d",
   });
 

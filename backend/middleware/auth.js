@@ -1,6 +1,10 @@
 const jwt = require("jsonwebtoken");
 const { getSupabase } = require("../config/supabase");
 
+const JWT_SECRET =
+  process.env.JWT_SECRET ||
+  "FemFin_AI_JWT_2026_Production_Ready_Key_At_Least_32_Chars";
+
 const findUserById = async (id) => {
   const supabase = getSupabase();
   const { data, error } = await supabase
@@ -40,7 +44,7 @@ exports.protect = async (req, res, next) => {
 
   try {
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
 
     // Get user from token
     req.user = await findUserById(decoded.id);
@@ -93,7 +97,7 @@ exports.optionalAuth = async (req, res, next) => {
 
   if (token) {
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, JWT_SECRET);
       req.user = await findUserById(decoded.id);
     } catch (error) {
       // Token invalid but continue without user
