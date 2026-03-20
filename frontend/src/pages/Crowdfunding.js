@@ -62,6 +62,7 @@ const FALLBACK_CAMPAIGNS = [
     ],
     verified: true,
     image: "👗",
+    isDemo: true,
   },
   {
     id: 2,
@@ -81,6 +82,7 @@ const FALLBACK_CAMPAIGNS = [
     ],
     verified: true,
     image: "🏥",
+    isDemo: true,
   },
   {
     id: 3,
@@ -100,6 +102,7 @@ const FALLBACK_CAMPAIGNS = [
     ],
     verified: true,
     image: "🌾",
+    isDemo: true,
   },
 ];
 
@@ -128,6 +131,7 @@ const normalizeCampaignForUi = (campaign) => {
     milestones: campaign.milestones || [],
     verified: true,
     image: "🚀",
+    isDemo: false,
   };
 };
 
@@ -266,6 +270,28 @@ function Crowdfunding() {
 
   const handleInvest = async (values) => {
     if (!selectedCampaign) {
+      return;
+    }
+
+    if (selectedCampaign.isDemo) {
+      notifications.show({
+        title: "Demo Campaign",
+        message:
+          "This is demo data. Create a real campaign (or load live campaigns) before investing.",
+        color: "yellow",
+      });
+      return;
+    }
+
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    if (!token) {
+      notifications.show({
+        title: "Login Required",
+        message:
+          "Please login first to invest. This action requires authenticated payment verification.",
+        color: "red",
+      });
       return;
     }
 
@@ -503,12 +529,13 @@ function Crowdfunding() {
             <Button
               variant="light"
               leftSection={<IconHeart size={rem(16)} />}
+              disabled={campaign.isDemo}
               onClick={() => {
                 setSelectedCampaign(campaign);
                 setInvestModalOpened(true);
               }}
             >
-              Invest Now
+              {campaign.isDemo ? "Demo Only" : "Invest Now"}
             </Button>
             <Button variant="outline">View Details</Button>
           </Group>
