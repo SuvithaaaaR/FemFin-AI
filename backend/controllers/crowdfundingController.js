@@ -39,25 +39,38 @@ const createRazorpayOrder = async ({ amountInRupees, campaignId, userId }) => {
     .slice(0, 12);
   const receipt = `cmp_${compactCampaignId}_${Date.now().toString().slice(-10)}`;
 
-  const { data } = await axios.post(
-    `${RAZORPAY_BASE_URL}/orders`,
-    {
-      amount: amountInPaise,
-      currency: "INR",
-      receipt,
-      notes: {
-        campaignId,
-        investorId: String(userId),
+  let data;
+  try {
+    const response = await axios.post(
+      `${RAZORPAY_BASE_URL}/orders`,
+      {
+        amount: amountInPaise,
+        currency: "INR",
+        receipt,
+        notes: {
+          campaignId,
+          investorId: String(userId),
+        },
       },
-    },
-    {
-      headers: {
-        Authorization: `Basic ${authHeader}`,
-        "Content-Type": "application/json",
+      {
+        headers: {
+          Authorization: `Basic ${authHeader}`,
+          "Content-Type": "application/json",
+        },
+        timeout: 15000,
       },
-      timeout: 15000,
-    },
-  );
+    );
+    data = response.data;
+  } catch (error) {
+    const upstreamMessage =
+      error?.response?.data?.error?.description ||
+      error?.response?.data?.error?.reason ||
+      error?.response?.data?.error?.code ||
+      error?.message ||
+      "Razorpay order creation failed";
+
+    throw new ErrorResponse(`Razorpay error: ${upstreamMessage}`, 500);
+  }
 
   return data;
 };
