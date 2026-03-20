@@ -29,7 +29,9 @@ const fetchAllFunds = async () => {
 exports.getFunds = asyncHandler(async (req, res) => {
   try {
     const funds = await fetchAllFunds();
-    const activeFunds = funds.filter((item) => (item.status || "Active") === "Active");
+    const activeFunds = funds.filter(
+      (item) => (item.status || "Active") === "Active",
+    );
     const filtered = applyFallbackFilters(activeFunds, req.query);
 
     return res.status(200).json({
@@ -68,7 +70,9 @@ exports.getFund = asyncHandler(async (req, res) => {
   }
 
   if (!data) {
-    const fallbackFund = FALLBACK_FUNDS.find((item) => item._id === req.params.id);
+    const fallbackFund = FALLBACK_FUNDS.find(
+      (item) => item._id === req.params.id,
+    );
 
     if (!fallbackFund) {
       throw new ErrorResponse("Fund not found", 404);
@@ -150,7 +154,10 @@ exports.updateFund = asyncHandler(async (req, res) => {
  */
 exports.deleteFund = asyncHandler(async (req, res) => {
   const supabase = getSupabase();
-  const { error } = await supabase.from("funds").delete().eq("id", req.params.id);
+  const { error } = await supabase
+    .from("funds")
+    .delete()
+    .eq("id", req.params.id);
 
   if (error) {
     throw new ErrorResponse(error.message, 500);
@@ -170,7 +177,9 @@ exports.deleteFund = asyncHandler(async (req, res) => {
 exports.getFundCategories = asyncHandler(async (req, res) => {
   try {
     const funds = await fetchAllFunds();
-    const categories = [...new Set(funds.map((item) => item.category).filter(Boolean))];
+    const categories = [
+      ...new Set(funds.map((item) => item.category).filter(Boolean)),
+    ];
 
     return res.status(200).json({
       success: true,
@@ -178,7 +187,9 @@ exports.getFundCategories = asyncHandler(async (req, res) => {
       source: "supabase",
     });
   } catch (error) {
-    const categories = [...new Set(FALLBACK_FUNDS.map((item) => item.category))];
+    const categories = [
+      ...new Set(FALLBACK_FUNDS.map((item) => item.category)),
+    ];
     return res.status(200).json({
       success: true,
       data: categories,

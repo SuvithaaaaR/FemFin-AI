@@ -5,7 +5,6 @@ import Header from "./components/Layout/Header";
 import ProtectedRoute from "./components/ProtectedRoute";
 import HomePage from "./pages/HomePage";
 import FundDetails from "./pages/FundDetails";
-import ApplyFund from "./pages/ApplyFund";
 import FundRecommendation from "./pages/FundRecommendation";
 import Crowdfunding from "./pages/Crowdfunding";
 import CreditScoring from "./pages/CreditScoring";
@@ -32,19 +31,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route
                 path="/fund-details"
-                element={
-                  <ProtectedRoute>
-                    <FundDetails />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/apply-fund"
-                element={
-                  <ProtectedRoute>
-                    <ApplyFund />
-                  </ProtectedRoute>
-                }
+                element={<FundDetails />}
               />
               <Route
                 path="/fund-recommendation"

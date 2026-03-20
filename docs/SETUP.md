@@ -214,11 +214,11 @@ cd ../backend && npm install
 2. From `frontend/`, run `npm run deploy`
 3. Ensure `homepage` in `frontend/package.json` points to your Pages/custom domain
 
-1. Backend (Render)
-2. Create a Web Service with Root Directory set to `backend`
-3. Build command: `npm install`
-4. Start command: `npm start`
-5. Add env vars from `backend/.env.example`
+4. Backend (Render)
+5. Create a Web Service with Root Directory set to `backend`
+6. Build command: `npm install`
+7. Start command: `npm start`
+8. Add env vars from `backend/.env.example`
 
 ### For Production Deployment:
 

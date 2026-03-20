@@ -77,12 +77,6 @@ function Header() {
               </Menu.Item>
               <Menu.Item
                 leftSection={<IconChartBar size={rem(16)} />}
-                onClick={() => navigate("/apply-fund")}
-              >
-                Apply Fund
-              </Menu.Item>
-              <Menu.Item
-                leftSection={<IconChartBar size={rem(16)} />}
                 onClick={() => navigate("/fund-recommendation")}
               >
                 AI Recommendation
@@ -238,15 +232,6 @@ function Header() {
                 }}
               >
                 Fund Details
-              </Menu.Item>
-              <Menu.Item
-                leftSection={<IconChartBar size={rem(16)} />}
-                onClick={() => {
-                  navigate("/apply-fund");
-                  toggle();
-                }}
-              >
-                Apply Fund
               </Menu.Item>
               <Menu.Item
                 leftSection={<IconChartBar size={rem(16)} />}

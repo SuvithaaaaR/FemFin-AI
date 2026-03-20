@@ -42,24 +42,26 @@ A comprehensive AI-powered platform for women entrepreneurs to access funding th
 
 1. Install dependencies:
 
-  ```bash
-  cd frontend
-  npm install
-  cd ../backend
-  npm install
-  ```
+```bash
+cd frontend
+npm install
+cd ../backend
+npm install
+```
 
 2. Set up environment variables (create/update `.env` files in `frontend` and `backend`)
 
 3. Run the application in two terminals:
-  ```bash
-  cd backend
-  npm run dev
-  ```
-  ```bash
-  cd frontend
-  npm start
-  ```
+
+```bash
+cd backend
+npm run dev
+```
+
+```bash
+cd frontend
+npm start
+```
 
 ## Project Structure
 

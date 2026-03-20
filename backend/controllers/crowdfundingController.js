@@ -37,12 +37,17 @@ exports.getCampaigns = asyncHandler(async (req, res) => {
   let campaigns = (data || []).map(normalizeCampaign);
 
   if (sort === "trending") {
-    campaigns = campaigns.sort((a, b) => (b.stats?.views || 0) - (a.stats?.views || 0));
+    campaigns = campaigns.sort(
+      (a, b) => (b.stats?.views || 0) - (a.stats?.views || 0),
+    );
   } else if (sort === "funded") {
-    campaigns = campaigns.sort((a, b) => (b.currentAmount || 0) - (a.currentAmount || 0));
+    campaigns = campaigns.sort(
+      (a, b) => (b.currentAmount || 0) - (a.currentAmount || 0),
+    );
   } else {
     campaigns = campaigns.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
   }
 
@@ -143,7 +148,9 @@ exports.updateCampaign = asyncHandler(async (req, res, next) => {
   }
 
   if (existing.creator_id !== req.user.id) {
-    return next(new ErrorResponse("Not authorized to update this campaign", 403));
+    return next(
+      new ErrorResponse("Not authorized to update this campaign", 403),
+    );
   }
 
   const payload = {
@@ -194,10 +201,15 @@ exports.deleteCampaign = asyncHandler(async (req, res, next) => {
   }
 
   if (existing.creator_id !== req.user.id) {
-    return next(new ErrorResponse("Not authorized to delete this campaign", 403));
+    return next(
+      new ErrorResponse("Not authorized to delete this campaign", 403),
+    );
   }
 
-  const { error } = await supabase.from("campaigns").delete().eq("id", req.params.id);
+  const { error } = await supabase
+    .from("campaigns")
+    .delete()
+    .eq("id", req.params.id);
 
   if (error) {
     throw new ErrorResponse(error.message, 500);
@@ -238,7 +250,10 @@ exports.investInCampaign = asyncHandler(async (req, res, next) => {
 
   if (Number(amount) < Number(campaign.min_investment || 0)) {
     return next(
-      new ErrorResponse(`Minimum investment is ${campaign.min_investment}`, 400),
+      new ErrorResponse(
+        `Minimum investment is ${campaign.min_investment}`,
+        400,
+      ),
     );
   }
 
@@ -251,8 +266,12 @@ exports.investInCampaign = asyncHandler(async (req, res, next) => {
     investedAt: new Date().toISOString(),
   });
 
-  const currentAmount = Number(campaign.current_amount || 0) + Number(amount || 0);
-  const status = currentAmount >= Number(campaign.target_amount || 0) ? "Funded" : campaign.status;
+  const currentAmount =
+    Number(campaign.current_amount || 0) + Number(amount || 0);
+  const status =
+    currentAmount >= Number(campaign.target_amount || 0)
+      ? "Funded"
+      : campaign.status;
 
   const { error: updateError } = await supabase
     .from("campaigns")
@@ -274,7 +293,8 @@ exports.investInCampaign = asyncHandler(async (req, res, next) => {
       campaignId: campaign.id,
       investedAmount: Number(amount),
       totalRaised: currentAmount,
-      fundingPercentage: (currentAmount / Number(campaign.target_amount || 1)) * 100,
+      fundingPercentage:
+        (currentAmount / Number(campaign.target_amount || 1)) * 100,
     },
   });
 });

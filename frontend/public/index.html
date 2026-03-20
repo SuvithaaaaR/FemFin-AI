@@ -18,6 +18,16 @@
       content="black-translucent"
     />
     <title>FemFin AI - Women Entrepreneur Funding Platform</title>
+    <script>
+      // Handle GitHub Pages SPA fallback redirect from 404.html.
+      (function () {
+        var redirect = sessionStorage.getItem("spa-redirect");
+        if (redirect) {
+          sessionStorage.removeItem("spa-redirect");
+          window.history.replaceState(null, null, redirect);
+        }
+      })();
+    </script>
     <style>
       body {
         margin: 0;

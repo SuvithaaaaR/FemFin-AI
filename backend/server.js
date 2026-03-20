@@ -33,7 +33,9 @@ const configuredOrigins = (process.env.CLIENT_URL || "")
   .map((origin) => origin.trim())
   .filter(Boolean);
 
-const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...configuredOrigins])];
+const allowedOrigins = [
+  ...new Set([...defaultAllowedOrigins, ...configuredOrigins]),
+];
 
 const corsOptions = {
   origin: (origin, callback) => {
