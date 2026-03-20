@@ -19,6 +19,6 @@ services:
       - key: JWT_SECRET
         value: FemFin_AI_JWT_2026_Production_Ready_Key_At_Least_32_Chars
       - key: CLIENT_URL
-        value: https://suvithaaaar.github.io/FemFin-AI
+        value: https://femfin.app
       - key: XAI_API_KEY
         value: xai-tG0aM3KpSlhQxA6UcuBDfdGmQHS22P38AEMsMVVxU5soSZwIpaOPOZvUdlCVvREMs4uwUU2KQm6aB6no

@@ -21,8 +21,33 @@ dotenv.config({ path: path.resolve(__dirname, ".env") });
 const app = express();
 
 // CORS configuration
+const defaultAllowedOrigins = [
+  "http://localhost:3000",
+  "https://femfin.app",
+  "https://suvithaaaar.github.io",
+  "https://suvithaaaar.github.io/FemFin-AI",
+];
+
+const configuredOrigins = (process.env.CLIENT_URL || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...configuredOrigins])];
+
 const corsOptions = {
-  origin: process.env.CLIENT_URL || "http://localhost:3000",
+  origin: (origin, callback) => {
+    // Allow non-browser and same-origin requests
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
   credentials: true,
   optionsSuccessStatus: 200,
 };
@@ -158,7 +183,9 @@ const startServer = async () => {
     });
   } catch (error) {
     console.error("❌ Unable to start server: ", error.message);
-    console.error("   Ensure Supabase is reachable and env vars are configured.");
+    console.error(
+      "   Ensure Supabase is reachable and env vars are configured.",
+    );
     process.exit(1);
   }
 };
