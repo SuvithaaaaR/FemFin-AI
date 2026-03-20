@@ -24,27 +24,32 @@ const app = express();
 const defaultAllowedOrigins = [
   "http://localhost:3000",
   "https://femfin.app",
+  "https://www.femfin.app",
   "https://suvithaaaar.github.io",
   "https://suvithaaaar.github.io/FemFin-AI",
 ];
 
+const normalizeOrigin = (value) => String(value || "").trim().replace(/\/+$/, "");
+
 const configuredOrigins = (process.env.CLIENT_URL || "")
   .split(",")
-  .map((origin) => origin.trim())
+  .map((origin) => normalizeOrigin(origin))
   .filter(Boolean);
 
 const allowedOrigins = [
-  ...new Set([...defaultAllowedOrigins, ...configuredOrigins]),
+  ...new Set([...defaultAllowedOrigins.map(normalizeOrigin), ...configuredOrigins]),
 ];
 
 const corsOptions = {
   origin: (origin, callback) => {
+    const normalizedOrigin = normalizeOrigin(origin);
+
     // Allow non-browser and same-origin requests
     if (!origin) {
       return callback(null, true);
     }
 
-    if (allowedOrigins.includes(origin)) {
+    if (allowedOrigins.includes(normalizedOrigin)) {
       return callback(null, true);
     }
 
