@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: femfin-backend
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: SUPABASE_URL
+        value: https://wudgzyrfeegibybygvzl.supabase.co
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1ZGd6eXJmZWVnaWJ5YnlndnpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NzM5MzQsImV4cCI6MjA4OTU0OTkzNH0.We2_EJxvDjIRyyGE8zIvKyjHMFHHQLhKw1H52_YANX8
+      - key: JWT_SECRET
+        value: FemFin_AI_JWT_2026_Production_Ready_Key_At_Least_32_Chars
+      - key: CLIENT_URL
+        value: https://suvithaaaar.github.io/FemFin-AI
+      - key: XAI_API_KEY
+        value: xai-tG0aM3KpSlhQxA6UcuBDfdGmQHS22P38AEMsMVVxU5soSZwIpaOPOZvUdlCVvREMs4uwUU2KQm6aB6no

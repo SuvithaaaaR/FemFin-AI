@@ -1,0 +1,19 @@
+{
+  "files": {
+    "main.css": "/FemFin-AI/static/css/main.0518a763.css",
+    "main.js": "/FemFin-AI/static/js/main.82b4f991.js",
+    "static/js/239.877dba0a.chunk.js": "/FemFin-AI/static/js/239.877dba0a.chunk.js",
+    "static/js/977.1f3f69db.chunk.js": "/FemFin-AI/static/js/977.1f3f69db.chunk.js",
+    "static/js/732.0897edff.chunk.js": "/FemFin-AI/static/js/732.0897edff.chunk.js",
+    "index.html": "/FemFin-AI/index.html",
+    "main.0518a763.css.map": "/FemFin-AI/static/css/main.0518a763.css.map",
+    "main.82b4f991.js.map": "/FemFin-AI/static/js/main.82b4f991.js.map",
+    "239.877dba0a.chunk.js.map": "/FemFin-AI/static/js/239.877dba0a.chunk.js.map",
+    "977.1f3f69db.chunk.js.map": "/FemFin-AI/static/js/977.1f3f69db.chunk.js.map",
+    "732.0897edff.chunk.js.map": "/FemFin-AI/static/js/732.0897edff.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.0518a763.css",
+    "static/js/main.82b4f991.js"
+  ]
+}
