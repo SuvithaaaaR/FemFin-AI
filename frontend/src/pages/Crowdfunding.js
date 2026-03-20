@@ -261,7 +261,9 @@ function Crowdfunding() {
       notifications.show({
         title: "Error",
         message:
-          error.response?.data?.message || "Failed to create campaign",
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to create campaign",
         color: "red",
       });
     } finally {

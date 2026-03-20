@@ -262,19 +262,37 @@ exports.createCampaign = asyncHandler(async (req, res) => {
     ? req.body.category
     : "Other";
 
+  const targetAmount = Number(req.body.targetAmount);
+  if (!Number.isFinite(targetAmount) || targetAmount <= 0) {
+    throw new ErrorResponse("Target amount must be greater than 0", 400);
+  }
+
+  const minInvestment = Number(req.body.minInvestment || 1000);
+  const milestones = Array.isArray(req.body.milestones)
+    ? req.body.milestones
+        .map((item) => ({
+          title: String(item?.title || "").trim(),
+          targetAmount: Number(item?.targetAmount || 0),
+        }))
+        .filter(
+          (item) => item.title.length > 0 && Number.isFinite(item.targetAmount) && item.targetAmount > 0,
+        )
+    : [];
+
   const payload = {
     creator_id: req.user.id,
     title: req.body.title,
     description: req.body.description,
     category: normalizedCategory,
-    target_amount: Number(req.body.targetAmount || 0),
+    target_amount: targetAmount,
     current_amount: Number(req.body.currentAmount || 0),
-    min_investment: Number(req.body.minInvestment || 1000),
+    min_investment:
+      Number.isFinite(minInvestment) && minInvestment > 0
+        ? minInvestment
+        : 1000,
     end_date: req.body.endDate || null,
     status: req.body.status || "Draft",
-    entrepreneur: req.body.entrepreneur || null,
-    location: req.body.location || null,
-    milestones: req.body.milestones || [],
+    milestones,
     investments: req.body.investments || [],
     stats: req.body.stats || { views: 0 },
   };
@@ -356,12 +374,6 @@ exports.updateCampaign = asyncHandler(async (req, res, next) => {
     end_date:
       req.body.endDate !== undefined ? req.body.endDate : existing.end_date,
     status: req.body.status || existing.status,
-    entrepreneur:
-      req.body.entrepreneur !== undefined
-        ? req.body.entrepreneur
-        : existing.entrepreneur,
-    location:
-      req.body.location !== undefined ? req.body.location : existing.location,
     milestones: req.body.milestones || existing.milestones || [],
   };
 
