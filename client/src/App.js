@@ -12,6 +12,9 @@ import CreditScoring from "./pages/CreditScoring";
 import Dashboard from "./pages/Dashboard";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
+import RecommendationHistory from "./pages/RecommendationHistory";
+import PitchDeckPage from "./pages/PitchDeck";
+import InvestorDetailsPage from "./pages/InvestorDetails";
 
 function App() {
   return (
@@ -48,6 +51,30 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <FundRecommendation />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pitch-deck"
+                element={
+                  <ProtectedRoute>
+                    <PitchDeckPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/investor-details"
+                element={
+                  <ProtectedRoute>
+                    <InvestorDetailsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/recommendation-history"
+                element={
+                  <ProtectedRoute>
+                    <RecommendationHistory />
                   </ProtectedRoute>
                 }
               />

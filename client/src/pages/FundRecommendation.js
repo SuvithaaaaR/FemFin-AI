@@ -231,7 +231,7 @@ function FundRecommendation() {
                             }}
                           >
                             <Text size="xs" fw={500} c="dimmed">
-                              Comparison to your profile:
+                              Why this is suitable for your idea:
                             </Text>
                             <Text size="sm">{item.comparisonText}</Text>
                           </Paper>

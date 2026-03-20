@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { fundRecommendation } = require("../controllers");
-const { aiLimiter, optionalAuth } = require("../middleware");
+const { aiLimiter, optionalAuth, protect } = require("../middleware");
 
 /**
  * @route   POST /api/fund-recommendations/analyze
@@ -21,5 +21,12 @@ router.post(
  * @access  Public
  */
 router.get("/sources", fundRecommendation.getFundingSources);
+
+/**
+ * @route   GET /api/fund-recommendations/history
+ * @desc    Get saved recommendation submissions for logged-in user
+ * @access  Private
+ */
+router.get("/history", protect, fundRecommendation.getRecommendationHistory);
 
 module.exports = router;

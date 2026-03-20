@@ -1,0 +1,26 @@
+{
+  "agritech": {
+    "market": "₹50,000 Cr",
+    "tnLoss": "₹10,000 Cr/year",
+    "farmers": "1.2 Cr TN farmers",
+    "sampleTraction": "10 paid pilot farms across Tamil Nadu"
+  },
+  "social": {
+    "market": "₹25,000 Cr",
+    "tnLoss": "₹3,200 Cr/year social productivity gap",
+    "farmers": "8,000 women self-help groups",
+    "sampleTraction": "5 district-level women co-op partnerships"
+  },
+  "retail": {
+    "market": "₹75,000 Cr",
+    "tnLoss": "₹4,500 Cr/year inventory inefficiency",
+    "farmers": "3.5 L women-led retail businesses",
+    "sampleTraction": "12 store pilots with repeat purchase growth"
+  },
+  "investors": ["Women Entrepreneurs India", "She Capital", "Chennai Angels"],
+  "successStories": [
+    "A Chennai women-led agritech startup scaled from pilot to 3 states in 18 months.",
+    "A social commerce founder raised angel funding after proving 30% cost reduction.",
+    "A retail-tech women founder achieved 2.4x revenue growth post first institutional cheque."
+  ]
+}

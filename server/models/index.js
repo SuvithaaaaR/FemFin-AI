@@ -4,4 +4,5 @@ module.exports = {
   Business: require("./Business"),
   Campaign: require("./Campaign"),
   CreditScore: require("./CreditScore"),
+  FundRecommendationRequest: require("./FundRecommendationRequest"),
 };

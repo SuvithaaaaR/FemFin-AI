@@ -1,0 +1,206 @@
+{
+  "metadata": {
+    "totalInvestors": 112,
+    "womenFocused": 18,
+    "active2026": true,
+    "lastUpdated": "March 2026",
+    "avgTicketSize": "₹25L"
+  },
+  "networks": [
+    {
+      "id": "wei-angels",
+      "name": "Women Entrepreneurs India Angels",
+      "focus": [
+        "Women founders",
+        "Social impact",
+        "Artisans",
+        "Sustainability"
+      ],
+      "ticketSize": "₹10L-₹50L",
+      "location": "Pan India",
+      "contact": {
+        "email": "contact@womenentrepreneursindia.com",
+        "phone": "+91-XXXXXXXXXX",
+        "website": "https://www.womenentrepreneursindia.com/wei-angel.php"
+      },
+      "keyMembers": [
+        {
+          "name": "Lavanya Chinthakayala",
+          "linkedin": "linkedin.com/in/lavanya"
+        },
+        { "name": "Meghana Narsimha", "focus": "Sustainability" }
+      ],
+      "womenFocus": true,
+      "responseTime": "2-4 weeks",
+      "applicationProcess": "Online form -> Screening -> Pitch"
+    },
+    {
+      "id": "she-capital",
+      "name": "She Capital",
+      "focus": ["Women founders", "Tech", "Consumer", "Fintech"],
+      "ticketSize": "₹25L-₹2Cr",
+      "location": "Mumbai",
+      "contact": {
+        "email": "info@shecapital.vc",
+        "website": "https://www.shecapital.vc"
+      },
+      "womenFocus": true,
+      "responseTime": "3-6 weeks"
+    },
+    {
+      "id": "ian-indian",
+      "name": "Indian Angel Network (IAN)",
+      "focus": ["Seed", "Tech", "Healthcare", "Fintech", "DeepTech"],
+      "ticketSize": "₹50L-₹5Cr",
+      "location": "Delhi-NCR",
+      "contact": {
+        "email": "startups@indianangelnetwork.com",
+        "website": "https://iangroup.vc"
+      },
+      "responseTime": "4-8 weeks",
+      "notableInvestments": ["Postman", "Urban Company"]
+    },
+    {
+      "id": "chennai-angels",
+      "name": "Chennai Angels (TCA)",
+      "focus": ["TN startups", "AgriTech", "HealthTech", "EdTech", "SaaS"],
+      "ticketSize": "₹20L-₹75L",
+      "location": "Chennai",
+      "contact": {
+        "email": "startups@thechennaiangels.com",
+        "website": "https://thechennaiangels.com"
+      },
+      "responseTime": "3-5 weeks",
+      "tnFocus": true
+    },
+    {
+      "id": "kerala-angels",
+      "name": "Kerala Angel Network",
+      "focus": ["South India", "DeepTech", "SaaS", "Consumer", "Health"],
+      "ticketSize": "₹10L-₹50L",
+      "location": "Kochi",
+      "contact": {
+        "email": "funding@keralaangelnetwork.com",
+        "website": "https://kerala.tie.org/kan"
+      },
+      "responseTime": "2-4 weeks"
+    },
+    {
+      "id": "mumbai-angels",
+      "name": "Mumbai Angels Network",
+      "focus": ["Consumer", "Fintech", "EdTech", "HealthTech"],
+      "ticketSize": "₹25L-₹1Cr",
+      "location": "Mumbai",
+      "contact": {
+        "email": "info@mumbaiangels.com",
+        "website": "https://www.mumbaiangels.com"
+      },
+      "responseTime": "4-6 weeks"
+    },
+    {
+      "id": "hyderabad-angels",
+      "name": "Hyderabad Angels",
+      "focus": ["DeepTech", "AI/ML", "SaaS", "Fintech"],
+      "ticketSize": "₹15L-₹60L",
+      "location": "Hyderabad",
+      "contact": {
+        "email": "startups@hyderabadangels.in",
+        "website": "https://hyderabadangels.in"
+      }
+    },
+    {
+      "id": "ah-ventures",
+      "name": "ah! Ventures",
+      "focus": ["Early stage", "Tech", "Consumer"],
+      "ticketSize": "₹20L-₹80L",
+      "location": "Ahmedabad",
+      "contact": {
+        "email": "info@ahventures.in",
+        "website": "https://www.ahventures.in"
+      }
+    },
+    {
+      "id": "lead-angels",
+      "name": "Lead Angels",
+      "focus": ["Pre-seed", "Seed", "Marketplace"],
+      "ticketSize": "₹10L-₹40L",
+      "location": "Pan India",
+      "contact": {
+        "email": "hello@leadangels.in",
+        "website": "https://leadangels.in"
+      },
+      "responseTime": "1-3 weeks"
+    },
+    {
+      "id": "letsventure",
+      "name": "LetsVenture",
+      "focus": ["Seed", "Series A", "SaaS", "Marketplace"],
+      "ticketSize": "₹80L-₹40Cr",
+      "location": "Pan India",
+      "contact": {
+        "email": "startups@letsventure.com",
+        "website": "https://letsventure.com"
+      },
+      "womenFocus": true
+    }
+  ],
+  "individuals": [
+    {
+      "id": "kunal-shah",
+      "name": "Kunal Shah",
+      "title": "Founder @ CRED",
+      "focus": ["Fintech", "Consumer tech", "SaaS", "AI"],
+      "ticketSize": "₹1Cr-₹5Cr",
+      "location": "Mumbai",
+      "contact": {
+        "twitter": "https://twitter.com/mkunals",
+        "linkedin": "https://linkedin.com/in/kunals"
+      },
+      "recentDeal": "ZILO Series A (Feb 2026)",
+      "investments": 186,
+      "response": "Twitter DM"
+    },
+    {
+      "id": "anupam-mittal",
+      "name": "Anupam Mittal",
+      "title": "Founder @ Shaadi.com, People Group",
+      "focus": ["Consumer", "E-commerce", "HealthTech"],
+      "ticketSize": "₹50L-₹3Cr",
+      "location": "Mumbai",
+      "contact": {
+        "twitter": "https://twitter.com/anupamittal",
+        "sharks": "Shark Tank India"
+      },
+      "investments": 100
+    },
+    {
+      "id": "ramakant-sharma",
+      "name": "Ramakant Sharma",
+      "title": "Founder @ Livspace",
+      "focus": ["Consumer", "HomeTech", "SaaS"],
+      "ticketSize": "₹25L-₹1Cr",
+      "location": "Bengaluru",
+      "contact": {
+        "linkedin": "https://linkedin.com/in/ramakant"
+      },
+      "recentDeal": "Material Depot Series A (Feb 2026)"
+    },
+    {
+      "id": "kunal-bahl",
+      "name": "Kunal Bahl",
+      "title": "Co-founder @ Snapdeal",
+      "focus": ["Consumer", "E-commerce", "Marketplace"],
+      "ticketSize": "₹1Cr-₹10Cr",
+      "location": "Delhi",
+      "investments": 63
+    }
+  ],
+  "regional": {
+    "tamilNadu": ["chennai-angels"],
+    "karnataka": ["letsventure", "bangalore-angels"],
+    "maharashtra": ["mumbai-angels", "she-capital"],
+    "kerala": ["kerala-angels"],
+    "telangana": ["hyderabad-angels"]
+  },
+  "womenNetworks": ["wei-angels", "she-capital", "letsventure"]
+}

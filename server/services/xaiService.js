@@ -1,3 +1,5 @@
+const axios = require("axios");
+const { generateText } = require("ai");
 const { createXai } = require("@ai-sdk/xai");
 require("dotenv").config();
 
@@ -5,6 +7,80 @@ require("dotenv").config();
 const xai = createXai({
   apiKey: process.env.XAI_API_KEY,
 });
+
+const AI_PROVIDER = (process.env.AI_PROVIDER || "grok").toLowerCase();
+const OLLAMA_URL = process.env.OLLAMA_URL || "http://127.0.0.1:11434";
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "llama3.1:8b";
+const DEFAULT_MODEL = "grok-beta";
+
+const useOllama = () => AI_PROVIDER === "ollama";
+
+const resolveModel = (modelName) => {
+  try {
+    return xai(modelName || DEFAULT_MODEL);
+  } catch (error) {
+    console.warn(
+      `Invalid model '${modelName}', falling back to ${DEFAULT_MODEL}`,
+    );
+    return xai(DEFAULT_MODEL);
+  }
+};
+
+const generateOllamaResponse = async (
+  prompt,
+  { temperature = 0.7, maxTokens = 1000 } = {},
+) => {
+  const response = await axios.post(
+    `${OLLAMA_URL}/api/generate`,
+    {
+      model: OLLAMA_MODEL,
+      prompt,
+      stream: false,
+      options: {
+        temperature,
+        num_predict: maxTokens,
+      },
+    },
+    {
+      timeout: 120000,
+    },
+  );
+
+  const text = response?.data?.response;
+  if (!text || typeof text !== "string") {
+    throw new Error("Invalid response from Ollama");
+  }
+
+  return text.trim();
+};
+
+const chatWithOllama = async (
+  messages,
+  { temperature = 0.8, maxTokens = 1500 } = {},
+) => {
+  const response = await axios.post(
+    `${OLLAMA_URL}/api/chat`,
+    {
+      model: OLLAMA_MODEL,
+      messages,
+      stream: false,
+      options: {
+        temperature,
+        num_predict: maxTokens,
+      },
+    },
+    {
+      timeout: 120000,
+    },
+  );
+
+  const text = response?.data?.message?.content;
+  if (!text || typeof text !== "string") {
+    throw new Error("Invalid chat response from Ollama");
+  }
+
+  return text.trim();
+};
 
 /**
  * Generate AI response using Grok
@@ -14,17 +90,25 @@ const xai = createXai({
  */
 async function generateGrokResponse(prompt, model = "grok-beta") {
   try {
-    const response = await xai.chat.completions.create({
-      model: model,
-      messages: [{ role: "user", content: prompt }],
+    if (useOllama()) {
+      return await generateOllamaResponse(prompt, {
+        temperature: 0.7,
+        maxTokens: 1000,
+      });
+    }
+
+    const { text } = await generateText({
+      model: resolveModel(model),
+      prompt,
       temperature: 0.7,
-      max_tokens: 1000,
+      maxTokens: 1000,
     });
 
-    return response.choices[0].message.content;
+    return text;
   } catch (error) {
-    console.error("Error calling Grok AI:", error.message);
-    throw new Error("Failed to generate AI response");
+    const providerName = useOllama() ? "Ollama" : "Grok";
+    console.error(`Error calling ${providerName} AI:`, error.message);
+    throw new Error(`Failed to generate AI response via ${providerName}`);
   }
 }
 
@@ -167,17 +251,37 @@ async function chatWithGrok(message, conversationHistory = []) {
       { role: "user", content: message },
     ];
 
-    const response = await xai.chat.completions.create({
-      model: "grok-beta",
-      messages: messages,
+    const normalizedMessages = messages
+      .filter((msg) => msg && typeof msg.content === "string")
+      .map((msg) => ({
+        role:
+          msg.role === "assistant"
+            ? "assistant"
+            : msg.role === "system"
+              ? "system"
+              : "user",
+        content: msg.content,
+      }));
+
+    if (useOllama()) {
+      return await chatWithOllama(normalizedMessages, {
+        temperature: 0.8,
+        maxTokens: 1500,
+      });
+    }
+
+    const { text } = await generateText({
+      model: resolveModel(DEFAULT_MODEL),
+      messages: normalizedMessages,
       temperature: 0.8,
-      max_tokens: 1500,
+      maxTokens: 1500,
     });
 
-    return response.choices[0].message.content;
+    return text;
   } catch (error) {
-    console.error("Error in chat:", error.message);
-    throw new Error("Failed to process chat message");
+    const providerName = useOllama() ? "Ollama" : "Grok";
+    console.error(`Error in ${providerName} chat:`, error.message);
+    throw new Error(`Failed to process chat message via ${providerName}`);
   }
 }
 

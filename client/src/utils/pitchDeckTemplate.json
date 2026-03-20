@@ -1,0 +1,28 @@
+{
+  "slides": [
+    { "id": 1, "title": "Cover", "fields": ["company", "tagline", "contact"] },
+    { "id": 2, "title": "Problem", "fields": ["problem", "marketPain"] },
+    { "id": 3, "title": "Solution", "fields": ["solution", "differentiator"] },
+    { "id": 4, "title": "Market", "fields": ["tam", "sam", "som"] },
+    {
+      "id": 5,
+      "title": "Business Model",
+      "fields": ["pricing", "unitEconomics"]
+    },
+    { "id": 6, "title": "Traction", "fields": ["traction", "milestones"] },
+    {
+      "id": 7,
+      "title": "Competition",
+      "fields": ["competitors", "positioning"]
+    },
+    {
+      "id": 8,
+      "title": "Go-to-Market",
+      "fields": ["channels", "regionalPlan"]
+    },
+    { "id": 9, "title": "Team", "fields": ["founder", "advisors"] },
+    { "id": 10, "title": "Financials", "fields": ["year1", "year2", "year3"] },
+    { "id": 11, "title": "Ask", "fields": ["fundingAsk", "fundUse"] },
+    { "id": 12, "title": "Contact / Thank You", "fields": ["contact", "cta"] }
+  ]
+}

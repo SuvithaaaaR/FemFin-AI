@@ -19,6 +19,7 @@ import {
   IconCoins,
   IconCreditCard,
   IconDashboard,
+  IconClock,
   IconSun,
   IconMoon,
   IconLogin,
@@ -85,6 +86,40 @@ function Header() {
                 onClick={() => navigate("/fund-recommendation")}
               >
                 AI Recommendation
+              </Menu.Item>
+              <Menu.Item
+                leftSection={<IconClock size={rem(16)} />}
+                onClick={() => navigate("/recommendation-history")}
+              >
+                Recommendation History
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
+
+          <Menu shadow="md" width={240} position="bottom-start">
+            <Menu.Target>
+              <Button
+                variant="subtle"
+                leftSection={<IconChartBar size={rem(16)} />}
+                rightSection={<IconChevronDown size={rem(14)} />}
+              >
+                Pitch Desk
+              </Button>
+            </Menu.Target>
+
+            <Menu.Dropdown>
+              <Menu.Label>Pitch Desk</Menu.Label>
+              <Menu.Item
+                leftSection={<IconChartBar size={rem(16)} />}
+                onClick={() => navigate("/pitch-deck")}
+              >
+                Pitch Deck Generator
+              </Menu.Item>
+              <Menu.Item
+                leftSection={<IconClock size={rem(16)} />}
+                onClick={() => navigate("/investor-details")}
+              >
+                Investor Details
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>
@@ -221,6 +256,35 @@ function Header() {
                 }}
               >
                 AI Recommendation
+              </Menu.Item>
+              <Menu.Item
+                leftSection={<IconClock size={rem(16)} />}
+                onClick={() => {
+                  navigate("/recommendation-history");
+                  toggle();
+                }}
+              >
+                Recommendation History
+              </Menu.Item>
+              <Menu.Divider />
+              <Menu.Label>Pitch Desk</Menu.Label>
+              <Menu.Item
+                leftSection={<IconChartBar size={rem(16)} />}
+                onClick={() => {
+                  navigate("/pitch-deck");
+                  toggle();
+                }}
+              >
+                Pitch Deck Generator
+              </Menu.Item>
+              <Menu.Item
+                leftSection={<IconClock size={rem(16)} />}
+                onClick={() => {
+                  navigate("/investor-details");
+                  toggle();
+                }}
+              >
+                Investor Details
               </Menu.Item>
               <Menu.Divider />
               <Menu.Item

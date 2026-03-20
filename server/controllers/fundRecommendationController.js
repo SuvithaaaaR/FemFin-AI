@@ -1,4 +1,65 @@
 const { asyncHandler, ErrorResponse } = require("../middleware/errorHandler");
+const { FundRecommendationRequest } = require("../models");
+
+const INR_FORMATTER = new Intl.NumberFormat("en-IN", {
+  maximumFractionDigits: 0,
+});
+
+const formatInr = (value) => {
+  if (typeof value !== "number" || Number.isNaN(value)) {
+    return null;
+  }
+  return `₹${INR_FORMATTER.format(value)}`;
+};
+
+const buildSuitabilityReason = (fund, userData) => {
+  const {
+    businessIdea,
+    budgetRequired,
+    industryType,
+    businessStage,
+    experience,
+  } = userData;
+
+  const ideaSnippet = businessIdea
+    ? businessIdea.trim().slice(0, 90) +
+      (businessIdea.trim().length > 90 ? "..." : "")
+    : "your business idea";
+
+  const reasons = [
+    `Your ${businessStage} ${industryType} idea (${ideaSnippet}) aligns with this fund's focus.`,
+    `Your requested budget of ${formatInr(Number(budgetRequired)) || budgetRequired} is in line with the indicative funding window (${fund.fundingRange}).`,
+    `The expected timeline (${fund.timeline}) makes it practical for your current planning phase.`,
+  ];
+
+  if (experience && experience.toLowerCase() !== "none") {
+    reasons.push(
+      `Your prior experience (${experience}) strengthens your eligibility for this option.`,
+    );
+  }
+
+  return reasons.join(" ");
+};
+
+const attachSuitabilityReasons = (recommendations, userData) => {
+  const categories = [
+    "governmentSchemes",
+    "angelInvestors",
+    "vcFunds",
+    "grants",
+  ];
+
+  categories.forEach((category) => {
+    recommendations[category] = (recommendations[category] || []).map(
+      (fund) => ({
+        ...fund,
+        comparisonText: buildSuitabilityReason(fund, userData),
+      }),
+    );
+  });
+
+  return recommendations;
+};
 
 /**
  * AI-powered fund recommendation algorithm
@@ -176,7 +237,7 @@ const analyzeFundRecommendations = (userData) => {
     });
   }
 
-  return recommendations;
+  return attachSuitabilityReasons(recommendations, userData);
 };
 
 /**
@@ -200,10 +261,43 @@ exports.analyzeFunds = asyncHandler(async (req, res, next) => {
   // Generate AI recommendations
   const recommendations = analyzeFundRecommendations(userData);
 
+  await FundRecommendationRequest.create({
+    user: req.user?._id || null,
+    fullName: userData.fullName,
+    email: userData.email,
+    phone: userData.phone,
+    businessIdea: userData.businessIdea,
+    budgetRequired: Number(userData.budgetRequired),
+    industryType: userData.industryType,
+    businessStage: userData.businessStage,
+    experience: userData.experience,
+    location: userData.location,
+    teamSize: userData.teamSize,
+    recommendations,
+  });
+
   res.status(200).json({
     success: true,
     message: "Analysis completed successfully",
     recommendations,
+  });
+});
+
+/**
+ * @desc    Get saved AI recommendation requests for current user
+ * @route   GET /api/fund-recommendations/history
+ * @access  Private
+ */
+exports.getRecommendationHistory = asyncHandler(async (req, res) => {
+  const history = await FundRecommendationRequest.find({ user: req.user._id })
+    .sort({ createdAt: -1 })
+    .limit(50)
+    .lean();
+
+  res.status(200).json({
+    success: true,
+    count: history.length,
+    data: history,
   });
 });
 
