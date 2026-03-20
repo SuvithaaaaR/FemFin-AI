@@ -168,11 +168,7 @@ const chatWithOllama = async (
 /**
  * Generate AI response using active provider (Ollama first by default).
  */
-async function generateGrokResponse(
-  prompt,
-  model = "grok-beta",
-  options = {},
-) {
+async function generateGrokResponse(prompt, model = "grok-beta", options = {}) {
   const resolvedMaxTokens = Number(options?.maxTokens || 1000);
   const resolvedTemperature =
     typeof options?.temperature === "number" ? options.temperature : 0.7;
@@ -245,9 +241,10 @@ const getAiStatus = async () => {
   const availableOllamaModels = await getOllamaAvailableModels();
   const ollamaReady = availableOllamaModels.length > 0;
   const configuredModel = String(OLLAMA_MODEL || "").trim();
-  const selectedOllamaModel = configuredModel && availableOllamaModels.includes(configuredModel)
-    ? configuredModel
-    : availableOllamaModels[0] || null;
+  const selectedOllamaModel =
+    configuredModel && availableOllamaModels.includes(configuredModel)
+      ? configuredModel
+      : availableOllamaModels[0] || null;
 
   const grokConfigured = Boolean(RESOLVED_XAI_API_KEY);
   const modelCandidates = buildModelCandidates(DEFAULT_MODEL);
