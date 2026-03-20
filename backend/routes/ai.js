@@ -6,6 +6,8 @@ const router = express.Router();
 
 // Public status route for deployment/integration checks
 router.get("/status", aiController.getStatus);
+// Public query route for pitch deck generation flow
+router.post("/query", aiController.query);
 
 // All remaining routes require authentication
 router.use(protect);
@@ -31,8 +33,5 @@ router.post("/analyze-pitch", aiController.analyzePitch);
 
 // General chat
 router.post("/chat", aiController.chat);
-
-// General query
-router.post("/query", aiController.query);
 
 module.exports = router;
