@@ -11,7 +11,8 @@ const xai = createXai({
 const AI_PROVIDER = (process.env.AI_PROVIDER || "grok").toLowerCase();
 const OLLAMA_URL = process.env.OLLAMA_URL || "http://127.0.0.1:11434";
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "llama3.1:8b";
-const DEFAULT_MODEL = "grok-beta";
+const DEFAULT_MODEL = process.env.XAI_MODEL || "grok-beta";
+const AI_TIMEOUT_MS = Number(process.env.AI_TIMEOUT_MS || 120000);
 
 const useOllama = () => AI_PROVIDER === "ollama";
 
@@ -42,7 +43,7 @@ const generateOllamaResponse = async (
       },
     },
     {
-      timeout: 120000,
+      timeout: AI_TIMEOUT_MS,
     },
   );
 
@@ -70,7 +71,7 @@ const chatWithOllama = async (
       },
     },
     {
-      timeout: 120000,
+      timeout: AI_TIMEOUT_MS,
     },
   );
 
@@ -98,7 +99,7 @@ async function generateGrokResponse(prompt, model = "grok-beta") {
     }
 
     const { text } = await generateText({
-      model: resolveModel(model),
+      model: resolveModel(model || DEFAULT_MODEL),
       prompt,
       temperature: 0.7,
       maxTokens: 1000,
@@ -108,9 +109,24 @@ async function generateGrokResponse(prompt, model = "grok-beta") {
   } catch (error) {
     const providerName = useOllama() ? "Ollama" : "Grok";
     console.error(`Error calling ${providerName} AI:`, error.message);
-    throw new Error(`Failed to generate AI response via ${providerName}`);
+    throw new Error(
+      `Failed to generate AI response via ${providerName}. Verify provider configuration and API credentials.`,
+    );
   }
 }
+
+const getAiStatus = () => {
+  const grokConfigured = Boolean(process.env.XAI_API_KEY);
+  return {
+    provider: AI_PROVIDER,
+    ready: useOllama() || grokConfigured,
+    model: useOllama() ? OLLAMA_MODEL : DEFAULT_MODEL,
+    grokConfigured,
+    ollamaUrl: useOllama() ? OLLAMA_URL : null,
+  };
+};
+
+const isAiReady = () => getAiStatus().ready;
 
 /**
  * Generate financial advice using Grok
@@ -293,4 +309,6 @@ module.exports = {
   generateCreditScoreTips,
   analyzePitch,
   chatWithGrok,
+  getAiStatus,
+  isAiReady,
 };

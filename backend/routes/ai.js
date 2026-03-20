@@ -4,7 +4,10 @@ const aiController = require("../controllers/aiController");
 
 const router = express.Router();
 
-// All routes require authentication
+// Public status route for deployment/integration checks
+router.get("/status", aiController.getStatus);
+
+// All remaining routes require authentication
 router.use(protect);
 
 /**

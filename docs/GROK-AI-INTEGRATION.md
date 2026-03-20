@@ -35,11 +35,32 @@ npm install @ai-sdk/xai axios dotenv
 Open `backend/.env` and add your xAI API key:
 
 ```env
-# xAI API Key (for Grok AI)
+AI_PROVIDER=grok
+XAI_MODEL=grok-beta
+AI_TIMEOUT_MS=120000
 XAI_API_KEY=your_actual_xai_api_key_here
 ```
 
 ⚠️ **Important**: Replace `your_actual_xai_api_key_here` with your real API key!
+
+### 3. Verify Integration Status
+
+Use the status endpoint to confirm provider readiness:
+
+**Endpoint**: `GET /api/ai/status`
+
+Expected response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "provider": "grok",
+    "ready": true,
+    "model": "grok-beta"
+  }
+}
+```
 
 ---
 

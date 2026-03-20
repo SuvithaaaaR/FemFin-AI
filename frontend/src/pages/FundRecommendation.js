@@ -185,6 +185,22 @@ function FundRecommendation() {
           </div>
         </Group>
 
+        {recommendations.aiSummary && (
+          <Card withBorder radius="md" padding="md" bg="violet.0">
+            <Stack gap="xs">
+              <Group justify="space-between">
+                <Text fw={700}>Grok AI Summary</Text>
+                <Badge variant="light" color="grape">
+                  {recommendations.provider || "grok"}
+                </Badge>
+              </Group>
+              <Text size="sm" style={{ whiteSpace: "pre-wrap" }}>
+                {recommendations.aiSummary}
+              </Text>
+            </Stack>
+          </Card>
+        )}
+
         {categories.map((category, idx) => (
           <Card key={idx} shadow="sm" padding="lg" radius="md" withBorder>
             <Stack gap="md">

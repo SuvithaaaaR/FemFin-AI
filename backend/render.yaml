@@ -13,15 +13,21 @@ services:
       - key: PORT
         value: 10000
       - key: SUPABASE_URL
-        value: https://wudgzyrfeegibybygvzl.supabase.co
+        sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY
-        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1ZGd6eXJmZWVnaWJ5YnlndnpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NzM5MzQsImV4cCI6MjA4OTU0OTkzNH0.We2_EJxvDjIRyyGE8zIvKyjHMFHHQLhKw1H52_YANX8
+        sync: false
       - key: JWT_SECRET
-        value: FemFin_AI_JWT_2026_Production_Ready_Key_At_Least_32_Chars
+        sync: false
       - key: CLIENT_URL
         value: https://femfin.app
+      - key: AI_PROVIDER
+        value: grok
+      - key: XAI_MODEL
+        value: grok-beta
+      - key: AI_TIMEOUT_MS
+        value: 120000
       - key: XAI_API_KEY
-        value: xai-tG0aM3KpSlhQxA6UcuBDfdGmQHS22P38AEMsMVVxU5soSZwIpaOPOZvUdlCVvREMs4uwUU2KQm6aB6no
+        sync: false
       - key: AUTH_RATE_LIMIT_WINDOW
         value: 15
       - key: AUTH_RATE_LIMIT_MAX

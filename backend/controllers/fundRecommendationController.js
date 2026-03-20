@@ -1,5 +1,7 @@
 const { asyncHandler, ErrorResponse } = require("../middleware/errorHandler");
 const { getSupabase } = require("../config/supabase");
+const { FALLBACK_FUNDS } = require("../data/fundCatalog");
+const xaiService = require("../services/xaiService");
 
 const INR_FORMATTER = new Intl.NumberFormat("en-IN", {
   maximumFractionDigits: 0,
@@ -10,6 +12,56 @@ const formatInr = (value) => {
     return null;
   }
   return `₹${INR_FORMATTER.format(value)}`;
+};
+
+const formatFundingRange = (fund) => {
+  const min = fund?.fundingRange?.min ?? fund?.amount;
+  const max = fund?.fundingRange?.max ?? fund?.amount;
+
+  if (min && max) {
+    return `${formatInr(min) || min} - ${formatInr(max) || max}`;
+  }
+  if (max) {
+    return `Up to ${formatInr(max) || max}`;
+  }
+  if (min) {
+    return `From ${formatInr(min) || min}`;
+  }
+  return "Not specified";
+};
+
+const buildFundCatalogContext = (funds) =>
+  funds
+    .map((fund, index) => {
+      const eligibility = Array.isArray(fund.eligibility)
+        ? fund.eligibility.slice(0, 3).join("; ")
+        : "Eligibility not specified";
+
+      return `${index + 1}. ${fund.name || fund.title} [${fund.category || "General"}] - Funding: ${formatFundingRange(fund)}. Timeline: ${fund.timeline || "N/A"}. Eligibility: ${eligibility}. Summary: ${fund.description || "No description"}.`;
+    })
+    .join("\n");
+
+const fetchFundCatalogSnapshot = async (supabase, limit = 12) => {
+  try {
+    const { data, error } = await supabase
+      .from("funds")
+      .select("*")
+      .eq("status", "Active")
+      .order("updated_at", { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      throw error;
+    }
+
+    if (data?.length) {
+      return data;
+    }
+  } catch (error) {
+    console.warn("Using fallback catalog for AI recommendation summary:", error.message);
+  }
+
+  return FALLBACK_FUNDS.slice(0, limit);
 };
 
 const buildSuitabilityReason = (fund, userData) => {
@@ -262,6 +314,36 @@ exports.analyzeFunds = asyncHandler(async (req, res, next) => {
   // Generate AI recommendations
   const recommendations = analyzeFundRecommendations(userData);
 
+  let aiSummary = null;
+  let recommendationProvider = "rule-engine";
+
+  if (xaiService.isAiReady()) {
+    try {
+      const catalogSnapshot = await fetchFundCatalogSnapshot(supabase, 12);
+      const catalogContext = buildFundCatalogContext(catalogSnapshot);
+
+      aiSummary = await xaiService.generateFundRecommendations(
+        {
+          industry: userData.industryType,
+          stage: userData.businessStage,
+          fundingAmount: userData.budgetRequired,
+          location: userData.location,
+          businessModel: userData.businessIdea,
+        },
+        catalogContext,
+      );
+      recommendationProvider = "grok";
+    } catch (error) {
+      console.error("Grok recommendation summary failed:", error.message);
+    }
+  }
+
+  const responsePayload = {
+    ...recommendations,
+    aiSummary,
+    provider: recommendationProvider,
+  };
+
   await supabase.from("fund_recommendation_requests").insert({
     user_id: req.user?.id || null,
     full_name: userData.fullName,
@@ -274,13 +356,13 @@ exports.analyzeFunds = asyncHandler(async (req, res, next) => {
     experience: userData.experience,
     location: userData.location,
     team_size: userData.teamSize,
-    recommendations,
+    recommendations: responsePayload,
   });
 
   res.status(200).json({
     success: true,
     message: "Analysis completed successfully",
-    recommendations,
+    recommendations: responsePayload,
   });
 });
 

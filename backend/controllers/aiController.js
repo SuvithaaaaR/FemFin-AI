@@ -297,3 +297,21 @@ exports.query = asyncHandler(async (req, res) => {
     data: response,
   });
 });
+
+/**
+ * @desc    Get AI provider integration status
+ * @route   GET /api/ai/status
+ * @access  Public
+ */
+exports.getStatus = asyncHandler(async (req, res) => {
+  const status = xaiService.getAiStatus();
+
+  res.status(200).json({
+    success: true,
+    data: {
+      provider: status.provider,
+      ready: status.ready,
+      model: status.model,
+    },
+  });
+});

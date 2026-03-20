@@ -146,6 +146,7 @@ app.get("/api", (req, res) => {
         latest: "GET /api/credit-scoring/latest",
       },
       ai: {
+        status: "GET /api/ai/status",
         financialAdvice: "POST /api/ai/financial-advice",
         analyzeBusinessPlan: "POST /api/ai/analyze-business-plan",
         fundRecommendations: "POST /api/ai/fund-recommendations",
