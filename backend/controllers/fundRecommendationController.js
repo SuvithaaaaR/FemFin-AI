@@ -84,9 +84,19 @@ const buildSuitabilityReason = (fund, userData) => {
     `The expected timeline (${fund.timeline}) makes it practical for your current planning phase.`,
   ];
 
-  if (experience && experience.toLowerCase() !== "none") {
+  const normalizedExperience =
+    typeof experience === "string"
+      ? experience.trim()
+      : experience === null || experience === undefined
+        ? ""
+        : String(experience).trim();
+
+  if (
+    normalizedExperience &&
+    normalizedExperience.toLowerCase() !== "none"
+  ) {
     reasons.push(
-      `Your prior experience (${experience}) strengthens your eligibility for this option.`,
+      `Your prior experience (${normalizedExperience}) strengthens your eligibility for this option.`,
     );
   }
 
@@ -317,7 +327,9 @@ exports.analyzeFunds = asyncHandler(async (req, res, next) => {
   let aiSummary = null;
   let recommendationProvider = "rule-engine";
 
-  if (xaiService.isAiReady()) {
+  const aiStatus = await xaiService.getAiStatus();
+
+  if (aiStatus.ready) {
     try {
       const catalogSnapshot = await fetchFundCatalogSnapshot(supabase, 12);
       const catalogContext = buildFundCatalogContext(catalogSnapshot);
@@ -332,9 +344,9 @@ exports.analyzeFunds = asyncHandler(async (req, res, next) => {
         },
         catalogContext,
       );
-      recommendationProvider = "grok";
+      recommendationProvider = aiStatus.activeProvider || aiStatus.provider;
     } catch (error) {
-      console.error("Grok recommendation summary failed:", error.message);
+      console.error("AI recommendation summary failed:", error.message);
     }
   }
 
