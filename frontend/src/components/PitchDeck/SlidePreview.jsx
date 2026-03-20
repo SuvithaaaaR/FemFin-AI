@@ -32,16 +32,25 @@ function SlidePreview({ slides }) {
                 <Text fw={700} c="pink.7">
                   {slide.id}. {slide.title}
                 </Text>
-                {slide.points.slice(0, 4).map((point, index) => (
+
+                {!!slide.points?.[0] && (
+                  <Text size="sm" fw={600}>
+                    Executive takeaway: {slide.points[0]}
+                  </Text>
+                )}
+
+                {(slide.points || []).slice(1, 9).map((point, index) => (
                   <Text key={index} size="sm" c="dimmed">
                     - {point}
                   </Text>
                 ))}
-                {slide.points.length > 4 && (
+
+                {(slide.points || []).length > 9 && (
                   <Text size="xs" c="gray.6">
-                    + {slide.points.length - 4} more analysis points in PDF
+                    + {(slide.points || []).length - 9} additional points not shown
                   </Text>
                 )}
+
                 {slide.chartData?.series?.length > 0 && (
                   <Group gap={6}>
                     <Badge size="xs" color="violet" variant="light">

@@ -1091,7 +1091,7 @@ Output schema:
           <Grid.Col span={{ base: 12, lg: 7 }}>
             <Stack>
               <PDFGenerator
-                disabled={!generatedSlides.length}
+                disabled={!generatedSlides.length || loading}
                 onDownload={handleDownloadPdf}
                 onPreview={handlePreviewPdf}
                 onSave={handleSave}
