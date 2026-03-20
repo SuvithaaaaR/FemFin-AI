@@ -146,6 +146,24 @@ async function generateGrokResponse(
   } catch (error) {
     const providerName = useOllama() ? "Ollama" : "Grok";
     console.error(`Error calling ${providerName} AI:`, error.message);
+
+    const message = String(error?.message || "").toLowerCase();
+    if (
+      message.includes("doesn't have any credits") ||
+      message.includes("does not have permission") ||
+      message.includes("credits or licenses")
+    ) {
+      throw new Error(
+        "xAI account has no active credits/license. Add credits in xAI console and retry.",
+      );
+    }
+
+    if (message.includes("model not found")) {
+      throw new Error(
+        "Configured Grok model is unavailable for this xAI account. Update to an allowed model and retry.",
+      );
+    }
+
     throw new Error(
       `Failed to generate AI response via ${providerName}. Verify provider configuration and API credentials.`,
     );

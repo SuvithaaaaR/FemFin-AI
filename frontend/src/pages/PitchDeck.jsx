@@ -700,10 +700,13 @@ Output schema:
               });
             }
           } catch (error) {
+            const backendMessage =
+              error.response?.data?.message ||
+              error.response?.data?.error ||
+              "Grok is temporarily unavailable.";
             notifications.show({
               title: "AI fallback enabled",
-              message:
-                "Grok is temporarily unavailable. Generated with advanced local investor template.",
+              message: `${backendMessage} Generated with advanced local investor template.`,
               color: "yellow",
             });
           }
