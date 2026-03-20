@@ -307,14 +307,16 @@ exports.query = asyncHandler(async (req, res) => {
  * @access  Public
  */
 exports.getStatus = asyncHandler(async (req, res) => {
-  const status = xaiService.getAiStatus();
+  const status = await xaiService.getAiStatus();
 
   res.status(200).json({
     success: true,
     data: {
       provider: status.provider,
+      activeProvider: status.activeProvider,
       ready: status.ready,
       model: status.model,
+      modelCandidates: status.modelCandidates,
     },
   });
 });

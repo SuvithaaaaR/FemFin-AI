@@ -7,18 +7,78 @@ const FALLBACK_XAI_API_KEY =
   "xai-tG0aM3KpSlhQxA6UcuBDfdGmQHS22P38AEMsMVVxU5soSZwIpaOPOZvUdlCVvREMs4uwUU2KQm6aB6no";
 const RESOLVED_XAI_API_KEY = process.env.XAI_API_KEY || FALLBACK_XAI_API_KEY;
 
-// Initialize xAI with your API key
+// Initialize xAI with API key (used for Grok fallback/auto mode).
 const xai = createXai({
   apiKey: RESOLVED_XAI_API_KEY,
 });
 
-const AI_PROVIDER = (process.env.AI_PROVIDER || "grok").toLowerCase();
+const AI_PROVIDER = (process.env.AI_PROVIDER || "ollama").toLowerCase();
 const OLLAMA_URL = process.env.OLLAMA_URL || "http://127.0.0.1:11434";
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "llama3.1:8b";
 const DEFAULT_MODEL = process.env.XAI_MODEL || "grok-2-latest";
 const AI_TIMEOUT_MS = Number(process.env.AI_TIMEOUT_MS || 120000);
 
-const useOllama = () => AI_PROVIDER === "ollama";
+const useOllamaOnly = () => AI_PROVIDER === "ollama";
+const useAutoProvider = () => AI_PROVIDER === "auto";
+const shouldPreferOllama = () => useOllamaOnly() || useAutoProvider();
+
+let ollamaCache = {
+  checkedAt: 0,
+  models: [],
+};
+
+const OLLAMA_CACHE_TTL_MS = 45000;
+
+const getOllamaAvailableModels = async (forceRefresh = false) => {
+  const now = Date.now();
+  if (
+    !forceRefresh &&
+    now - ollamaCache.checkedAt < OLLAMA_CACHE_TTL_MS &&
+    Array.isArray(ollamaCache.models)
+  ) {
+    return ollamaCache.models;
+  }
+
+  try {
+    const response = await axios.get(`${OLLAMA_URL}/api/tags`, {
+      timeout: 8000,
+    });
+
+    const models = (response?.data?.models || [])
+      .map((item) => item?.name)
+      .filter((name) => typeof name === "string" && name.trim().length > 0);
+
+    ollamaCache = {
+      checkedAt: now,
+      models,
+    };
+
+    return models;
+  } catch (error) {
+    ollamaCache = {
+      checkedAt: now,
+      models: [],
+    };
+    return [];
+  }
+};
+
+const resolveOllamaModel = async () => {
+  const availableModels = await getOllamaAvailableModels();
+
+  if (!availableModels.length) {
+    throw new Error(
+      "No local Ollama model found. Pull a model first (example: ollama pull llama3.1:8b).",
+    );
+  }
+
+  const preferred = String(OLLAMA_MODEL || "").trim();
+  if (preferred && availableModels.includes(preferred)) {
+    return preferred;
+  }
+
+  return availableModels[0];
+};
 
 const resolveModel = (modelName) => {
   try {
@@ -49,10 +109,12 @@ const generateOllamaResponse = async (
   prompt,
   { temperature = 0.7, maxTokens = 1000 } = {},
 ) => {
+  const resolvedModel = await resolveOllamaModel();
+
   const response = await axios.post(
     `${OLLAMA_URL}/api/generate`,
     {
-      model: OLLAMA_MODEL,
+      model: resolvedModel,
       prompt,
       stream: false,
       options: {
@@ -77,10 +139,12 @@ const chatWithOllama = async (
   messages,
   { temperature = 0.8, maxTokens = 1500 } = {},
 ) => {
+  const resolvedModel = await resolveOllamaModel();
+
   const response = await axios.post(
     `${OLLAMA_URL}/api/chat`,
     {
-      model: OLLAMA_MODEL,
+      model: resolvedModel,
       messages,
       stream: false,
       options: {
@@ -102,10 +166,7 @@ const chatWithOllama = async (
 };
 
 /**
- * Generate AI response using Grok
- * @param {string} prompt - The prompt to send to Grok
- * @param {string} model - The model to use (default: grok-beta)
- * @returns {Promise<string>} - The AI response
+ * Generate AI response using active provider (Ollama first by default).
  */
 async function generateGrokResponse(
   prompt,
@@ -117,11 +178,21 @@ async function generateGrokResponse(
     typeof options?.temperature === "number" ? options.temperature : 0.7;
 
   try {
-    if (useOllama()) {
-      return await generateOllamaResponse(prompt, {
-        temperature: resolvedTemperature,
-        maxTokens: resolvedMaxTokens,
-      });
+    if (shouldPreferOllama()) {
+      try {
+        return await generateOllamaResponse(prompt, {
+          temperature: resolvedTemperature,
+          maxTokens: resolvedMaxTokens,
+        });
+      } catch (ollamaError) {
+        if (useOllamaOnly()) {
+          throw ollamaError;
+        }
+        console.warn(
+          "Ollama unavailable in auto mode, falling back to Grok:",
+          ollamaError.message,
+        );
+      }
     }
 
     const modelCandidates = buildModelCandidates(model || DEFAULT_MODEL);
@@ -144,7 +215,7 @@ async function generateGrokResponse(
 
     throw new Error(`All Grok model attempts failed. ${failures.join(" | ")}`);
   } catch (error) {
-    const providerName = useOllama() ? "Ollama" : "Grok";
+    const providerName = shouldPreferOllama() ? "Ollama/Grok" : "Grok";
     console.error(`Error calling ${providerName} AI:`, error.message);
 
     const message = String(error?.message || "").toLowerCase();
@@ -170,25 +241,52 @@ async function generateGrokResponse(
   }
 }
 
-const getAiStatus = () => {
+const getAiStatus = async () => {
+  const availableOllamaModels = await getOllamaAvailableModels();
+  const ollamaReady = availableOllamaModels.length > 0;
+  const configuredModel = String(OLLAMA_MODEL || "").trim();
+  const selectedOllamaModel = configuredModel && availableOllamaModels.includes(configuredModel)
+    ? configuredModel
+    : availableOllamaModels[0] || null;
+
   const grokConfigured = Boolean(RESOLVED_XAI_API_KEY);
   const modelCandidates = buildModelCandidates(DEFAULT_MODEL);
+
+  let activeProvider = "none";
+  if (useOllamaOnly()) {
+    activeProvider = ollamaReady ? "ollama" : "none";
+  } else if (useAutoProvider()) {
+    activeProvider = ollamaReady ? "ollama" : grokConfigured ? "grok" : "none";
+  } else {
+    activeProvider = grokConfigured ? "grok" : "none";
+  }
+
   return {
     provider: AI_PROVIDER,
-    ready: useOllama() || grokConfigured,
-    model: useOllama() ? OLLAMA_MODEL : modelCandidates[0],
-    modelCandidates: useOllama() ? [OLLAMA_MODEL] : modelCandidates,
+    activeProvider,
+    ready:
+      activeProvider === "ollama"
+        ? ollamaReady
+        : activeProvider === "grok"
+          ? grokConfigured
+          : false,
+    model:
+      activeProvider === "ollama" ? selectedOllamaModel : modelCandidates[0],
+    modelCandidates:
+      activeProvider === "ollama" ? availableOllamaModels : modelCandidates,
     grokConfigured,
-    ollamaUrl: useOllama() ? OLLAMA_URL : null,
+    ollamaUrl: shouldPreferOllama() ? OLLAMA_URL : null,
+    availableOllamaModels,
   };
 };
 
-const isAiReady = () => getAiStatus().ready;
+const isAiReady = async () => {
+  const status = await getAiStatus();
+  return Boolean(status.ready);
+};
 
 /**
- * Generate financial advice using Grok
- * @param {Object} userData - User's financial data
- * @returns {Promise<string>} - Financial advice
+ * Generate financial advice.
  */
 async function generateFinancialAdvice(userData) {
   const prompt = `As a financial advisor for women entrepreneurs, provide personalized advice based on the following:
@@ -204,9 +302,7 @@ Provide concise, actionable financial recommendations.`;
 }
 
 /**
- * Analyze business plan using Grok
- * @param {string} businessPlan - The business plan text
- * @returns {Promise<string>} - Analysis and feedback
+ * Analyze business plan.
  */
 async function analyzeBusinessPlan(businessPlan) {
   const prompt = `Analyze this business plan and provide constructive feedback:
@@ -224,9 +320,7 @@ Focus on:
 }
 
 /**
- * Generate fund matching recommendations
- * @param {Object} businessProfile - Business profile data
- * @returns {Promise<string>} - Fund recommendations
+ * Generate fund matching recommendations.
  */
 async function generateFundRecommendations(
   businessProfile,
@@ -241,7 +335,7 @@ async function generateFundRecommendations(
 Applicant Profile:
 - Industry: ${businessProfile.industry || "Not specified"}
 - Stage: ${businessProfile.stage || "Not specified"}
-- Funding Need: ₹${businessProfile.fundingAmount || "Not specified"}
+- Funding Need: ?${businessProfile.fundingAmount || "Not specified"}
 - Location: ${businessProfile.location || "Not specified"}
 - Business Model: ${businessProfile.businessModel || "Not specified"}
 
@@ -266,10 +360,7 @@ Summary: ...`;
 }
 
 /**
- * Generate credit score improvement tips
- * @param {number} currentScore - Current credit score
- * @param {Object} financialHistory - Financial history data
- * @returns {Promise<string>} - Improvement tips
+ * Generate credit score improvement tips.
  */
 async function generateCreditScoreTips(currentScore, financialHistory) {
   const prompt = `Provide actionable tips to improve a credit score of ${currentScore}.
@@ -285,9 +376,7 @@ Give 5-7 specific, practical steps to improve the credit score.`;
 }
 
 /**
- * Generate investment pitch feedback
- * @param {string} pitch - The investment pitch text
- * @returns {Promise<string>} - Feedback and suggestions
+ * Generate investment pitch feedback.
  */
 async function analyzePitch(pitch) {
   const prompt = `Review this investment pitch and provide detailed feedback:
@@ -307,10 +396,7 @@ Evaluate:
 }
 
 /**
- * Chat with Grok (general conversation)
- * @param {string} message - User's message
- * @param {Array} conversationHistory - Previous messages
- * @returns {Promise<string>} - AI response
+ * Chat with AI assistant.
  */
 async function chatWithGrok(message, conversationHistory = []) {
   try {
@@ -336,11 +422,21 @@ async function chatWithGrok(message, conversationHistory = []) {
         content: msg.content,
       }));
 
-    if (useOllama()) {
-      return await chatWithOllama(normalizedMessages, {
-        temperature: 0.8,
-        maxTokens: 1500,
-      });
+    if (shouldPreferOllama()) {
+      try {
+        return await chatWithOllama(normalizedMessages, {
+          temperature: 0.8,
+          maxTokens: 1500,
+        });
+      } catch (ollamaError) {
+        if (useOllamaOnly()) {
+          throw ollamaError;
+        }
+        console.warn(
+          "Ollama chat unavailable in auto mode, falling back to Grok:",
+          ollamaError.message,
+        );
+      }
     }
 
     const { text } = await generateText({
@@ -352,7 +448,7 @@ async function chatWithGrok(message, conversationHistory = []) {
 
     return text;
   } catch (error) {
-    const providerName = useOllama() ? "Ollama" : "Grok";
+    const providerName = shouldPreferOllama() ? "Ollama/Grok" : "Grok";
     console.error(`Error in ${providerName} chat:`, error.message);
     throw new Error(`Failed to process chat message via ${providerName}`);
   }
