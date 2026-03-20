@@ -12,6 +12,8 @@ const BLOCKCHAIN_PRIVATE_KEY = process.env.BLOCKCHAIN_PRIVATE_KEY || "";
 const BLOCKCHAIN_NETWORK = process.env.BLOCKCHAIN_NETWORK || "sepolia";
 const BLOCKCHAIN_EXPLORER_BASE_URL =
   process.env.BLOCKCHAIN_EXPLORER_BASE_URL || "https://sepolia.etherscan.io/tx/";
+const INVESTMENT_AGREEMENT_VERSION =
+  process.env.INVESTMENT_AGREEMENT_VERSION || "v1.0";
 
 const isRazorpayConfigured = () =>
   Boolean(RAZORPAY_KEY_ID) && Boolean(RAZORPAY_KEY_SECRET);
@@ -67,6 +69,18 @@ const verifyRazorpaySignature = ({ orderId, paymentId, signature }) => {
 const fetchRazorpayPayment = async (paymentId) => {
   const authHeader = Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString("base64");
   const { data } = await axios.get(`${RAZORPAY_BASE_URL}/payments/${paymentId}`, {
+    headers: {
+      Authorization: `Basic ${authHeader}`,
+    },
+    timeout: 15000,
+  });
+
+  return data;
+};
+
+const fetchRazorpayOrder = async (orderId) => {
+  const authHeader = Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString("base64");
+  const { data } = await axios.get(`${RAZORPAY_BASE_URL}/orders/${orderId}`, {
     headers: {
       Authorization: `Basic ${authHeader}`,
     },
@@ -496,6 +510,9 @@ exports.createInvestmentOrder = asyncHandler(async (req, res, next) => {
 exports.verifyInvestmentPayment = asyncHandler(async (req, res, next) => {
   const {
     amount,
+    investorName,
+    investorEmail,
+    agreementAccepted,
     razorpay_order_id: razorpayOrderId,
     razorpay_payment_id: razorpayPaymentId,
     razorpay_signature: razorpaySignature,
@@ -503,6 +520,18 @@ exports.verifyInvestmentPayment = asyncHandler(async (req, res, next) => {
 
   if (!razorpayOrderId || !razorpayPaymentId || !razorpaySignature) {
     return next(new ErrorResponse("Missing Razorpay payment details", 400));
+  }
+
+  if (!agreementAccepted) {
+    return next(
+      new ErrorResponse("You must accept the investment agreement", 400),
+    );
+  }
+
+  if (!investorName || !investorEmail) {
+    return next(
+      new ErrorResponse("Investor name and email are required", 400),
+    );
   }
 
   if (
@@ -544,7 +573,40 @@ exports.verifyInvestmentPayment = asyncHandler(async (req, res, next) => {
     });
   }
 
-  const payment = await fetchRazorpayPayment(razorpayPaymentId);
+  const [payment, order] = await Promise.all([
+    fetchRazorpayPayment(razorpayPaymentId),
+    fetchRazorpayOrder(razorpayOrderId),
+  ]);
+
+  if (payment?.order_id !== razorpayOrderId) {
+    return next(
+      new ErrorResponse("Payment does not belong to the submitted order", 400),
+    );
+  }
+
+  if (String(order?.notes?.campaignId || "") !== String(campaign.id)) {
+    return next(new ErrorResponse("Order is not linked to this campaign", 400));
+  }
+
+  if (String(order?.notes?.investorId || "") !== String(req.user.id)) {
+    return next(new ErrorResponse("Order investor validation failed", 400));
+  }
+
+  if (String(payment?.currency || "").toUpperCase() !== "INR") {
+    return next(new ErrorResponse("Invalid payment currency", 400));
+  }
+
+  const amountFromPayment = Number(payment?.amount || 0) / 100;
+  if (amountFromPayment <= 0) {
+    return next(new ErrorResponse("Invalid payment amount", 400));
+  }
+
+  if (Number.isFinite(Number(amount)) && Number(amount) > 0) {
+    if (Math.abs(Number(amount) - amountFromPayment) > 0.01) {
+      return next(new ErrorResponse("Payment amount mismatch", 400));
+    }
+  }
+
   if (!["authorized", "captured"].includes(payment?.status)) {
     return next(
       new ErrorResponse(
@@ -554,10 +616,23 @@ exports.verifyInvestmentPayment = asyncHandler(async (req, res, next) => {
     );
   }
 
-  const investedAmount = Number(amount || (payment?.amount || 0) / 100);
+  const investedAmount = Number(amount || amountFromPayment);
   if (investedAmount < Number(campaign.min_investment || 0)) {
     return next(new ErrorResponse("Investment amount below minimum", 400));
   }
+
+  const agreementText = [
+    `campaign:${campaign.id}`,
+    `investor:${req.user.id}`,
+    `amount:${investedAmount}`,
+    `version:${INVESTMENT_AGREEMENT_VERSION}`,
+    `order:${razorpayOrderId}`,
+    `payment:${razorpayPaymentId}`,
+  ].join("|");
+  const agreementHash = crypto
+    .createHash("sha256")
+    .update(agreementText)
+    .digest("hex");
 
   const blockchain = await recordInvestmentOnBlockchain({
     campaignId: campaign.id,
@@ -575,6 +650,19 @@ exports.verifyInvestmentPayment = asyncHandler(async (req, res, next) => {
     paymentProvider: "razorpay",
     razorpayOrderId,
     razorpayPaymentId,
+    razorpaySignature,
+    investorDetails: {
+      name: String(investorName).trim(),
+      email: String(investorEmail).trim().toLowerCase(),
+    },
+    agreement: {
+      accepted: true,
+      acceptedAt: new Date().toISOString(),
+      version: INVESTMENT_AGREEMENT_VERSION,
+      hash: agreementHash,
+      clientIp: req.ip,
+      userAgent: req.get("user-agent") || null,
+    },
     blockchain,
   });
 
@@ -606,6 +694,17 @@ exports.verifyInvestmentPayment = asyncHandler(async (req, res, next) => {
       totalRaised: currentAmount,
       fundingPercentage:
         (currentAmount / Number(campaign.target_amount || 1)) * 100,
+      payment: {
+        provider: "razorpay",
+        orderId: razorpayOrderId,
+        paymentId: razorpayPaymentId,
+        status: payment?.status,
+      },
+      agreement: {
+        accepted: true,
+        version: INVESTMENT_AGREEMENT_VERSION,
+        hash: agreementHash,
+      },
       blockchain,
     },
   });

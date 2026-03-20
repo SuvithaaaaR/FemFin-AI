@@ -20,6 +20,8 @@ import {
   rem,
   Modal,
   List,
+  Checkbox,
+  Divider,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
@@ -147,7 +149,9 @@ function Crowdfunding() {
   const [activeTab, setActiveTab] = useState("browse");
   const [createModalOpened, setCreateModalOpened] = useState(false);
   const [investModalOpened, setInvestModalOpened] = useState(false);
+  const [receiptModalOpened, setReceiptModalOpened] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState(null);
+  const [investmentReceipt, setInvestmentReceipt] = useState(null);
   const [campaigns, setCampaigns] = useState(FALLBACK_CAMPAIGNS);
   const [creatingCampaign, setCreatingCampaign] = useState(false);
   const [processingInvestment, setProcessingInvestment] = useState(false);
@@ -189,6 +193,7 @@ function Crowdfunding() {
       amount: "",
       investorName: "",
       email: "",
+      agreementAccepted: false,
     },
   });
 
@@ -276,6 +281,10 @@ function Crowdfunding() {
         throw new Error("Minimum investment amount is 1000");
       }
 
+      if (!values.agreementAccepted) {
+        throw new Error("Please accept the investment agreement before payment");
+      }
+
       const orderResponse = await apiClient.post(
         `/crowdfunding/campaigns/${selectedCampaign.id}/investments/order`,
         { amount },
@@ -286,7 +295,7 @@ function Crowdfunding() {
         throw new Error("Invalid order response from backend");
       }
 
-      await new Promise((resolve, reject) => {
+      const verificationData = await new Promise((resolve, reject) => {
         const rz = new window.Razorpay({
           key: orderData.keyId,
           amount: orderData.order.amount,
@@ -307,6 +316,9 @@ function Crowdfunding() {
                 `/crowdfunding/campaigns/${selectedCampaign.id}/investments/verify`,
                 {
                   amount,
+                  investorName: values.investorName,
+                  investorEmail: values.email,
+                  agreementAccepted: values.agreementAccepted,
                   razorpay_order_id: response.razorpay_order_id,
                   razorpay_payment_id: response.razorpay_payment_id,
                   razorpay_signature: response.razorpay_signature,
@@ -329,6 +341,16 @@ function Crowdfunding() {
 
       await refreshCampaigns();
 
+      setInvestmentReceipt({
+        campaignTitle: selectedCampaign.title,
+        amount,
+        investorName: values.investorName,
+        investorEmail: values.email,
+        payment: verificationData?.payment,
+        agreement: verificationData?.agreement,
+        blockchain: verificationData?.blockchain,
+      });
+
       notifications.show({
         title: "Investment Successful!",
         message:
@@ -336,6 +358,7 @@ function Crowdfunding() {
         color: "green",
       });
       setInvestModalOpened(false);
+      setReceiptModalOpened(true);
       investForm.reset();
     } catch (error) {
       notifications.show({
@@ -785,6 +808,13 @@ function Crowdfunding() {
                 </List>
               </Paper>
 
+              <Checkbox
+                label="I agree to the digital investment agreement and smart-contract execution terms"
+                {...investForm.getInputProps("agreementAccepted", {
+                  type: "checkbox",
+                })}
+              />
+
               <Group justify="flex-end" mt="md">
                 <Button
                   variant="default"
@@ -796,12 +826,74 @@ function Crowdfunding() {
                   type="submit"
                   leftSection={<IconCoins size={rem(16)} />}
                   loading={processingInvestment}
+                  disabled={!investForm.values.agreementAccepted}
                 >
                   Confirm Investment
                 </Button>
               </Group>
             </Stack>
           </form>
+        </Modal>
+
+        <Modal
+          opened={receiptModalOpened}
+          onClose={() => setReceiptModalOpened(false)}
+          title={<Title order={3}>Investment Receipt</Title>}
+          size="md"
+        >
+          <Stack gap="sm">
+            <Text size="sm">
+              Your investment has been securely recorded with payment verification
+              and blockchain proof.
+            </Text>
+
+            <Divider />
+
+            <Group justify="space-between">
+              <Text fw={600}>Campaign</Text>
+              <Text>{investmentReceipt?.campaignTitle}</Text>
+            </Group>
+            <Group justify="space-between">
+              <Text fw={600}>Investor</Text>
+              <Text>{investmentReceipt?.investorName}</Text>
+            </Group>
+            <Group justify="space-between">
+              <Text fw={600}>Email</Text>
+              <Text>{investmentReceipt?.investorEmail}</Text>
+            </Group>
+            <Group justify="space-between">
+              <Text fw={600}>Amount</Text>
+              <Text>₹ {Number(investmentReceipt?.amount || 0).toLocaleString("en-IN")}</Text>
+            </Group>
+
+            {!!investmentReceipt?.payment?.paymentId && (
+              <Group justify="space-between">
+                <Text fw={600}>Payment ID</Text>
+                <Text size="sm">{investmentReceipt.payment.paymentId}</Text>
+              </Group>
+            )}
+
+            {!!investmentReceipt?.agreement?.hash && (
+              <Group justify="space-between">
+                <Text fw={600}>Agreement Hash</Text>
+                <Text size="sm">{investmentReceipt.agreement.hash.slice(0, 18)}...</Text>
+              </Group>
+            )}
+
+            {!!investmentReceipt?.blockchain?.txHash && (
+              <Group justify="space-between">
+                <Text fw={600}>Blockchain Tx</Text>
+                <Text size="sm">{investmentReceipt.blockchain.txHash.slice(0, 18)}...</Text>
+              </Group>
+            )}
+
+            <Divider />
+
+            <Text size="xs" c="dimmed">
+              Full payment IDs, agreement hash, and blockchain transaction data
+              are stored in backend investment records for auditability.
+            </Text>
+          </Stack>
         </Modal>
       </Stack>
     </Container>
