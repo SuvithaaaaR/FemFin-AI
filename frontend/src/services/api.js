@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Get API URL from environment variables
 const API_BASE_URL =
-  process.env.REACT_APP_API_URL || "https://femfin-backend.onrender.com/api";
+  process.env.REACT_APP_API_URL || "https://femfin-ai.onrender.com/api";
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
