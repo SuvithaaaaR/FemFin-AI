@@ -15,6 +15,7 @@ import {
   TextInput,
   Textarea,
   NumberInput,
+  Select,
   Paper,
   ThemeIcon,
   rem,
@@ -678,9 +679,20 @@ function Crowdfunding() {
                 max={90}
                 {...createForm.getInputProps("duration")}
               />
-              <TextInput
+              <Select
                 label="Category"
-                placeholder="e.g., Technology, Fashion, Healthcare"
+                placeholder="Select category"
+                data={[
+                  "Technology",
+                  "Healthcare",
+                  "Education",
+                  "Retail",
+                  "Manufacturing",
+                  "Services",
+                  "Agriculture",
+                  "Social Impact",
+                  "Other",
+                ]}
                 required
                 {...createForm.getInputProps("category")}
               />

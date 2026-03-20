@@ -248,13 +248,32 @@ exports.getCampaign = asyncHandler(async (req, res, next) => {
  */
 exports.createCampaign = asyncHandler(async (req, res) => {
   const supabase = getSupabase();
+  const normalizedCategory = [
+    "Technology",
+    "Healthcare",
+    "Education",
+    "Retail",
+    "Manufacturing",
+    "Services",
+    "Agriculture",
+    "Social Impact",
+    "Other",
+  ].includes(req.body.category)
+    ? req.body.category
+    : "Other";
+
   const payload = {
-    ...req.body,
     creator_id: req.user.id,
-    target_amount: req.body.targetAmount || 0,
-    current_amount: req.body.currentAmount || 0,
-    min_investment: req.body.minInvestment || 1000,
+    title: req.body.title,
+    description: req.body.description,
+    category: normalizedCategory,
+    target_amount: Number(req.body.targetAmount || 0),
+    current_amount: Number(req.body.currentAmount || 0),
+    min_investment: Number(req.body.minInvestment || 1000),
     end_date: req.body.endDate || null,
+    status: req.body.status || "Draft",
+    entrepreneur: req.body.entrepreneur || null,
+    location: req.body.location || null,
     milestones: req.body.milestones || [],
     investments: req.body.investments || [],
     stats: req.body.stats || { views: 0 },
@@ -304,12 +323,46 @@ exports.updateCampaign = asyncHandler(async (req, res, next) => {
     );
   }
 
+  const allowedCategories = [
+    "Technology",
+    "Healthcare",
+    "Education",
+    "Retail",
+    "Manufacturing",
+    "Services",
+    "Agriculture",
+    "Social Impact",
+    "Other",
+  ];
+
   const payload = {
-    ...req.body,
-    target_amount: req.body.targetAmount,
-    current_amount: req.body.currentAmount,
-    min_investment: req.body.minInvestment,
-    end_date: req.body.endDate,
+    title: req.body.title,
+    description: req.body.description,
+    category: allowedCategories.includes(req.body.category)
+      ? req.body.category
+      : existing.category,
+    target_amount:
+      req.body.targetAmount !== undefined
+        ? Number(req.body.targetAmount)
+        : existing.target_amount,
+    current_amount:
+      req.body.currentAmount !== undefined
+        ? Number(req.body.currentAmount)
+        : existing.current_amount,
+    min_investment:
+      req.body.minInvestment !== undefined
+        ? Number(req.body.minInvestment)
+        : existing.min_investment,
+    end_date:
+      req.body.endDate !== undefined ? req.body.endDate : existing.end_date,
+    status: req.body.status || existing.status,
+    entrepreneur:
+      req.body.entrepreneur !== undefined
+        ? req.body.entrepreneur
+        : existing.entrepreneur,
+    location:
+      req.body.location !== undefined ? req.body.location : existing.location,
+    milestones: req.body.milestones || existing.milestones || [],
   };
 
   const { data, error } = await supabase
