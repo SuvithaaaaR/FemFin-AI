@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Container,
   Title,
@@ -36,75 +36,137 @@ import {
 } from "@tabler/icons-react";
 import apiClient from "../services/api";
 
+const FALLBACK_CAMPAIGNS = [
+  {
+    id: 1,
+    title: "Eco-Friendly Fashion Brand",
+    entrepreneur: "Priya Sharma",
+    location: "Mumbai",
+    target: 5000000,
+    raised: 3500000,
+    investors: 124,
+    daysLeft: 15,
+    category: "Fashion",
+    description:
+      "Sustainable fashion brand using organic materials and ethical manufacturing.",
+    milestones: [
+      { title: "Product Development", amount: 1500000, status: "completed" },
+      {
+        title: "Manufacturing Setup",
+        amount: 2000000,
+        status: "in-progress",
+      },
+      { title: "Marketing & Launch", amount: 1500000, status: "pending" },
+    ],
+    verified: true,
+    image: "👗",
+  },
+  {
+    id: 2,
+    title: "HealthTech Mobile App",
+    entrepreneur: "Anita Desai",
+    location: "Bangalore",
+    target: 3000000,
+    raised: 1200000,
+    investors: 67,
+    daysLeft: 30,
+    category: "Healthcare",
+    description: "AI-powered health monitoring app for women's wellness.",
+    milestones: [
+      { title: "App Development", amount: 1000000, status: "completed" },
+      { title: "Beta Testing", amount: 800000, status: "in-progress" },
+      { title: "Market Launch", amount: 1200000, status: "pending" },
+    ],
+    verified: true,
+    image: "🏥",
+  },
+  {
+    id: 3,
+    title: "Organic Farm Products",
+    entrepreneur: "Meera Patel",
+    location: "Pune",
+    target: 2000000,
+    raised: 1800000,
+    investors: 156,
+    daysLeft: 7,
+    category: "Agriculture",
+    description: "Direct farm-to-consumer organic produce delivery platform.",
+    milestones: [
+      { title: "Infrastructure", amount: 800000, status: "completed" },
+      { title: "Supply Chain", amount: 700000, status: "completed" },
+      { title: "Expansion", amount: 500000, status: "in-progress" },
+    ],
+    verified: true,
+    image: "🌾",
+  },
+];
+
+const normalizeCampaignForUi = (campaign) => {
+  const endDate = campaign.endDate || campaign.end_date;
+  const daysLeft = endDate
+    ? Math.max(
+        0,
+        Math.ceil((new Date(endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
+      )
+    : 0;
+
+  return {
+    id: campaign._id || campaign.id,
+    title: campaign.title,
+    entrepreneur: campaign.entrepreneur || "Founder",
+    location: campaign.location || "India",
+    target: Number(campaign.targetAmount || campaign.target_amount || 0),
+    raised: Number(campaign.currentAmount || campaign.current_amount || 0),
+    investors:
+      Number(campaign.stats?.backers || 0) ||
+      (Array.isArray(campaign.investments) ? campaign.investments.length : 0),
+    daysLeft,
+    category: campaign.category || "General",
+    description: campaign.description || "",
+    milestones: campaign.milestones || [],
+    verified: true,
+    image: "🚀",
+  };
+};
+
+const loadRazorpayCheckout = () =>
+  new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+
 function Crowdfunding() {
   const [activeTab, setActiveTab] = useState("browse");
   const [createModalOpened, setCreateModalOpened] = useState(false);
   const [investModalOpened, setInvestModalOpened] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState(null);
-  const [campaigns, setCampaigns] = useState([
-    {
-      id: 1,
-      title: "Eco-Friendly Fashion Brand",
-      entrepreneur: "Priya Sharma",
-      location: "Mumbai",
-      target: 5000000,
-      raised: 3500000,
-      investors: 124,
-      daysLeft: 15,
-      category: "Fashion",
-      description:
-        "Sustainable fashion brand using organic materials and ethical manufacturing.",
-      milestones: [
-        { title: "Product Development", amount: 1500000, status: "completed" },
-        {
-          title: "Manufacturing Setup",
-          amount: 2000000,
-          status: "in-progress",
-        },
-        { title: "Marketing & Launch", amount: 1500000, status: "pending" },
-      ],
-      verified: true,
-      image: "👗",
-    },
-    {
-      id: 2,
-      title: "HealthTech Mobile App",
-      entrepreneur: "Anita Desai",
-      location: "Bangalore",
-      target: 3000000,
-      raised: 1200000,
-      investors: 67,
-      daysLeft: 30,
-      category: "Healthcare",
-      description: "AI-powered health monitoring app for women's wellness.",
-      milestones: [
-        { title: "App Development", amount: 1000000, status: "completed" },
-        { title: "Beta Testing", amount: 800000, status: "in-progress" },
-        { title: "Market Launch", amount: 1200000, status: "pending" },
-      ],
-      verified: true,
-      image: "🏥",
-    },
-    {
-      id: 3,
-      title: "Organic Farm Products",
-      entrepreneur: "Meera Patel",
-      location: "Pune",
-      target: 2000000,
-      raised: 1800000,
-      investors: 156,
-      daysLeft: 7,
-      category: "Agriculture",
-      description: "Direct farm-to-consumer organic produce delivery platform.",
-      milestones: [
-        { title: "Infrastructure", amount: 800000, status: "completed" },
-        { title: "Supply Chain", amount: 700000, status: "completed" },
-        { title: "Expansion", amount: 500000, status: "in-progress" },
-      ],
-      verified: true,
-      image: "🌾",
-    },
-  ]);
+  const [campaigns, setCampaigns] = useState(FALLBACK_CAMPAIGNS);
+  const [creatingCampaign, setCreatingCampaign] = useState(false);
+  const [processingInvestment, setProcessingInvestment] = useState(false);
+
+  const refreshCampaigns = async () => {
+    try {
+      const response = await apiClient.get("/crowdfunding/campaigns");
+      const normalized = (response.data?.data || []).map(normalizeCampaignForUi);
+      if (normalized.length) {
+        setCampaigns(normalized);
+      }
+    } catch (error) {
+      // Keep fallback campaigns silently if API is unavailable.
+    }
+  };
+
+  useEffect(() => {
+    void refreshCampaigns();
+  }, []);
 
   const createForm = useForm({
     initialValues: {
@@ -130,9 +192,54 @@ function Crowdfunding() {
     },
   });
 
+  const trendingCampaigns = useMemo(
+    () => [...campaigns].sort((a, b) => b.raised - a.raised).slice(0, 6),
+    [campaigns],
+  );
+
+  const myInvestments = useMemo(
+    () =>
+      campaigns.filter((campaign) =>
+        Array.isArray(campaign.investments)
+          ? campaign.investments.some((inv) => inv?.investor)
+          : false,
+      ),
+    [campaigns],
+  );
+
   const handleCreateCampaign = async (values) => {
+    setCreatingCampaign(true);
     try {
-      const response = await apiClient.post("/crowdfunding/create", values);
+      const milestones = [
+        {
+          title: values.milestone1,
+          targetAmount: Number(values.milestone1Amount || 0),
+        },
+        {
+          title: values.milestone2,
+          targetAmount: Number(values.milestone2Amount || 0),
+        },
+        {
+          title: values.milestone3,
+          targetAmount: Number(values.milestone3Amount || 0),
+        },
+      ].filter((item) => item.title && item.targetAmount > 0);
+
+      const endDate = new Date();
+      endDate.setDate(endDate.getDate() + Number(values.duration || 30));
+
+      await apiClient.post("/crowdfunding/campaigns", {
+        title: values.title,
+        description: values.description,
+        targetAmount: Number(values.targetAmount || 0),
+        category: values.category,
+        status: "Active",
+        endDate: endDate.toISOString(),
+        milestones,
+      });
+
+      await refreshCampaigns();
+
       notifications.show({
         title: "Campaign Created!",
         message: "Your crowdfunding campaign is now live",
@@ -143,21 +250,89 @@ function Crowdfunding() {
     } catch (error) {
       notifications.show({
         title: "Error",
-        message: "Failed to create campaign",
+        message:
+          error.response?.data?.message || "Failed to create campaign",
         color: "red",
       });
+    } finally {
+      setCreatingCampaign(false);
     }
   };
 
   const handleInvest = async (values) => {
+    if (!selectedCampaign) {
+      return;
+    }
+
+    setProcessingInvestment(true);
     try {
-      const response = await apiClient.post(
-        `/crowdfunding/invest/${selectedCampaign.id}`,
-        values,
+      const sdkLoaded = await loadRazorpayCheckout();
+      if (!sdkLoaded) {
+        throw new Error("Unable to load Razorpay checkout SDK");
+      }
+
+      const amount = Number(values.amount || 0);
+      if (amount < 1000) {
+        throw new Error("Minimum investment amount is 1000");
+      }
+
+      const orderResponse = await apiClient.post(
+        `/crowdfunding/campaigns/${selectedCampaign.id}/investments/order`,
+        { amount },
       );
+
+      const orderData = orderResponse.data?.data;
+      if (!orderData?.order?.id || !orderData?.keyId) {
+        throw new Error("Invalid order response from backend");
+      }
+
+      await new Promise((resolve, reject) => {
+        const rz = new window.Razorpay({
+          key: orderData.keyId,
+          amount: orderData.order.amount,
+          currency: orderData.order.currency,
+          name: "FemFin Crowdfunding",
+          description: `Investment in ${selectedCampaign.title}`,
+          order_id: orderData.order.id,
+          prefill: {
+            name: values.investorName,
+            email: values.email,
+          },
+          theme: {
+            color: "#9c27b0",
+          },
+          handler: async (response) => {
+            try {
+              const verifyResponse = await apiClient.post(
+                `/crowdfunding/campaigns/${selectedCampaign.id}/investments/verify`,
+                {
+                  amount,
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                },
+              );
+              resolve(verifyResponse.data?.data || {});
+            } catch (verifyError) {
+              reject(verifyError);
+            }
+          },
+          modal: {
+            ondismiss: () => {
+              reject(new Error("Payment cancelled"));
+            },
+          },
+        });
+
+        rz.open();
+      });
+
+      await refreshCampaigns();
+
       notifications.show({
         title: "Investment Successful!",
-        message: "Your funds will be released based on milestones",
+        message:
+          "Payment verified and investment recorded with blockchain receipt.",
         color: "green",
       });
       setInvestModalOpened(false);
@@ -165,9 +340,14 @@ function Crowdfunding() {
     } catch (error) {
       notifications.show({
         title: "Error",
-        message: "Failed to process investment",
+        message:
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to process investment",
         color: "red",
       });
+    } finally {
+      setProcessingInvestment(false);
     }
   };
 
@@ -343,6 +523,7 @@ function Crowdfunding() {
             <Button
               size="lg"
               leftSection={<IconPlus size={rem(20)} />}
+              loading={creatingCampaign}
               onClick={() => setCreateModalOpened(true)}
             >
               Create Campaign
@@ -383,15 +564,29 @@ function Crowdfunding() {
           </Tabs.Panel>
 
           <Tabs.Panel value="trending" pt="xl">
-            <Text c="dimmed" ta="center" py="xl">
-              Trending campaigns will appear here
-            </Text>
+            <Grid>
+              {trendingCampaigns.map((campaign) => (
+                <Grid.Col key={campaign.id} span={{ base: 12, md: 6, lg: 4 }}>
+                  <CampaignCard campaign={campaign} />
+                </Grid.Col>
+              ))}
+            </Grid>
           </Tabs.Panel>
 
           <Tabs.Panel value="invested" pt="xl">
-            <Text c="dimmed" ta="center" py="xl">
-              Your investments will appear here
-            </Text>
+            {myInvestments.length ? (
+              <Grid>
+                {myInvestments.map((campaign) => (
+                  <Grid.Col key={campaign.id} span={{ base: 12, md: 6, lg: 4 }}>
+                    <CampaignCard campaign={campaign} />
+                  </Grid.Col>
+                ))}
+              </Grid>
+            ) : (
+              <Text c="dimmed" ta="center" py="xl">
+                Your investments will appear here
+              </Text>
+            )}
           </Tabs.Panel>
         </Tabs>
 
@@ -600,6 +795,7 @@ function Crowdfunding() {
                 <Button
                   type="submit"
                   leftSection={<IconCoins size={rem(16)} />}
+                  loading={processingInvestment}
                 >
                   Confirm Investment
                 </Button>

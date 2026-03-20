@@ -1,5 +1,142 @@
 const { getSupabase } = require("../config/supabase");
 const { asyncHandler, ErrorResponse } = require("../middleware/errorHandler");
+const axios = require("axios");
+const crypto = require("crypto");
+
+const RAZORPAY_BASE_URL = "https://api.razorpay.com/v1";
+const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || "";
+const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || "";
+
+const BLOCKCHAIN_RPC_URL = process.env.BLOCKCHAIN_RPC_URL || "";
+const BLOCKCHAIN_PRIVATE_KEY = process.env.BLOCKCHAIN_PRIVATE_KEY || "";
+const BLOCKCHAIN_NETWORK = process.env.BLOCKCHAIN_NETWORK || "sepolia";
+const BLOCKCHAIN_EXPLORER_BASE_URL =
+  process.env.BLOCKCHAIN_EXPLORER_BASE_URL || "https://sepolia.etherscan.io/tx/";
+
+const isRazorpayConfigured = () =>
+  Boolean(RAZORPAY_KEY_ID) && Boolean(RAZORPAY_KEY_SECRET);
+
+const createRazorpayOrder = async ({ amountInRupees, campaignId, userId }) => {
+  if (!isRazorpayConfigured()) {
+    throw new ErrorResponse(
+      "Razorpay is not configured on backend. Add RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET.",
+      500,
+    );
+  }
+
+  const amountInPaise = Math.round(Number(amountInRupees) * 100);
+  if (!Number.isFinite(amountInPaise) || amountInPaise <= 0) {
+    throw new ErrorResponse("Invalid investment amount", 400);
+  }
+
+  const authHeader = Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString("base64");
+
+  const { data } = await axios.post(
+    `${RAZORPAY_BASE_URL}/orders`,
+    {
+      amount: amountInPaise,
+      currency: "INR",
+      receipt: `camp_${campaignId}_${Date.now()}`,
+      notes: {
+        campaignId,
+        investorId: String(userId),
+      },
+    },
+    {
+      headers: {
+        Authorization: `Basic ${authHeader}`,
+        "Content-Type": "application/json",
+      },
+      timeout: 15000,
+    },
+  );
+
+  return data;
+};
+
+const verifyRazorpaySignature = ({ orderId, paymentId, signature }) => {
+  const payload = `${orderId}|${paymentId}`;
+  const expectedSignature = crypto
+    .createHmac("sha256", RAZORPAY_KEY_SECRET)
+    .update(payload)
+    .digest("hex");
+
+  return expectedSignature === signature;
+};
+
+const fetchRazorpayPayment = async (paymentId) => {
+  const authHeader = Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString("base64");
+  const { data } = await axios.get(`${RAZORPAY_BASE_URL}/payments/${paymentId}`, {
+    headers: {
+      Authorization: `Basic ${authHeader}`,
+    },
+    timeout: 15000,
+  });
+
+  return data;
+};
+
+const recordInvestmentOnBlockchain = async ({
+  campaignId,
+  investorId,
+  amount,
+  razorpayPaymentId,
+}) => {
+  if (!BLOCKCHAIN_RPC_URL || !BLOCKCHAIN_PRIVATE_KEY) {
+    return {
+      status: "skipped",
+      reason:
+        "Blockchain RPC/private key not configured. Set BLOCKCHAIN_RPC_URL and BLOCKCHAIN_PRIVATE_KEY.",
+      network: BLOCKCHAIN_NETWORK,
+      txHash: null,
+      explorerUrl: null,
+    };
+  }
+
+  try {
+    const { ethers } = require("ethers");
+    const provider = new ethers.JsonRpcProvider(BLOCKCHAIN_RPC_URL);
+    const wallet = new ethers.Wallet(BLOCKCHAIN_PRIVATE_KEY, provider);
+
+    const proofPayload = JSON.stringify({
+      campaignId,
+      investorId,
+      amount,
+      razorpayPaymentId,
+      ts: Date.now(),
+    });
+    const proofHash = crypto.createHash("sha256").update(proofPayload).digest("hex");
+    const proofHex = Buffer.from(`FemFin:${proofHash}`, "utf8")
+      .toString("hex")
+      .slice(0, 512);
+
+    const tx = await wallet.sendTransaction({
+      to: wallet.address,
+      value: 0,
+      data: `0x${proofHex}`,
+    });
+
+    const receipt = await tx.wait();
+    const txHash = receipt?.hash || tx.hash;
+
+    return {
+      status: "confirmed",
+      reason: null,
+      network: BLOCKCHAIN_NETWORK,
+      txHash,
+      explorerUrl: txHash ? `${BLOCKCHAIN_EXPLORER_BASE_URL}${txHash}` : null,
+      proofHash,
+    };
+  } catch (error) {
+    return {
+      status: "failed",
+      reason: error.message,
+      network: BLOCKCHAIN_NETWORK,
+      txHash: null,
+      explorerUrl: null,
+    };
+  }
+};
 
 const normalizeCampaign = (row) => ({
   ...row,
@@ -295,6 +432,181 @@ exports.investInCampaign = asyncHandler(async (req, res, next) => {
       totalRaised: currentAmount,
       fundingPercentage:
         (currentAmount / Number(campaign.target_amount || 1)) * 100,
+    },
+  });
+});
+
+/**
+ * @desc    Create Razorpay order for campaign investment
+ * @route   POST /api/crowdfunding/campaigns/:id/investments/order
+ * @access  Private
+ */
+exports.createInvestmentOrder = asyncHandler(async (req, res, next) => {
+  const { amount } = req.body;
+  const supabase = getSupabase();
+
+  const { data: campaign, error: fetchError } = await supabase
+    .from("campaigns")
+    .select("*")
+    .eq("id", req.params.id)
+    .maybeSingle();
+
+  if (fetchError) {
+    throw new ErrorResponse(fetchError.message, 500);
+  }
+
+  if (!campaign) {
+    return next(new ErrorResponse("Campaign not found", 404));
+  }
+
+  if (campaign.status !== "Active") {
+    return next(new ErrorResponse("Campaign is not active", 400));
+  }
+
+  if (Number(amount) < Number(campaign.min_investment || 0)) {
+    return next(
+      new ErrorResponse(`Minimum investment is ${campaign.min_investment}`, 400),
+    );
+  }
+
+  const order = await createRazorpayOrder({
+    amountInRupees: Number(amount),
+    campaignId: campaign.id,
+    userId: req.user.id,
+  });
+
+  res.status(200).json({
+    success: true,
+    data: {
+      keyId: RAZORPAY_KEY_ID,
+      order,
+      campaign: {
+        id: campaign.id,
+        title: campaign.title,
+      },
+    },
+  });
+});
+
+/**
+ * @desc    Verify Razorpay payment and record investment (+ blockchain proof)
+ * @route   POST /api/crowdfunding/campaigns/:id/investments/verify
+ * @access  Private
+ */
+exports.verifyInvestmentPayment = asyncHandler(async (req, res, next) => {
+  const {
+    amount,
+    razorpay_order_id: razorpayOrderId,
+    razorpay_payment_id: razorpayPaymentId,
+    razorpay_signature: razorpaySignature,
+  } = req.body;
+
+  if (!razorpayOrderId || !razorpayPaymentId || !razorpaySignature) {
+    return next(new ErrorResponse("Missing Razorpay payment details", 400));
+  }
+
+  if (
+    !verifyRazorpaySignature({
+      orderId: razorpayOrderId,
+      paymentId: razorpayPaymentId,
+      signature: razorpaySignature,
+    })
+  ) {
+    return next(new ErrorResponse("Invalid Razorpay signature", 400));
+  }
+
+  const supabase = getSupabase();
+  const { data: campaign, error: fetchError } = await supabase
+    .from("campaigns")
+    .select("*")
+    .eq("id", req.params.id)
+    .maybeSingle();
+
+  if (fetchError) {
+    throw new ErrorResponse(fetchError.message, 500);
+  }
+
+  if (!campaign) {
+    return next(new ErrorResponse("Campaign not found", 404));
+  }
+
+  const existingInvestments = [...(campaign.investments || [])];
+  const duplicatePayment = existingInvestments.some(
+    (inv) => inv.razorpayPaymentId === razorpayPaymentId,
+  );
+  if (duplicatePayment) {
+    return res.status(200).json({
+      success: true,
+      message: "Payment already verified",
+      data: {
+        campaignId: campaign.id,
+      },
+    });
+  }
+
+  const payment = await fetchRazorpayPayment(razorpayPaymentId);
+  if (!["authorized", "captured"].includes(payment?.status)) {
+    return next(
+      new ErrorResponse(
+        `Payment is not authorized/captured. Current status: ${payment?.status || "unknown"}`,
+        400,
+      ),
+    );
+  }
+
+  const investedAmount = Number(amount || (payment?.amount || 0) / 100);
+  if (investedAmount < Number(campaign.min_investment || 0)) {
+    return next(new ErrorResponse("Investment amount below minimum", 400));
+  }
+
+  const blockchain = await recordInvestmentOnBlockchain({
+    campaignId: campaign.id,
+    investorId: req.user.id,
+    amount: investedAmount,
+    razorpayPaymentId,
+  });
+
+  existingInvestments.push({
+    investor: req.user.id,
+    amount: investedAmount,
+    transactionHash: blockchain.txHash || null,
+    status: "Confirmed",
+    investedAt: new Date().toISOString(),
+    paymentProvider: "razorpay",
+    razorpayOrderId,
+    razorpayPaymentId,
+    blockchain,
+  });
+
+  const currentAmount = Number(campaign.current_amount || 0) + investedAmount;
+  const status =
+    currentAmount >= Number(campaign.target_amount || 0)
+      ? "Funded"
+      : campaign.status;
+
+  const { error: updateError } = await supabase
+    .from("campaigns")
+    .update({
+      investments: existingInvestments,
+      current_amount: currentAmount,
+      status,
+    })
+    .eq("id", campaign.id);
+
+  if (updateError) {
+    throw new ErrorResponse(updateError.message, 500);
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Payment verified and investment recorded",
+    data: {
+      campaignId: campaign.id,
+      investedAmount,
+      totalRaised: currentAmount,
+      fundingPercentage:
+        (currentAmount / Number(campaign.target_amount || 1)) * 100,
+      blockchain,
     },
   });
 });

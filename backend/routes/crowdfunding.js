@@ -46,6 +46,28 @@ router.delete("/campaigns/:id", protect, crowdfunding.deleteCampaign);
 router.post("/campaigns/:id/invest", protect, crowdfunding.investInCampaign);
 
 /**
+ * @route   POST /api/crowdfunding/campaigns/:id/investments/order
+ * @desc    Create Razorpay order for campaign investment
+ * @access  Private
+ */
+router.post(
+	"/campaigns/:id/investments/order",
+	protect,
+	crowdfunding.createInvestmentOrder,
+);
+
+/**
+ * @route   POST /api/crowdfunding/campaigns/:id/investments/verify
+ * @desc    Verify Razorpay payment and record blockchain-backed investment
+ * @access  Private
+ */
+router.post(
+	"/campaigns/:id/investments/verify",
+	protect,
+	crowdfunding.verifyInvestmentPayment,
+);
+
+/**
  * @route   GET /api/crowdfunding/my-campaigns
  * @desc    Get user's campaigns
  * @access  Private
