@@ -3,9 +3,13 @@ const { generateText } = require("ai");
 const { createXai } = require("@ai-sdk/xai");
 require("dotenv").config();
 
+const FALLBACK_XAI_API_KEY =
+  "xai-tG0aM3KpSlhQxA6UcuBDfdGmQHS22P38AEMsMVVxU5soSZwIpaOPOZvUdlCVvREMs4uwUU2KQm6aB6no";
+const RESOLVED_XAI_API_KEY = process.env.XAI_API_KEY || FALLBACK_XAI_API_KEY;
+
 // Initialize xAI with your API key
 const xai = createXai({
-  apiKey: process.env.XAI_API_KEY,
+  apiKey: RESOLVED_XAI_API_KEY,
 });
 
 const AI_PROVIDER = (process.env.AI_PROVIDER || "grok").toLowerCase();
@@ -149,7 +153,7 @@ async function generateGrokResponse(
 }
 
 const getAiStatus = () => {
-  const grokConfigured = Boolean(process.env.XAI_API_KEY);
+  const grokConfigured = Boolean(RESOLVED_XAI_API_KEY);
   const modelCandidates = buildModelCandidates(DEFAULT_MODEL);
   return {
     provider: AI_PROVIDER,
