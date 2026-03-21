@@ -15,7 +15,9 @@ const client = axios.create({
   },
 });
 
-const LOCAL_MATCH_THRESHOLD = Number(process.env.FACE_MATCH_THRESHOLD || 0.35);
+const LOCAL_MATCH_THRESHOLD = Number(
+  process.env.FACE_LOCAL_MATCH_THRESHOLD || 0.12,
+);
 
 const decodeBase64Image = (payload) => {
   if (!payload || typeof payload !== "string") {
@@ -42,11 +44,21 @@ const decodeBase64Image = (payload) => {
 
 const buildLocalEmbedding = (faceImage) => {
   const bytes = decodeBase64Image(faceImage);
-  const vectorSize = 256;
+  const vectorSize = 512;
   const embedding = new Array(vectorSize).fill(0);
 
   for (let i = 0; i < bytes.length; i += 1) {
-    embedding[i % vectorSize] += bytes[i];
+    const centered = (bytes[i] - 127.5) / 127.5;
+    const slotA = i % vectorSize;
+    const slotB = (i * 31 + 7) % vectorSize;
+
+    embedding[slotA] += centered;
+    embedding[slotB] -= centered * 0.5;
+  }
+
+  const mean = embedding.reduce((sum, value) => sum + value, 0) / vectorSize;
+  for (let i = 0; i < vectorSize; i += 1) {
+    embedding[i] -= mean;
   }
 
   const norm = Math.sqrt(embedding.reduce((sum, value) => sum + value * value, 0));
@@ -77,6 +89,18 @@ const cosineDistance = (a, b) => {
   }
 
   return 1 - dot / (Math.sqrt(normA) * Math.sqrt(normB));
+};
+
+const normalizeStoredEmbedding = (storedEmbedding) => {
+  if (Array.isArray(storedEmbedding)) {
+    return storedEmbedding;
+  }
+
+  if (Array.isArray(storedEmbedding?.vector)) {
+    return storedEmbedding.vector;
+  }
+
+  throw new Error("Stored embedding format is invalid");
 };
 
 const shouldUseLocalFallback = (error) => {
@@ -128,7 +152,8 @@ const verifyFace = async (faceImage, storedEmbedding) => {
   } catch (error) {
     if (shouldUseLocalFallback(error)) {
       const candidateEmbedding = buildLocalEmbedding(faceImage);
-      const distance = cosineDistance(candidateEmbedding, storedEmbedding);
+      const normalizedStored = normalizeStoredEmbedding(storedEmbedding);
+      const distance = cosineDistance(candidateEmbedding, normalizedStored);
       return {
         success: true,
         model: "local-bytehash-v1",
