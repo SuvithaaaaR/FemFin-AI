@@ -1,0 +1,794 @@
+{
+  "exportedAt": "2026-03-21T04:16:41.279Z",
+  "projectUrl": "https://wudgzyrfeegibybygvzl.supabase.co",
+  "tables": {
+    "users": [
+      {
+        "id": "ac499309-c42b-4611-8562-77e7cf090dde",
+        "name": "Suvitha ramesh",
+        "email": "suviiiramesh+1162959363@gmail.com",
+        "password_hash": "$2a$12$VUsmcHgohaQ.zYiorSG4dOh3LBFUtbpTSutXTCun/PY6B43jhlR9a",
+        "role": "entrepreneur",
+        "phone_number": "6379647335",
+        "profile": null,
+        "credit_score": null,
+        "created_at": "2026-03-20T09:14:49.320952+00:00",
+        "updated_at": "2026-03-20T09:14:49.320952+00:00"
+      },
+      {
+        "id": "de9f9e1b-99d0-4b12-8bc1-33afc0838a09",
+        "name": "Suvitha ramesh",
+        "email": "suviiiramesh+65208@gmail.com",
+        "password_hash": "$2a$12$9k8VrKC4y01JwTMb7IRTzO/I4cNpCMh8wfim75cv59MUhtF9XfwYG",
+        "role": "entrepreneur",
+        "phone_number": "6379647335",
+        "profile": null,
+        "credit_score": null,
+        "created_at": "2026-03-20T09:16:03.345455+00:00",
+        "updated_at": "2026-03-20T09:16:03.345455+00:00"
+      },
+      {
+        "id": "193316b6-7baa-4115-8645-a9fc90b60e1d",
+        "name": "Probe User",
+        "email": "probe+60392@gmail.com",
+        "password_hash": "$2a$12$nv4sDc5IEP9Vo67IkX9.Ceg1TIyKg/WRdgsbj/fzsLZKdaWPr8zkO",
+        "role": "entrepreneur",
+        "phone_number": "6379647335",
+        "profile": null,
+        "credit_score": null,
+        "created_at": "2026-03-20T09:16:19.941917+00:00",
+        "updated_at": "2026-03-20T09:16:19.941917+00:00"
+      },
+      {
+        "id": "ed65f09c-9da7-4e7f-b4ef-80bcdbfdb10f",
+        "name": "Probe User",
+        "email": "probe+20190@gmail.com",
+        "password_hash": "$2a$12$WnDfrSqxrgAj2yqs.B/xF.gDSNjfm10MYmJI8yiuatmuodnzMTUHu",
+        "role": "entrepreneur",
+        "phone_number": "6379647335",
+        "profile": null,
+        "credit_score": null,
+        "created_at": "2026-03-20T09:16:34.434668+00:00",
+        "updated_at": "2026-03-20T09:16:34.434668+00:00"
+      },
+      {
+        "id": "faadc245-a475-48a7-a12c-1a86b87744e2",
+        "name": "Probe User",
+        "email": "probe+26031@gmail.com",
+        "password_hash": "$2a$12$wCyz8BjdVNalbPQ5vPqTZempqXiaIu0c4gFCmc04NEOaBwU0DcOhu",
+        "role": "entrepreneur",
+        "phone_number": "6379647335",
+        "profile": null,
+        "credit_score": null,
+        "created_at": "2026-03-20T09:16:48.819848+00:00",
+        "updated_at": "2026-03-20T09:16:48.819848+00:00"
+      },
+      {
+        "id": "c2e7784b-ea48-427e-9208-82cc61ca2917",
+        "name": "Suvitha ramesh",
+        "email": "suviiiramesh@gmail.com",
+        "password_hash": "$2a$12$aFyTTY4c1O.Z4haIhGGUAeox7r3/gcq1RPS0Mcu8FW.Nj.aeXs.Oi",
+        "role": "entrepreneur",
+        "phone_number": "6379647335",
+        "profile": null,
+        "credit_score": null,
+        "created_at": "2026-03-20T09:21:00.624415+00:00",
+        "updated_at": "2026-03-20T09:21:00.624415+00:00"
+      },
+      {
+        "id": "4093f828-e51a-484e-ba1e-a00386918bca",
+        "name": "Ranjani",
+        "email": "ranjaniramesh134@gmail.com",
+        "password_hash": "$2a$12$gQ3UhCHOtFFMErRSZ55c7..jhGWnye3J51vyM5PX1eJVdP/SbXK7m",
+        "role": "entrepreneur",
+        "phone_number": "9787922819",
+        "profile": null,
+        "credit_score": null,
+        "created_at": "2026-03-20T12:50:13.412268+00:00",
+        "updated_at": "2026-03-20T12:50:13.412268+00:00"
+      },
+      {
+        "id": "ea232692-a10b-4570-848c-30d14dcdc4a0",
+        "name": "Copilot Test",
+        "email": "copilot.test.764996@example.com",
+        "password_hash": "$2a$12$4NEQWAiJ4Gqm8BS11gXpde7p5wGb9YGW/buGKnRo0xlD4vXnPg8m2",
+        "role": "entrepreneur",
+        "phone_number": null,
+        "profile": null,
+        "credit_score": null,
+        "created_at": "2026-03-20T17:05:48.471637+00:00",
+        "updated_at": "2026-03-20T17:05:48.471637+00:00"
+      },
+      {
+        "id": "c2be5816-7a34-4b57-9b09-992c410dcaa1",
+        "name": "Copilot WWW Test",
+        "email": "copilot.www.723624@example.com",
+        "password_hash": "$2a$12$8ej6Hxm0AIXSH8tGXYQDpeztdJBg9OPPBY7R4FDjHQICQGC2ki7Uq",
+        "role": "entrepreneur",
+        "phone_number": null,
+        "profile": null,
+        "credit_score": null,
+        "created_at": "2026-03-20T17:15:32.680177+00:00",
+        "updated_at": "2026-03-20T17:15:32.680177+00:00"
+      },
+      {
+        "id": "debf800d-234b-424a-b076-093d686a566b",
+        "name": "Campaign Owner",
+        "email": "campaign.owner.540588@example.com",
+        "password_hash": "$2a$12$lGhrdbLUwToSDELfglzDVOvweBTLTP6gSjkJ.8.2cM5KGmdRIuWCG",
+        "role": "entrepreneur",
+        "phone_number": null,
+        "profile": null,
+        "credit_score": null,
+        "created_at": "2026-03-20T17:16:58.451592+00:00",
+        "updated_at": "2026-03-20T17:16:58.451592+00:00"
+      },
+      {
+        "id": "d67f891f-b580-4e8a-b78e-a56013d4ce2a",
+        "name": "RP Check",
+        "email": "rp.check.742348@example.com",
+        "password_hash": "$2a$12$NU9mQtxONsnuO4cLulKhEexCwOXfVF.EquKFu8DPTzSWtkGr2/Qj2",
+        "role": "entrepreneur",
+        "phone_number": null,
+        "profile": null,
+        "credit_score": null,
+        "created_at": "2026-03-20T17:42:40.385762+00:00",
+        "updated_at": "2026-03-20T17:42:40.385762+00:00"
+      },
+      {
+        "id": "914e3979-90ce-4db0-a61e-6ce2e1faf40a",
+        "name": "RP Recheck",
+        "email": "rp.recheck.193391@example.com",
+        "password_hash": "$2a$12$EGfjST3eX1Yu.qFRCO5zjurdcoBRgoWa6He5MwQDCfXToybAB/nBm",
+        "role": "entrepreneur",
+        "phone_number": null,
+        "profile": null,
+        "credit_score": null,
+        "created_at": "2026-03-20T17:43:42.694275+00:00",
+        "updated_at": "2026-03-20T17:43:42.694275+00:00"
+      },
+      {
+        "id": "ae75b051-a949-46ef-806a-d221cd6d85ea",
+        "name": "RP Recheck",
+        "email": "rp.recheck.668746@example.com",
+        "password_hash": "$2a$12$bfxT./juAXNwqR3HcUTkTeQBk3en9XLt2ZKVgxrt8ZeaRGQZ8D7SS",
+        "role": "entrepreneur",
+        "phone_number": null,
+        "profile": null,
+        "credit_score": null,
+        "created_at": "2026-03-20T17:43:50.193808+00:00",
+        "updated_at": "2026-03-20T17:43:50.193808+00:00"
+      },
+      {
+        "id": "fa15fb5e-6881-4105-9a67-d58112ab7bde",
+        "name": "RP Recheck",
+        "email": "rp.recheck.886233@example.com",
+        "password_hash": "$2a$12$zXpLGbkBnwRcSS5c5J2fvODqWup2ezpJmaeDyVqEH3P3KkjrCJq4S",
+        "role": "entrepreneur",
+        "phone_number": null,
+        "profile": null,
+        "credit_score": null,
+        "created_at": "2026-03-20T17:44:41.18284+00:00",
+        "updated_at": "2026-03-20T17:44:41.18284+00:00"
+      },
+      {
+        "id": "a008ea7f-de3a-480f-aaa8-034cb2788ab2",
+        "name": "RP Postfix",
+        "email": "rp.postfix.126652@example.com",
+        "password_hash": "$2a$12$lzH7l5Nw6wAImL9KQezdmeiewa77QCzKRYFy/c3n4zffeJRbP5xG6",
+        "role": "entrepreneur",
+        "phone_number": null,
+        "profile": null,
+        "credit_score": null,
+        "created_at": "2026-03-20T17:46:37.717554+00:00",
+        "updated_at": "2026-03-20T17:46:37.717554+00:00"
+      },
+      {
+        "id": "628a58ca-ad98-43f2-9b50-26119cdb1ea1",
+        "name": "RP Postfix",
+        "email": "rp.postfix.836088@example.com",
+        "password_hash": "$2a$12$XKDlloexZ8VGTnuzgY55D.6DVtv6L/jmfQ0qblfZ7ORtG.b.WfByK",
+        "role": "entrepreneur",
+        "phone_number": null,
+        "profile": null,
+        "credit_score": null,
+        "created_at": "2026-03-20T17:47:50.410116+00:00",
+        "updated_at": "2026-03-20T17:47:50.410116+00:00"
+      },
+      {
+        "id": "3619a475-e6d1-4c00-a4a0-d4b3f57765c6",
+        "name": "Deploy Check",
+        "email": "deploy.check.671109@example.com",
+        "password_hash": "$2a$12$USZiqhQkTPD4.NSp6UP2iO.Msg1GmGYJfCHNPlMiUCMtCp5t.7KNS",
+        "role": "entrepreneur",
+        "phone_number": null,
+        "profile": null,
+        "credit_score": null,
+        "created_at": "2026-03-20T17:50:56.285895+00:00",
+        "updated_at": "2026-03-20T17:50:56.285895+00:00"
+      },
+      {
+        "id": "4ef6904b-b965-4972-a1ea-dee1f5ee7c80",
+        "name": "Suvitha ramesh",
+        "email": "suviramesh3106@gmail.com",
+        "password_hash": "$2a$12$f5AZhgddxBK9IHMKu7zJmuG3DnB2c4lTg5LVCdTd7Py/tC7ZQQ22a",
+        "role": "entrepreneur",
+        "phone_number": "6379647335",
+        "profile": null,
+        "credit_score": null,
+        "created_at": "2026-03-21T02:08:13.47971+00:00",
+        "updated_at": "2026-03-21T02:08:13.47971+00:00"
+      },
+      {
+        "id": "94a3a5a8-de49-4053-a488-a6e94b43c73b",
+        "name": "Face Fix User",
+        "email": "facefix926751@testmail.com",
+        "password_hash": "$2a$12$qN7tKyUzr9b8bwKumuigKezltCVnTj.oUp5THgE6Pfr38zbpxlOs.",
+        "role": "entrepreneur",
+        "phone_number": null,
+        "profile": null,
+        "credit_score": null,
+        "created_at": "2026-03-21T02:11:16.671396+00:00",
+        "updated_at": "2026-03-21T02:11:16.671396+00:00"
+      },
+      {
+        "id": "a4d85c2d-1c5b-4e43-ab7e-07bc70e4b6d5",
+        "name": "Face Fix User",
+        "email": "facefix384498@testmail.com",
+        "password_hash": "$2a$12$QijOQKWKjIfTRF3w6Yf0SO4gOGCDGoSgVsF7hlGkHtNhw7U5DNDgm",
+        "role": "entrepreneur",
+        "phone_number": null,
+        "profile": null,
+        "credit_score": null,
+        "created_at": "2026-03-21T02:11:28.054259+00:00",
+        "updated_at": "2026-03-21T02:11:28.054259+00:00"
+      },
+      {
+        "id": "0874ad03-c093-46f7-97ea-6117af383fd9",
+        "name": "Face Fix User",
+        "email": "facefix614524@testmail.com",
+        "password_hash": "$2a$12$DmM1f8DTQv0dKDjv/KsPyeoMEPx7u416zeTsjrfp80evFh2ZLSqCO",
+        "role": "entrepreneur",
+        "phone_number": null,
+        "profile": {
+          "faceAuth": {
+            "model": "local-bytehash-v1",
+            "updatedAt": "2026-03-21T02:14:36.367Z",
+            "embedding_iv": "PFjgay/fWEBxLKEt",
+            "embedding_auth_tag": "pyZWfunaawE8/B0ZCQWVqw==",
+            "embedding_encrypted": "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"
+          }
+        },
+        "credit_score": null,
+        "created_at": "2026-03-21T02:14:35.907748+00:00",
+        "updated_at": "2026-03-21T02:14:36.42514+00:00"
+      },
+      {
+        "id": "4cc71bff-8c25-4e1e-8df0-b0718a91c006",
+        "name": "Sabarish",
+        "email": "suviramesh3104@gmail.com",
+        "password_hash": "$2a$12$HP2KxjpMkoDziLfcudy4oOcLt4Uvx1LHU/UGUdXHPuT0/V1gTfIEm",
+        "role": "entrepreneur",
+        "phone_number": "6379647335",
+        "profile": {
+          "faceAuth": {
+            "model": "local-bytehash-v1",
+            "updatedAt": "2026-03-21T02:15:58.391Z",
+            "embedding_iv": "hb04GVjFcq8VHc9U",
+            "embedding_auth_tag": "Fg+bZlUShLHH/PTsnwkxYg==",
+            "embedding_encrypted": "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"
+          }
+        },
+        "credit_score": null,
+        "created_at": "2026-03-21T02:15:57.822056+00:00",
+        "updated_at": "2026-03-21T02:15:58.43689+00:00"
+      },
+      {
+        "id": "ed61f1d2-36c5-47f0-8d7b-8bdf50f23e5f",
+        "name": "Face Secure User",
+        "email": "facesec877526@testmail.com",
+        "password_hash": "$2a$12$OOilsefZ8vold78V3erJWOI.dybirQpFGn4YsUhsVeKEOF/PJGivi",
+        "role": "entrepreneur",
+        "phone_number": null,
+        "profile": {
+          "faceAuth": {
+            "model": "local-bytehash-v1",
+            "updatedAt": "2026-03-21T02:22:48.842Z",
+            "embedding_iv": "p6Zrjb5K9cKfqg65",
+            "embedding_auth_tag": "DMfB2D6VUwHk7l7rt7HZtQ==",
+            "embedding_encrypted": "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"
+          }
+        },
+        "credit_score": null,
+        "created_at": "2026-03-21T02:22:48.368413+00:00",
+        "updated_at": "2026-03-21T02:22:48.875773+00:00"
+      },
+      {
+        "id": "7d27e1da-b25b-46e0-bd2a-6a9c30bc30bd",
+        "name": "Face Hash User",
+        "email": "facehash918612@testmail.com",
+        "password_hash": "$2a$12$vJ0v.ZQgUANnSatQANt7MOoMsdPjmzN/I9Qf5C0Qousm4acGgkm9G",
+        "role": "entrepreneur",
+        "phone_number": null,
+        "profile": {
+          "faceAuth": {
+            "model": "local-bytehash-v1",
+            "updatedAt": "2026-03-21T02:26:59.062Z",
+            "embedding_iv": "JrUW/LrraprJ9AhW",
+            "faceImageSha256": "17ef57a8afd8066c19b7e5b3262fd16602918f7a72aea7bca6ee405db6ba549c",
+            "embedding_auth_tag": "HJmBfFdvRMliv/mTJ5zrMA==",
+            "embedding_encrypted": "RQn/YbZ+anyKYZnQ2JFZVmtuRN3hI5jignRD5j9zeZ9wPwmDmAiDB17iBEbuaJfDCbUr/Mdl/cEWeZAFj2OlzpB6y4AJbE3YGAXr0kV7QUIQe3wXhDEBadznZsgrXmbfww1KY7+Amf/Xmm/hzNVFmREmKovVFlMS405g1m3+V+mFzextR7hrC5Ws8LmA33TFufE2xFpAh2UeyBVSv7pafvcZS91RJ7hQ8nYO2aIErP/fhGVvcKJF+G6k0NWJEaDqnOIjav+maTgAt/uwPUBvRs8/prnJe+akMMvL9ul8YFOe1QouZ5A7XYRgIFH9Tv/2YWjgG7lyzs7U5Ou5MabUOhRV88ml5GiD/V3fozqhr//SJsN84opQj5TAP32qJCv4mq2icsNaulguXWn8yt800NKMtpIpICVQ4J99x9NqeRQ+ahPxkS9N1st6yobqCfXcm0VcbUDlR/2oHuj6449/giwUqEXnua3iYCBlFPqrLAsDhabv+OcXrDUSMKaWYur7mqpqrShdD29O2xHWM6ZgVJ5gKb4p5AGTU2J4hpIc1vq/eHp3J1la5ZWfa2v4C0oODMjrTIsTVrpozLaa7Ff45X7IPVaadoYZhVHm0WquIZO93fDEpTm/sM6P116EyY2NQuteOCyjiqiVLGMF1J5X+hmCmvA50cDYKMf15DJiIohgHt0QnAkUVo2et2CekeG1tToX+/KbaobbGY8HAbSRStMFXFnjZjmT+st3m10TobuZn7uAwtilCCcYUg33wbHoCU9KAeX9vzSld0zfIeF1g8Ojz/qhVx7Bc5sHDFvtTUfdxBJ7cRs9C4dHOy8tAvfA7JkrHWf/6YFbUtRoP8JQHHYkOrPi9lf04XqykdnSyG3VWbtwdEsYZamsXaV/5wlkpSKQwGB+EDzyDf/huE/+O65SF1lrTO8SCyM8UZw8ixTXGVZerwXN0hy0P1EtjKr8E/yHl81cY2y+18dYuqpAserPLdwLuLnREyBNVpvLQ7CYGv9BZ+3ileZ+bip0vobbRu1d5PS3j+L3+ovNP/ir9pz721I5lvx8BXtr0iPbN2nlp3k3l/ivhonQN6YhdGDZ1riG/zRCszt04mIf0QEsvW70F7pjANj0U8tDEdG3ku+wUAsVMqLp0x1C8AkcM9CFCI9M5KxbSSTXBtTHofOKPq04aAI1e1QFN8UJ+Cu+d7qUgFdeQt6s5fMuartF4c9/G7b8xQUWm67eTF/dFQGO6eV/3wRzLgtv/1lPM3jagHCnmbdBfEl/il8TiytpMnSEhefouzlDX5oWQqodIqDvvBtM6pMDBYtCaoUj0jGg5kl36VVm/+7FY17SpCFb2v0CSn6NRmTdaReP97EbWCetJZ5qbEXzN4JsOvuAxMyvYluRfzNyXciogZOho9B61iD9SwJqdtte9b91rBWkNMTHwS4aECAt+cWC+TgJnY5OFR/PJa7+dVCHhjfyNd9dznyWNQCdov5MRBiuBtDFy15OoQLXfB9JuI426wcbGNF8xApgPzzv9+dGdKCcKH6wtTydlFKdbOd3Ur7Xa1TwLxk1Ljv718dXlWpWGLAOQSknuQF+4dOpQpVh0KrVKifKgiTSB0fYA4G/F4eFEBuW6wNEyCP37Jpjx7UAsSXjHgSJnj+ix5s92dDzusHNhydJFIiwwm4l7pdZnZBxQsm8F4FJyZlyFHBLMf6AP0kZy7M239NlvjDyf05sLHp4QBrzLJ2jBC7sMaT+g9WV3xWmFATqQEXDnVzPg/VBL4tHDv4WyUHzFuRUBB5HQZ9sRYtK3UREnGys8NipV92yiRvpvz3mjZhGVjBo3EDiRUk/huMFunETK0dacLI8SwH56Y5vpE/notAwnklsNuSnKnj9+D81nAQGU/og8aYlqsvVRuYYYL5IwimbQRnxVmdR3kf01fHCYNU/4PehHJ9YMNAiu364EgFaryG2qb7AdocTYCVGM1pVyjWbTBAgPLPsM9GClEvmc/tAGwArAOCTmkl9lmgUpDFpz2oMxOVQfvNdQ+KoLuZ3Wl9RKJK2pFKyAM4wJvpnUHoIZPSI2JKq/0IqHirmHEn2kNAQHwUCO2hHVSr8C2B6a17qNEBMqG1Gr5TGVk7DAA1s0lI4zA5noegA9t8XJRednLZx/sxypdGONE7DJlLMp3I477MiBw49HU9ldk5eAaPX5+bW3xf7eprDZobBVRdss5NoN9OmnWaL8P+NYlcb6Uz4JBtwWPDySDjnOCwXemqrMcqws/VSf/4u7hcV5lOdDPzormF99pJQBf0rgJOQMcyVFvmRJvzatJzT8xsgeYilGtUfDhoY4kqmEWvvNWAaIMZoljHWrxLx639XUEW633E47efiGBUKlhA+Jc57eEVng/jiG94DyjjICJUmm+894PHC/J9nobHCn3Hf2LvwgEinl3DMCX89ingeVPM5TRmLxaXrYNEIt9I6Wbn2Ry2duQ6IhxVurGrIVI5dCRjIj40Uvw6BN4u0k59VJ0jfS+Z7gL4IN/tK8E4VIM3UgXd5WZfFT5/KfMe6z0DGhNPDhh7uaV/9DWD4y8seQNoR9PgMoaQf1o/Y5eLsVaVr9K+nPW77bRg2noXcvXlhOZ5PfuSn9fm19BCXa7qPDtpCDKkF80u46nCcpjMhIjFs5yzJdwHQIF3HcWLK2Uk9bvQBG+KoJcgqOh9wSB/J/bwVIA0eFZfLaxbTJdif9X6jL09XvfCazqVIb9QwJorFklR+ViY2yws2U0otCzKGalWRPHZPBqxPlhUFIEuEfwcm74z7KqrzllTwFv00+Zfv1zJEt0gHXJ4QoQh/fCMzFvZC2bZfR6UalgFSCqSVDsJx1WLaP/WB4Cl/PcCPRcLC1dFcRQLqIb36XOZP26eW11miH2KYqTP/s1JvYzuDMt4cb2j+Le3upEniyixCzlTInkJ8jXqP1oMzjZasNItqn/1NBINAbZiPzLExL6T+DZZQTNvhyKtTqicJnkfkQWPP44B+uHo50G2mKHNX26Z083Kn8s4ec90JHGlQ+1dLpHF0dbifqNe+Ya5PCxgIPVDNTmRBJVWksAujqMI9P+qFqSQYVjKOqPByOwIKLAyiuo/7h1p3gXk1Q0T5pqW7cd3vXHEYkwIjg6LycCaPrGxDxY3jCEcF6RPxRrzEwte1w6nlBPvlkuzbNEsVcAEEshpTJV4wuhIZppFIADpFSKY70Z7wJGaQ66AO4pCHDhHbFx5flhcsGo5R/26enGK7m4sj4mMjOchU4guLIB4g47nYYSn72nlfltBOqoPlOQkcyBnhWVQfTAxRfYHbLEYqYNcoHtW86hUBVg7xEcdbDFl1smbwV0aCk7wHsl0pbVs7uDhcBmTkqvrldvy6u1JgJF6eoiGpEbyM+DEzr5JQolaJCzqJsjYoV0f5ohFd9Yx7ZSjgshq8dhOljNj6DCR+PJBB57BAYNbpAaL2dEiU6zvQFD5x6ng5/8zrzG5rB4ITrXCsEShNYZBuldhNY/AncswqZEi/Y8UVCb+uOXIWUcr4Bvo/sHFMTXR+ca+H55LYWF9AhvRTWeMBHOXrilvFl0RbefRHqbFJ8OsCx5g+EDEGSTbIS1u+jfmdiPx1fQWOTx8oVd/ObDhZt1lF0X7ydEofiTJI32K5WuXYP+Am1puwawsK1X5lUf59hL8sa5Et1eGvzOwjyAlj5nRQxQaDv4HvLkkRj+hwMQmUu/vSCJN35hB1gXLEPhUivNPoOVw17WkcWcueikg4888x7EVwUNycrGBHWxnd5Zn0Wqken1kS0YisT4xb+Pfv0iz0nngEDoW1/3EcDWUAPBMHp6ttIzPVyTxAh993zn10TK3sOwtC+nsvZ4SO1N02oXdpLqEa42EKz3FwdCMmFHerYTqjAYEZoEbB4nI1pSe7OdbmxAhv7PFJ8fkTJZCmnQv7IKpOhqFmRIiPw6A/ZyzEj2MVh/WOCEf20FFzKuDaMYXJINygwjQ5/cYelZBb7r3og6CMMSxrExzCzXhwvdOio7nhrWFuvs0HbnA0Qo1SPJDKVKhy1bFgd3SFl6ZKTGXv4VcB29bUsNZn4Cddqa8uBkkSIMz0aZbrGeI/hEe5kTTTk/v0dXz4+fu/HIBnjvlM/2CLUkl+MftFj+coNxteUXP1CuerZvwd/4v6DALM1jNS+WlvnvpGt4gj7zSlngEl2VFFp1FXnlErQzZkSkKVozazeji/xmJ03fPVKN7AXPp1pVB+T7DkwaSl2iIUz5fbI5Ajx7SNa8QJb4oy6aeeclCf/YSnpxmPBAESzqC5tlCB8hyazb7S4j8JTSG+/wyTxE8RlPz9CnVB/S42htKdSXGepn98I377aTqbX5sU5sfWDMS+cNuHJL57FfocBOEAVUQKJqwi7r+roqz9IYkm9NaQzl6eJmv9QVBnJH0Bn/Y6RS+/jaj+fEYNhE+GaiXYx4O7YVeGJPyNgR7cdP2irPBv7Mm0AmZlC1uf/aX9idCrZ6g/np0eOcNu254/LEtjHCNXyhJW5O1YmKDHNqObn5xu/r1MHT2FKKBIWZ+rjtRY6oqH/r8NHFbNdF+GUeZHWTF+hYHzao7Lsm4PqNtqNVYTkkVTW6MtUdTHt8Tnz3t1GvAuP1HZgjZrao9uOjG1GoRSyfEfK6skWnseplmpFPNdH/yiN5FCg+TOhDp5gz5SRgxX2OPIYHuYrQ92uXjsEsWjF7wrouehy4OV/hE0ztyKmmwNCPNrmmSHK7Uy+fJTu5kF196JKCUE8SON+NHLQ44EymbRkC548U8zwVzLAq1+VyWkN7W32HjWYGv8D91YAgasg4dKi3ZDLgX6CJScTSjCl42fHyDwfmjz6Slf8W1x5ATYg+JBVfNO8X/8xdl9XFQ+mvfFbRCPVnAQ2sP86S+Or2SLQ3aXN1wGB6DXne9J7Ok21dxGq8wAjOBJ+Zgfbx2V9eg2WTNpF1kEeJvXfUwV8jdZ9x33wjJlMWfjp9oiXUkk1KZdqXLMPEAuCiC/PIERC/6+hqf3XvtE6zVQYBO2a5CKcxXpDoEG8kFTY1+rqypZzAhq/xKUvKaWzSlbON27qPnXVG33yIb139S01C8R0s0FGwm7PqTUHY6jvSXT+aypvi0lOkW4P29et9v7AiWtlVDREC+9O4z0sZdc2NEVHzymZeMEEzpjp0WaheadNtLONm83byApmVufFIJzo2jpUF83GGjRWSjd9tlZHlsF84bFdpkI2wJDzmSs8NOR0omfTpjChfcMWUDknNouY5XKJpycAUKQQd0KBEt7tMSxDslb9c96c6Gi4+4upZSWamO/DJmpJQalcjHQTNkzO5NlDQmzoyBBCXOPeZRusz3X/GMdRkltdZ7K4aCuQ6lr4PBYFBVjhmb/p3WezHij1Lg5zs8ku2Rvm+XNGPX9qOEKPQ2e6Er1K6MsOhGegvtpQGMLrV1B/Dgd0russLRkstXx8JlZLILOi/j0OVfztLF95cXZ8a6WTIBbK3asDd3Cy9iTSo8y6z//sfUijbdCcU9cA2cdgfLT5QS2GI0wvk+skqJb7LehDZe3VFRxYCSG0cfw2YIDvkeD1uq8QBBIt4Nc4Cacgig1itKpSAdyLYgmjZK5KkbI5v5cudDizO5otizPjBl1cbNNF/tkioxMgIqAmGF34L2dSWcUlAIYa6yJysaRzmTa0F0lnkc9Qcj2U++4avwN9m7WZyikTW3ikh3zrpT+dz1HWmYsK2smsdNPiEs5d06LkNXPw2ro+pv04MnAPmGqbcr+DuDgfpPfKrM3SrrOxUMTz7+gmiLRI5QdExsww+HV40coLOzEj8Vs+K9SfQV8W4zVc+0Ai0UPiSVXj0UZp4DHbT13BF7AEw5BgfRITm1sCPb4ObgY2kBKHTMna/sYKcesIrlOuDd3MweYKAGQPhpj+NqiUQ359KliYbPYaQSY86MbLO0W+JPDRepIHRQm0ADAWa6Vpi1QVpo3j9jh/zWjVF9CDN8rlM6YgRab42UkrUTNON++RjdssfgDb7RGh9cNOjpqHXYPXgDrCmlE4+QvxUTDqkyoi8DdxvvS0VH/GYZazc8V/RANKgExFPysakS1c45WR6GmsQUJ1h/rBWBC4ysesTkhuUNyBpKR5CH2Dy/HxbulnfMyf6ckXDZUaRlFyKn1ZGp+n9/KFhGEWnWK9Pac+2hQqSUzU9CbSlyszMEPK5anFQIpitaEFZSOzjDlhrxjm81YBdshKcSHzqKA7R/h9N9jmlWoMi3AHVGFJbL4VtEKbG1kltWhmGvGqcNqraQeyNUFiK+dHlzaIQSI33n02/96c8B9kXhMocxbg8/2pZJxm8TtijMa2uCKIVd+m5v2sgGLsCaSQKxT8QoQTxM+BsrAt0nu/EwQhTMIdUlKybXQiH/Pe3a3Zbp9Inh5PHKwL0k+/s+h3XUyTx1V3/aeY7jlPVHwZqUClyEjYxuZ5J4JaXmtGTAeyuyK0/vtYN3gojleuwB+AUqhg6CtwsAcLVBpcbQPe8gQXJ/6k/Bp8BSarlqL9ppwwX8CHNglV020K7F1WJpsKY8IOHnqj9bC9J2NEMWYLg5oIOxpO3Y1ESs4bopXaBR/+OzLEKtmRqBZvEiJtzMcoIDixoJNzB2V2ZZawOloJhZ4rK1VII6WLtFXCEO8KAzNZvb1ddyx9AlgKVe/jhlU26McwgSOeYhKh7jqBp5L8xBCx8RJHFi1jqu10C/w+OwoxYezjU3dWUSDLwoadn9NJgpO3NoWNQpMT8DuYJsok/A+T5KxsWTk8wu+08S2/d9cqSoVTAxmVasuyaVJeh7sEwJXW56af0/+0UdBXaguhRaA3maD6fyKCUQMb0HQTEABgtsmdOn0EV0noBZbCdAFGEk0hTm8uLXJpVEXsERha8q6g3Wy6la8dNvO89cfPNK/uhw7I2eJUN7JXx/gqAwE+TOr/XFXSjyEc1UKDl2CehrPFVyZdQLc8LdfN/WVsfdL3HJO+z07oQS2dd2IpxiRxA6BUacNT+k+j5+hT7qDTfucyfsw/wNV4RyQs8F0y2GKfGEprbt/CY1k4UreXv7jH8SWkUyv6HLyIdKnQGkG5LFPpJJyyXjds/jI9LXDjglJxFA2DevxMWy0s0j6EB/c2Iaqtka7sZICyUQpd0ambsoJX3FaT6iYwJQ6wb+tJCl6J2U6Bp8OfLleiA7hoFa1PY5fsSIE3U79+aTD3z46euwYx6W2zEGskeKrH1DjZKh3kD8/Z9A3dMAVhCnIcNygi9vmwMl2SAH+ayUFkhjm7OeaNTTobnZUN9O8yaL1n/Y3NzXp0muB7PeCQEcpVDAnznrRCS0AaFQCjEyqb8XvwiNB+0NwdEucWZY+GtD6QA9DXBDq538XjxhVUUDWl8C0Nfb2+WwYN0LdaRS8bY/jSXz5cCqZJsk4zCFT/8j9tlorR6Uz36RCIbrVA3K2leoeeJeiCBhztewcvGoMue4S+beitIjQhA9eG2EzggsCmWsfcafqcqR8K1t3PvVAJpXhCClmaQvLHs8zgn+p5GibSs4uHEbpFgGuQguCShtrn710JGnL0z6OlkiLn2nGky44+rrmdP2e9MZUbYVlY3aKOUpRZVxDD/qKQo9tm6nu8jhzRuf0J1RDnabV/lSdc//SazlKjM9q0EvkoUCbb/69LiCUe4YHKjqD2icT8v/TE7n79IzwVmfkYXne8HN+DfIHTNd+NUREgf1t7EIEfFan1me7r0AIO3o3Gbi7paJvW9s9SATq/xWX/pWsTT4nslrUzRN214Zd+BYrc8a1ohBg0Z9JEKa/xxg7c9Wv52r51GywCekMVW6hHbA="
+          }
+        },
+        "credit_score": null,
+        "created_at": "2026-03-21T02:26:58.737886+00:00",
+        "updated_at": "2026-03-21T02:26:59.104923+00:00"
+      },
+      {
+        "id": "83e82793-95b9-4ffb-82a3-d46a038ffed7",
+        "name": "Sabarish",
+        "email": "ranjaniramesh123@gmail.com",
+        "password_hash": "$2a$12$mGkmLkqGwFA88JIvvOhyo.ASSmMR/2mZd63owzoihhWSmhJBCMUVG",
+        "role": "entrepreneur",
+        "phone_number": "9787922816",
+        "profile": {},
+        "credit_score": null,
+        "created_at": "2026-03-21T04:14:46.252266+00:00",
+        "updated_at": "2026-03-21T04:14:46.252266+00:00"
+      }
+    ],
+    "funds": [],
+    "campaigns": [
+      {
+        "id": "0bd3e0d1-cebf-4462-bd41-648450c0ef6b",
+        "creator_id": "debf800d-234b-424a-b076-093d686a566b",
+        "business_id": null,
+        "title": "NilaCare Connect",
+        "category": "Healthcare",
+        "description": "Urban working women and caregivers struggle to access reliable, affordable at-home eldercare and post-discharge support.",
+        "status": "Active",
+        "target_amount": 100000,
+        "current_amount": 0,
+        "min_investment": 1000,
+        "end_date": "2026-04-19T17:16:57.19+00:00",
+        "milestones": [
+          {
+            "title": "Prototype",
+            "targetAmount": 30000
+          },
+          {
+            "title": "Building",
+            "targetAmount": 50000
+          },
+          {
+            "title": "Marketing",
+            "targetAmount": 20000
+          }
+        ],
+        "investments": [],
+        "stats": {
+          "views": 0
+        },
+        "created_at": "2026-03-20T17:16:58.654183+00:00",
+        "updated_at": "2026-03-20T17:16:58.654183+00:00"
+      },
+      {
+        "id": "ccaebf66-e2d9-4469-80fb-713c91598371",
+        "creator_id": "d67f891f-b580-4e8a-b78e-a56013d4ce2a",
+        "business_id": null,
+        "title": "RP Env Check",
+        "category": "Technology",
+        "description": "Validate razorpay env",
+        "status": "Active",
+        "target_amount": 50000,
+        "current_amount": 0,
+        "min_investment": 1000,
+        "end_date": "2026-04-04T17:42:39.157+00:00",
+        "milestones": [
+          {
+            "title": "M1",
+            "targetAmount": 10000
+          }
+        ],
+        "investments": [],
+        "stats": {
+          "views": 0
+        },
+        "created_at": "2026-03-20T17:42:40.651772+00:00",
+        "updated_at": "2026-03-20T17:42:40.651772+00:00"
+      }
+    ],
+    "investments": {
+      "_error": "Could not find the table 'public.investments' in the schema cache"
+    },
+    "credit_scores": [],
+    "fund_recommendation_requests": [
+      {
+        "id": "97bf82d6-0b94-434f-b534-fcbf30407a8f",
+        "user_id": null,
+        "full_name": "Test User",
+        "email": "test@example.com",
+        "phone": "9876543210",
+        "business_idea": "AI-enabled women safety mobile app for urban commuters",
+        "budget_required": 750000,
+        "industry_type": "Technology",
+        "business_stage": "Prototype/MVP",
+        "experience": "2",
+        "location": "Chennai",
+        "team_size": 3,
+        "recommendations": {
+          "grants": [
+            {
+              "name": "Stand Up India Scheme",
+              "timeline": "2-3 months",
+              "matchScore": 94,
+              "description": "Loans for women entrepreneurs for greenfield enterprises",
+              "eligibility": [
+                "Woman entrepreneur",
+                "New business venture",
+                "Manufacturing or services sector"
+              ],
+              "fundingRange": "10L - 1Cr",
+              "comparisonText": "Your Prototype/MVP Technology idea (AI-enabled women safety mobile app for urban commuters) aligns with this fund's focus. Your requested budget of ₹7,50,000 is in line with the indicative funding window (10L - 1Cr). The expected timeline (2-3 months) makes it practical for your current planning phase. Your prior experience (2) strengthens your eligibility for this option."
+            },
+            {
+              "name": "TREAD Scheme",
+              "timeline": "1-2 months",
+              "matchScore": 90,
+              "description": "Trade Related Entrepreneurship Assistance and Development for women",
+              "eligibility": [
+                "Women entrepreneurs",
+                "Trade-based business",
+                "Group or individual"
+              ],
+              "fundingRange": "1L - 30L",
+              "comparisonText": "Your Prototype/MVP Technology idea (AI-enabled women safety mobile app for urban commuters) aligns with this fund's focus. Your requested budget of ₹7,50,000 is in line with the indicative funding window (1L - 30L). The expected timeline (1-2 months) makes it practical for your current planning phase. Your prior experience (2) strengthens your eligibility for this option."
+            },
+            {
+              "name": "WEP (Women Entrepreneurship Platform)",
+              "timeline": "2-4 months",
+              "matchScore": 93,
+              "description": "Support for women to realize their entrepreneurial aspirations",
+              "eligibility": [
+                "Woman entrepreneur",
+                "Innovative business idea",
+                "Technology or services"
+              ],
+              "fundingRange": "5L - 25L",
+              "comparisonText": "Your Prototype/MVP Technology idea (AI-enabled women safety mobile app for urban commuters) aligns with this fund's focus. Your requested budget of ₹7,50,000 is in line with the indicative funding window (5L - 25L). The expected timeline (2-4 months) makes it practical for your current planning phase. Your prior experience (2) strengthens your eligibility for this option."
+            }
+          ],
+          "vcFunds": [],
+          "angelInvestors": [],
+          "governmentSchemes": [
+            {
+              "name": "Startup India Seed Fund",
+              "timeline": "3-6 months",
+              "matchScore": 95,
+              "description": "Financial assistance to startups for proof of concept, prototype development, product trials, market entry, and commercialization",
+              "eligibility": [
+                "Business less than 2 years old",
+                "Innovative business idea",
+                "DPIIT recognized startup"
+              ],
+              "fundingRange": "20L - 50L",
+              "comparisonText": "Your Prototype/MVP Technology idea (AI-enabled women safety mobile app for urban commuters) aligns with this fund's focus. Your requested budget of ₹7,50,000 is in line with the indicative funding window (20L - 50L). The expected timeline (3-6 months) makes it practical for your current planning phase. Your prior experience (2) strengthens your eligibility for this option."
+            },
+            {
+              "name": "MUDRA Loan Scheme",
+              "timeline": "1-2 months",
+              "matchScore": 88,
+              "description": "Loans up to 10 lakh for micro and small businesses",
+              "eligibility": [
+                "Registered business entity",
+                "No collateral required",
+                "For business expansion"
+              ],
+              "fundingRange": "50K - 10L",
+              "comparisonText": "Your Prototype/MVP Technology idea (AI-enabled women safety mobile app for urban commuters) aligns with this fund's focus. Your requested budget of ₹7,50,000 is in line with the indicative funding window (50K - 10L). The expected timeline (1-2 months) makes it practical for your current planning phase. Your prior experience (2) strengthens your eligibility for this option."
+            },
+            {
+              "name": "SBI Stree Shakti Package",
+              "timeline": "15-30 days",
+              "applyNote": "Apply at SBI branch or SBI SME loans portal with MSME registration and ownership proof.",
+              "matchScore": 97,
+              "description": "Women entrepreneur-focused SBI package for retail, services, professionals, and SSI segments.",
+              "eligibility": [
+                "Minimum 51% women ownership",
+                "Business in retail/services/professional/SSI segment",
+                "MSME/Udyam and business documentation"
+              ],
+              "fundingRange": "50K - 25L",
+              "comparisonText": "Your Prototype/MVP Technology idea (AI-enabled women safety mobile app for urban commuters) aligns with this fund's focus. Your requested budget of ₹7,50,000 is in line with the indicative funding window (50K - 25L). The expected timeline (15-30 days) makes it practical for your current planning phase. Your prior experience (2) strengthens your eligibility for this option.",
+              "integrationPrompt": "Retail/Service: 50K-2L, SSI/Professional: up to 25L, ensure 51% women ownership."
+            }
+          ]
+        },
+        "created_at": "2026-03-20T09:51:39.346947+00:00",
+        "updated_at": "2026-03-20T09:51:39.346947+00:00"
+      },
+      {
+        "id": "6258d763-0fdc-44c8-80f4-22e45346babb",
+        "user_id": "c2e7784b-ea48-427e-9208-82cc61ca2917",
+        "full_name": "Suvitha ramesh",
+        "email": "suviiiramesh@gmail.com",
+        "phone": "6379647335",
+        "business_idea": "Pastry",
+        "budget_required": 100000,
+        "industry_type": "Food & Beverage",
+        "business_stage": "Idea Stage",
+        "experience": "1",
+        "location": "namakkal",
+        "team_size": 1,
+        "recommendations": {
+          "grants": [
+            {
+              "name": "Stand Up India Scheme",
+              "timeline": "2-3 months",
+              "matchScore": 94,
+              "description": "Loans for women entrepreneurs for greenfield enterprises",
+              "eligibility": [
+                "Woman entrepreneur",
+                "New business venture",
+                "Manufacturing or services sector"
+              ],
+              "fundingRange": "10L - 1Cr",
+              "comparisonText": "Your Idea Stage Food & Beverage idea (Pastry) aligns with this fund's focus. Your requested budget of ₹1,00,000 is in line with the indicative funding window (10L - 1Cr). The expected timeline (2-3 months) makes it practical for your current planning phase. Your prior experience (1) strengthens your eligibility for this option."
+            },
+            {
+              "name": "TREAD Scheme",
+              "timeline": "1-2 months",
+              "matchScore": 90,
+              "description": "Trade Related Entrepreneurship Assistance and Development for women",
+              "eligibility": [
+                "Women entrepreneurs",
+                "Trade-based business",
+                "Group or individual"
+              ],
+              "fundingRange": "1L - 30L",
+              "comparisonText": "Your Idea Stage Food & Beverage idea (Pastry) aligns with this fund's focus. Your requested budget of ₹1,00,000 is in line with the indicative funding window (1L - 30L). The expected timeline (1-2 months) makes it practical for your current planning phase. Your prior experience (1) strengthens your eligibility for this option."
+            }
+          ],
+          "vcFunds": [],
+          "provider": "rule-engine",
+          "aiSummary": null,
+          "angelInvestors": [],
+          "governmentSchemes": [
+            {
+              "name": "Startup India Seed Fund",
+              "timeline": "3-6 months",
+              "matchScore": 95,
+              "description": "Financial assistance to startups for proof of concept, prototype development, product trials, market entry, and commercialization",
+              "eligibility": [
+                "Business less than 2 years old",
+                "Innovative business idea",
+                "DPIIT recognized startup"
+              ],
+              "fundingRange": "20L - 50L",
+              "comparisonText": "Your Idea Stage Food & Beverage idea (Pastry) aligns with this fund's focus. Your requested budget of ₹1,00,000 is in line with the indicative funding window (20L - 50L). The expected timeline (3-6 months) makes it practical for your current planning phase. Your prior experience (1) strengthens your eligibility for this option."
+            },
+            {
+              "name": "SBI Stree Shakti Package",
+              "timeline": "15-30 days",
+              "applyNote": "Apply at SBI branch or SBI SME loans portal with MSME registration and ownership proof.",
+              "matchScore": 97,
+              "description": "Women entrepreneur-focused SBI package for retail, services, professionals, and SSI segments.",
+              "eligibility": [
+                "Minimum 51% women ownership",
+                "Business in retail/services/professional/SSI segment",
+                "MSME/Udyam and business documentation"
+              ],
+              "fundingRange": "50K - 25L",
+              "comparisonText": "Your Idea Stage Food & Beverage idea (Pastry) aligns with this fund's focus. Your requested budget of ₹1,00,000 is in line with the indicative funding window (50K - 25L). The expected timeline (15-30 days) makes it practical for your current planning phase. Your prior experience (1) strengthens your eligibility for this option.",
+              "integrationPrompt": "Retail/Service: 50K-2L, SSI/Professional: up to 25L, ensure 51% women ownership."
+            }
+          ]
+        },
+        "created_at": "2026-03-20T11:46:49.284381+00:00",
+        "updated_at": "2026-03-20T11:46:49.284381+00:00"
+      },
+      {
+        "id": "3f65e808-8a24-4015-b1e5-95654d669ccb",
+        "user_id": null,
+        "full_name": "Demo User",
+        "email": "demo@example.com",
+        "phone": "9876543210",
+        "business_idea": "AI-driven bookkeeping for women-led micro businesses",
+        "budget_required": 500000,
+        "industry_type": "Technology",
+        "business_stage": "Prototype/MVP",
+        "experience": "2",
+        "location": "Chennai",
+        "team_size": 2,
+        "recommendations": {
+          "grants": [
+            {
+              "name": "Stand Up India Scheme",
+              "timeline": "2-3 months",
+              "matchScore": 94,
+              "description": "Loans for women entrepreneurs for greenfield enterprises",
+              "eligibility": [
+                "Woman entrepreneur",
+                "New business venture",
+                "Manufacturing or services sector"
+              ],
+              "fundingRange": "10L - 1Cr",
+              "comparisonText": "Your Prototype/MVP Technology idea (AI-driven bookkeeping for women-led micro businesses) aligns with this fund's focus. Your requested budget of ₹5,00,000 is in line with the indicative funding window (10L - 1Cr). The expected timeline (2-3 months) makes it practical for your current planning phase. Your prior experience (2) strengthens your eligibility for this option."
+            },
+            {
+              "name": "TREAD Scheme",
+              "timeline": "1-2 months",
+              "matchScore": 90,
+              "description": "Trade Related Entrepreneurship Assistance and Development for women",
+              "eligibility": [
+                "Women entrepreneurs",
+                "Trade-based business",
+                "Group or individual"
+              ],
+              "fundingRange": "1L - 30L",
+              "comparisonText": "Your Prototype/MVP Technology idea (AI-driven bookkeeping for women-led micro businesses) aligns with this fund's focus. Your requested budget of ₹5,00,000 is in line with the indicative funding window (1L - 30L). The expected timeline (1-2 months) makes it practical for your current planning phase. Your prior experience (2) strengthens your eligibility for this option."
+            },
+            {
+              "name": "WEP (Women Entrepreneurship Platform)",
+              "timeline": "2-4 months",
+              "matchScore": 93,
+              "description": "Support for women to realize their entrepreneurial aspirations",
+              "eligibility": [
+                "Woman entrepreneur",
+                "Innovative business idea",
+                "Technology or services"
+              ],
+              "fundingRange": "5L - 25L",
+              "comparisonText": "Your Prototype/MVP Technology idea (AI-driven bookkeeping for women-led micro businesses) aligns with this fund's focus. Your requested budget of ₹5,00,000 is in line with the indicative funding window (5L - 25L). The expected timeline (2-4 months) makes it practical for your current planning phase. Your prior experience (2) strengthens your eligibility for this option."
+            }
+          ],
+          "vcFunds": [],
+          "provider": "rule-engine",
+          "aiSummary": null,
+          "angelInvestors": [],
+          "governmentSchemes": [
+            {
+              "name": "Startup India Seed Fund",
+              "timeline": "3-6 months",
+              "matchScore": 95,
+              "description": "Financial assistance to startups for proof of concept, prototype development, product trials, market entry, and commercialization",
+              "eligibility": [
+                "Business less than 2 years old",
+                "Innovative business idea",
+                "DPIIT recognized startup"
+              ],
+              "fundingRange": "20L - 50L",
+              "comparisonText": "Your Prototype/MVP Technology idea (AI-driven bookkeeping for women-led micro businesses) aligns with this fund's focus. Your requested budget of ₹5,00,000 is in line with the indicative funding window (20L - 50L). The expected timeline (3-6 months) makes it practical for your current planning phase. Your prior experience (2) strengthens your eligibility for this option."
+            },
+            {
+              "name": "MUDRA Loan Scheme",
+              "timeline": "1-2 months",
+              "matchScore": 88,
+              "description": "Loans up to 10 lakh for micro and small businesses",
+              "eligibility": [
+                "Registered business entity",
+                "No collateral required",
+                "For business expansion"
+              ],
+              "fundingRange": "50K - 10L",
+              "comparisonText": "Your Prototype/MVP Technology idea (AI-driven bookkeeping for women-led micro businesses) aligns with this fund's focus. Your requested budget of ₹5,00,000 is in line with the indicative funding window (50K - 10L). The expected timeline (1-2 months) makes it practical for your current planning phase. Your prior experience (2) strengthens your eligibility for this option."
+            },
+            {
+              "name": "SBI Stree Shakti Package",
+              "timeline": "15-30 days",
+              "applyNote": "Apply at SBI branch or SBI SME loans portal with MSME registration and ownership proof.",
+              "matchScore": 97,
+              "description": "Women entrepreneur-focused SBI package for retail, services, professionals, and SSI segments.",
+              "eligibility": [
+                "Minimum 51% women ownership",
+                "Business in retail/services/professional/SSI segment",
+                "MSME/Udyam and business documentation"
+              ],
+              "fundingRange": "50K - 25L",
+              "comparisonText": "Your Prototype/MVP Technology idea (AI-driven bookkeeping for women-led micro businesses) aligns with this fund's focus. Your requested budget of ₹5,00,000 is in line with the indicative funding window (50K - 25L). The expected timeline (15-30 days) makes it practical for your current planning phase. Your prior experience (2) strengthens your eligibility for this option.",
+              "integrationPrompt": "Retail/Service: 50K-2L, SSI/Professional: up to 25L, ensure 51% women ownership."
+            }
+          ]
+        },
+        "created_at": "2026-03-20T11:48:04.156933+00:00",
+        "updated_at": "2026-03-20T11:48:04.156933+00:00"
+      },
+      {
+        "id": "df8cb7c2-bc47-4f40-b8ed-c9dfc901177e",
+        "user_id": "c2e7784b-ea48-427e-9208-82cc61ca2917",
+        "full_name": "Suvitha ramesh",
+        "email": "suviiiramesh@gmail.com",
+        "phone": "6379647335",
+        "business_idea": "pastry",
+        "budget_required": 100000,
+        "industry_type": "Food & Beverage",
+        "business_stage": "Idea Stage",
+        "experience": "1",
+        "location": "Namakkal",
+        "team_size": 1,
+        "recommendations": {
+          "grants": [
+            {
+              "name": "Stand Up India Scheme",
+              "timeline": "2-3 months",
+              "matchScore": 94,
+              "description": "Loans for women entrepreneurs for greenfield enterprises",
+              "eligibility": [
+                "Woman entrepreneur",
+                "New business venture",
+                "Manufacturing or services sector"
+              ],
+              "fundingRange": "10L - 1Cr",
+              "comparisonText": "Your Idea Stage Food & Beverage idea (pastry) aligns with this fund's focus. Your requested budget of ₹1,00,000 is in line with the indicative funding window (10L - 1Cr). The expected timeline (2-3 months) makes it practical for your current planning phase. Your prior experience (1) strengthens your eligibility for this option."
+            },
+            {
+              "name": "TREAD Scheme",
+              "timeline": "1-2 months",
+              "matchScore": 90,
+              "description": "Trade Related Entrepreneurship Assistance and Development for women",
+              "eligibility": [
+                "Women entrepreneurs",
+                "Trade-based business",
+                "Group or individual"
+              ],
+              "fundingRange": "1L - 30L",
+              "comparisonText": "Your Idea Stage Food & Beverage idea (pastry) aligns with this fund's focus. Your requested budget of ₹1,00,000 is in line with the indicative funding window (1L - 30L). The expected timeline (1-2 months) makes it practical for your current planning phase. Your prior experience (1) strengthens your eligibility for this option."
+            }
+          ],
+          "vcFunds": [],
+          "provider": "rule-engine",
+          "aiSummary": null,
+          "angelInvestors": [],
+          "governmentSchemes": [
+            {
+              "name": "Startup India Seed Fund",
+              "timeline": "3-6 months",
+              "matchScore": 95,
+              "description": "Financial assistance to startups for proof of concept, prototype development, product trials, market entry, and commercialization",
+              "eligibility": [
+                "Business less than 2 years old",
+                "Innovative business idea",
+                "DPIIT recognized startup"
+              ],
+              "fundingRange": "20L - 50L",
+              "comparisonText": "Your Idea Stage Food & Beverage idea (pastry) aligns with this fund's focus. Your requested budget of ₹1,00,000 is in line with the indicative funding window (20L - 50L). The expected timeline (3-6 months) makes it practical for your current planning phase. Your prior experience (1) strengthens your eligibility for this option."
+            },
+            {
+              "name": "SBI Stree Shakti Package",
+              "timeline": "15-30 days",
+              "applyNote": "Apply at SBI branch or SBI SME loans portal with MSME registration and ownership proof.",
+              "matchScore": 97,
+              "description": "Women entrepreneur-focused SBI package for retail, services, professionals, and SSI segments.",
+              "eligibility": [
+                "Minimum 51% women ownership",
+                "Business in retail/services/professional/SSI segment",
+                "MSME/Udyam and business documentation"
+              ],
+              "fundingRange": "50K - 25L",
+              "comparisonText": "Your Idea Stage Food & Beverage idea (pastry) aligns with this fund's focus. Your requested budget of ₹1,00,000 is in line with the indicative funding window (50K - 25L). The expected timeline (15-30 days) makes it practical for your current planning phase. Your prior experience (1) strengthens your eligibility for this option.",
+              "integrationPrompt": "Retail/Service: 50K-2L, SSI/Professional: up to 25L, ensure 51% women ownership."
+            }
+          ]
+        },
+        "created_at": "2026-03-20T11:54:47.036444+00:00",
+        "updated_at": "2026-03-20T11:54:47.036444+00:00"
+      }
+    ],
+    "fund_recommendations": {
+      "_error": "Could not find the table 'public.fund_recommendations' in the schema cache"
+    },
+    "user_face_embeddings": {
+      "_error": "Could not find the table 'public.user_face_embeddings' in the schema cache"
+    }
+  },
+  "counts": {
+    "users": 25,
+    "funds": 0,
+    "campaigns": 2,
+    "investments": -1,
+    "credit_scores": 0,
+    "fund_recommendation_requests": 4,
+    "fund_recommendations": -1,
+    "user_face_embeddings": -1
+  }
+}

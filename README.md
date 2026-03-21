@@ -282,11 +282,12 @@ npm run deploy
 
 ## Additional Documentation
 
-1. `docs/SETUP.md`
-2. `docs/BACKEND-ARCHITECTURE.md`
-3. `docs/BACKEND-QUICK-REFERENCE.md`
-4. `docs/PROJECT-STRUCTURE.md`
-5. `docs/GROK-AI-INTEGRATION.md`
+1. `docs/README.md`
+2. `docs/SETUP.md`
+3. `docs/BACKEND-ARCHITECTURE.md`
+4. `docs/BACKEND-QUICK-REFERENCE.md`
+5. `docs/PROJECT-STRUCTURE.md`
+6. `docs/GROK-AI-INTEGRATION.md`
 
 ## License
 
