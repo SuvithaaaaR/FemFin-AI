@@ -88,7 +88,7 @@ const shouldUseLocalFallback = (error) => {
     code === "ETIMEDOUT" ||
     code === "ENOTFOUND" ||
     code === "ECONNABORTED" ||
-    status >= 500
+    status >= 400
   );
 };
 
