@@ -1,12 +1,99 @@
+import base64
+import os
 from pathlib import Path
 
 import cv2
 from deepface import DeepFace
+import numpy as np
 
 from register import FACES_DIR
 
 FACE_CASCADE = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
 EYE_CASCADE = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_eye.xml")
+DEFAULT_THRESHOLD = float(os.getenv("FACE_MATCH_THRESHOLD", "0.30"))
+
+
+def _decode_image(image: str):
+    if not image or not isinstance(image, str):
+        raise ValueError("image is required")
+
+    payload = image.split(",", 1)[1] if image.startswith("data:image") else image
+    image_bytes = base64.b64decode(payload)
+    np_buffer = np.frombuffer(image_bytes, dtype=np.uint8)
+    frame = cv2.imdecode(np_buffer, cv2.IMREAD_COLOR)
+
+    if frame is None:
+        raise ValueError("Invalid image payload")
+
+    return frame
+
+
+def _to_vector(stored_embedding):
+    if isinstance(stored_embedding, list):
+        return [float(v) for v in stored_embedding]
+    if isinstance(stored_embedding, dict) and isinstance(stored_embedding.get("vector"), list):
+        return [float(v) for v in stored_embedding["vector"]]
+    raise ValueError("stored_embedding must be a numeric array")
+
+
+def _cosine_distance(a, b):
+    if len(a) != len(b):
+        raise ValueError("Embedding size mismatch")
+
+    va = np.array(a, dtype=np.float32)
+    vb = np.array(b, dtype=np.float32)
+
+    denom = float(np.linalg.norm(va) * np.linalg.norm(vb))
+    if denom == 0:
+        raise ValueError("Invalid embedding values")
+
+    distance = 1.0 - float(np.dot(va, vb) / denom)
+    return max(0.0, min(2.0, distance))
+
+
+def create_embedding(image: str, model_name: str = "Facenet512") -> dict:
+    try:
+        frame = _decode_image(image)
+        result = DeepFace.represent(
+            img_path=frame,
+            model_name=model_name,
+            detector_backend="opencv",
+            enforce_detection=True,
+        )
+
+        embedding = result[0]["embedding"] if isinstance(result, list) else result["embedding"]
+        return {
+            "success": True,
+            "model": model_name,
+            "embedding": embedding,
+        }
+    except Exception as exc:
+        return {"success": False, "message": f"Embedding failed: {exc}"}
+
+
+def verify_face_embedding(
+    image: str,
+    stored_embedding,
+    model_name: str = "Facenet512",
+    threshold: float = DEFAULT_THRESHOLD,
+) -> dict:
+    embedding_result = create_embedding(image=image, model_name=model_name)
+    if not embedding_result.get("success"):
+        return embedding_result
+
+    try:
+        candidate = embedding_result["embedding"]
+        reference = _to_vector(stored_embedding)
+        distance = _cosine_distance(candidate, reference)
+        return {
+            "success": True,
+            "model": model_name,
+            "distance": distance,
+            "threshold": threshold,
+            "is_match": distance <= threshold,
+        }
+    except Exception as exc:
+        return {"success": False, "message": f"Verification failed: {exc}"}
 
 
 def _detect_face(gray):

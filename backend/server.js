@@ -29,7 +29,10 @@ const defaultAllowedOrigins = [
   "https://suvithaaaar.github.io/FemFin-AI",
 ];
 
-const normalizeOrigin = (value) => String(value || "").trim().replace(/\/+$/, "");
+const normalizeOrigin = (value) =>
+  String(value || "")
+    .trim()
+    .replace(/\/+$/, "");
 
 const configuredOrigins = (process.env.CLIENT_URL || "")
   .split(",")
@@ -37,7 +40,10 @@ const configuredOrigins = (process.env.CLIENT_URL || "")
   .filter(Boolean);
 
 const allowedOrigins = [
-  ...new Set([...defaultAllowedOrigins.map(normalizeOrigin), ...configuredOrigins]),
+  ...new Set([
+    ...defaultAllowedOrigins.map(normalizeOrigin),
+    ...configuredOrigins,
+  ]),
 ];
 
 const corsOptions = {
@@ -120,8 +126,6 @@ app.get("/api", (req, res) => {
       auth: {
         register: "POST /api/auth/register",
         login: "POST /api/auth/login",
-        faceEnroll: "POST /api/auth/face/enroll",
-        faceLogin: "POST /api/auth/face/login",
         me: "GET /api/auth/me",
         updateDetails: "PUT /api/auth/updatedetails",
         updatePassword: "PUT /api/auth/updatepassword",

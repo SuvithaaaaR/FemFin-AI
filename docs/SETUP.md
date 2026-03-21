@@ -84,6 +84,7 @@ FACE_EMBEDDING_ENCRYPTION_KEY=your_random_32_plus_char_secret
 ```
 
 Note:
+
 - Face service runs in OpenCV fallback mode by default on Python 3.13.
 - DeepFace/FaceNet mode is used automatically when DeepFace is installed in a compatible Python environment.
 

@@ -11,7 +11,6 @@ import {
   Select,
   Alert,
   Stack,
-  Checkbox,
   Button,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
@@ -19,14 +18,11 @@ import { IconAlertCircle } from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
 import authService from "../services/authService";
 import { useAuth } from "../contexts/AuthContext";
-import FaceCapture from "../components/Auth/FaceCapture";
 
 function Register() {
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
   const [error, setError] = useState("");
-  const [enableFaceLogin, setEnableFaceLogin] = useState(false);
-  const [faceImage, setFaceImage] = useState("");
 
   // Redirect if already logged in
   useEffect(() => {
@@ -77,15 +73,9 @@ function Register() {
 
       login(response.user, response.token);
 
-      if (enableFaceLogin && faceImage) {
-        await authService.enrollFace({ faceImage });
-      }
-
       notifications.show({
         title: "Success",
-        message: enableFaceLogin
-          ? "Account created and face verification enabled."
-          : "Account created successfully!",
+        message: "Account created successfully!",
         color: "green",
       });
 
@@ -175,32 +165,7 @@ function Register() {
             {...form.getInputProps("confirmPassword")}
           />
 
-          <Checkbox
-            label="Enable Face Verification"
-            checked={enableFaceLogin}
-            onChange={(event) => {
-              setEnableFaceLogin(event.currentTarget.checked);
-              setError("");
-            }}
-          />
-
-          {enableFaceLogin && (
-            <FaceCapture
-              title="Capture Face For Enrollment"
-              onCapture={(image) => {
-                setFaceImage(image);
-                setError("");
-              }}
-            />
-          )}
-
           <Button onClick={handleRegister}>Create account</Button>
-
-          {enableFaceLogin && !faceImage && (
-            <Button variant="light" color="gray" disabled>
-              Capture face to enable verification
-            </Button>
-          )}
         </Stack>
 
         <Text c="dimmed" size="xs" ta="center" mt="md">

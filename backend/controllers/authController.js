@@ -85,7 +85,9 @@ exports.login = asyncHandler(async (req, res, next) => {
 
   const { data: user, error } = await supabase
     .from("users")
-    .select("id, name, email, role, credit_score, phone_number, profile, password_hash")
+    .select(
+      "id, name, email, role, credit_score, phone_number, profile, password_hash",
+    )
     .eq("email", String(email).toLowerCase())
     .maybeSingle();
 
