@@ -24,7 +24,6 @@ function ProtectedRoute({ children }) {
     return <Navigate to="/login" replace />;
   }
 
-  // Render the protected component if authenticated
   return children;
 }
 

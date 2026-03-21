@@ -95,14 +95,16 @@ exports.optionalAuth = async (req, res, next) => {
     token = req.headers.authorization.split(" ")[1];
   }
 
-  if (token) {
-    try {
+  try {
+    if (token) {
       const decoded = jwt.verify(token, JWT_SECRET);
       req.user = await findUserById(decoded.id);
-    } catch (error) {
-      // Token invalid but continue without user
+    } else {
       req.user = null;
     }
+  } catch (error) {
+    // Token invalid but continue without user
+    req.user = null;
   }
 
   next();
