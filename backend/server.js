@@ -62,8 +62,8 @@ const corsOptions = {
 // Middleware
 app.use(helmet()); // Security headers
 app.use(cors(corsOptions));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "12mb" }));
+app.use(express.urlencoded({ extended: true, limit: "12mb" }));
 app.use(addRequestId); // Add unique ID to each request
 app.use(requestLogger); // Log all requests
 app.use(sanitizeInput); // Sanitize input to prevent XSS
@@ -120,6 +120,8 @@ app.get("/api", (req, res) => {
       auth: {
         register: "POST /api/auth/register",
         login: "POST /api/auth/login",
+        faceEnroll: "POST /api/auth/face/enroll",
+        faceLogin: "POST /api/auth/face/login",
         me: "GET /api/auth/me",
         updateDetails: "PUT /api/auth/updatedetails",
         updatePassword: "PUT /api/auth/updatepassword",

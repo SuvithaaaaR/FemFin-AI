@@ -16,16 +16,19 @@ import {
   Group,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { IconAlertCircle, IconLogin } from "@tabler/icons-react";
+import { IconAlertCircle, IconFaceId, IconLogin } from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
 import authService from "../services/authService";
 import { useAuth } from "../contexts/AuthContext";
+import FaceCapture from "../components/Auth/FaceCapture";
 
 function Login() {
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [useFaceLogin, setUseFaceLogin] = useState(false);
+  const [faceImage, setFaceImage] = useState("");
 
   // Redirect if already logged in
   useEffect(() => {
@@ -43,7 +46,8 @@ function Login() {
 
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
-      password: (value) => (!value ? "Password is required" : null),
+      password: (value) =>
+        useFaceLogin ? null : !value ? "Password is required" : null,
     },
   });
 
@@ -52,10 +56,15 @@ function Login() {
     setError("");
 
     try {
-      const response = await authService.login({
-        email: values.email,
-        password: values.password,
-      });
+      const response = useFaceLogin
+        ? await authService.loginWithFace({
+            email: values.email,
+            faceImage,
+          })
+        : await authService.login({
+            email: values.email,
+            password: values.password,
+          });
 
       // Update auth context
       login(response.user, response.token);
@@ -63,7 +72,9 @@ function Login() {
       // Show success notification
       notifications.show({
         title: "Success",
-        message: `Welcome back, ${response.user.name}!`,
+        message: useFaceLogin
+          ? `Face verified. Welcome back, ${response.user.name}!`
+          : `Welcome back, ${response.user.name}!`,
         color: "green",
       });
 
@@ -99,6 +110,28 @@ function Login() {
       </Text>
 
       <Paper withBorder shadow="md" p={30} mt={30} radius="md">
+        <Group grow mb="md">
+          <Button
+            variant={!useFaceLogin ? "filled" : "light"}
+            onClick={() => {
+              setUseFaceLogin(false);
+              setError("");
+            }}
+          >
+            Password Login
+          </Button>
+          <Button
+            variant={useFaceLogin ? "filled" : "light"}
+            leftSection={<IconFaceId size="1rem" />}
+            onClick={() => {
+              setUseFaceLogin(true);
+              setError("");
+            }}
+          >
+            Face Login
+          </Button>
+        </Group>
+
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack>
             {error && (
@@ -119,22 +152,37 @@ function Login() {
               {...form.getInputProps("email")}
             />
 
-            <PasswordInput
-              label="Password"
-              placeholder="Your password"
-              required
-              {...form.getInputProps("password")}
-            />
-
-            <Group justify="space-between" mt="xs">
-              <Checkbox
-                label="Remember me"
-                {...form.getInputProps("rememberMe", { type: "checkbox" })}
+            {!useFaceLogin && (
+              <PasswordInput
+                label="Password"
+                placeholder="Your password"
+                required
+                {...form.getInputProps("password")}
               />
-              <Anchor component="button" size="sm">
-                Forgot password?
-              </Anchor>
-            </Group>
+            )}
+
+            {useFaceLogin && (
+              <FaceCapture
+                title="Scan Your Face"
+                onCapture={(image) => {
+                  setFaceImage(image);
+                  setError("");
+                }}
+                disabled={loading}
+              />
+            )}
+
+            {!useFaceLogin && (
+              <Group justify="space-between" mt="xs">
+                <Checkbox
+                  label="Remember me"
+                  {...form.getInputProps("rememberMe", { type: "checkbox" })}
+                />
+                <Anchor component="button" size="sm">
+                  Forgot password?
+                </Anchor>
+              </Group>
+            )}
           </Stack>
 
           <Button
@@ -142,9 +190,12 @@ function Login() {
             mt="xl"
             type="submit"
             loading={loading}
-            leftSection={<IconLogin size="1rem" />}
+            leftSection={
+              useFaceLogin ? <IconFaceId size="1rem" /> : <IconLogin size="1rem" />
+            }
+            disabled={useFaceLogin && !faceImage}
           >
-            Sign in
+            {useFaceLogin ? "Verify Face & Sign in" : "Sign in"}
           </Button>
         </form>
 

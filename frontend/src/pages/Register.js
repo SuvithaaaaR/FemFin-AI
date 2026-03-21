@@ -12,18 +12,22 @@ import {
   Stack,
   Anchor,
   Alert,
+  Checkbox,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { IconAlertCircle, IconUserPlus } from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
 import authService from "../services/authService";
 import { useAuth } from "../contexts/AuthContext";
+import FaceCapture from "../components/Auth/FaceCapture";
 
 function Register() {
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [enableFaceLogin, setEnableFaceLogin] = useState(false);
+  const [faceImage, setFaceImage] = useState("");
 
   // Redirect if already logged in
   useEffect(() => {
@@ -64,13 +68,23 @@ function Register() {
       const { confirmPassword, ...registerData } = values;
       const response = await authService.register(registerData);
 
+      if (enableFaceLogin) {
+        if (!faceImage) {
+          throw new Error("Please capture your face image for biometric enrollment.");
+        }
+
+        await authService.enrollFace({ faceImage });
+      }
+
       // Update auth context
       login(response.user, response.token);
 
       // Show success notification
       notifications.show({
         title: "Success",
-        message: "Account created successfully!",
+        message: enableFaceLogin
+          ? "Account created and face login enrolled successfully!"
+          : "Account created successfully!",
         color: "green",
       });
 
@@ -164,6 +178,26 @@ function Register() {
               required
               {...form.getInputProps("confirmPassword")}
             />
+
+            <Checkbox
+              label="Enable Face Login (Biometric)"
+              checked={enableFaceLogin}
+              onChange={(event) => {
+                setEnableFaceLogin(event.currentTarget.checked);
+                setError("");
+              }}
+            />
+
+            {enableFaceLogin && (
+              <FaceCapture
+                title="Capture Face For Enrollment"
+                onCapture={(image) => {
+                  setFaceImage(image);
+                  setError("");
+                }}
+                disabled={loading}
+              />
+            )}
           </Stack>
 
           <Button
@@ -172,6 +206,7 @@ function Register() {
             type="submit"
             loading={loading}
             leftSection={<IconUserPlus size="1rem" />}
+            disabled={enableFaceLogin && !faceImage}
           >
             Create Account
           </Button>

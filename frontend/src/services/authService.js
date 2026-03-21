@@ -22,6 +22,27 @@ const authService = {
     return response.data;
   },
 
+  // Login with face recognition
+  loginWithFace: async ({ email, faceImage }) => {
+    const response = await apiClient.post("/auth/face/login", {
+      email,
+      faceImage,
+    });
+    if (response.data.token) {
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+    }
+    return response.data;
+  },
+
+  // Enroll or update logged-in user's face embedding
+  enrollFace: async ({ faceImage }) => {
+    const response = await apiClient.post("/auth/face/enroll", {
+      faceImage,
+    });
+    return response.data;
+  },
+
   // Logout user
   logout: () => {
     localStorage.removeItem("token");

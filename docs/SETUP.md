@@ -47,10 +47,45 @@ Follow these steps to get the application running on your local machine:
    npm start
    ```
 
+   Optional third terminal (Face Authentication Service):
+
+   ```bash
+   cd backend/face-auth-service
+   python -m venv .venv
+   # Windows PowerShell
+   .\.venv\Scripts\Activate.ps1
+   pip install -r requirements.txt
+   python app.py
+   ```
+
 4. **Access the Application**
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:5000
    - API Health Check: http://localhost:5000/api/health
+   - Face Service Health: http://localhost:8000/health
+
+## Face Recognition Authentication
+
+- Register account in the app.
+- (Optional) Enable **Face Login (Biometric)** and capture face image on register page.
+- On login page, switch to **Face Login**, capture image, and sign in.
+
+Backend endpoints:
+
+- `POST /api/auth/face/enroll` (private)
+- `POST /api/auth/face/login` (public)
+
+Required backend environment variables:
+
+```
+FACE_AUTH_SERVICE_URL=http://127.0.0.1:8000
+FACE_AUTH_SERVICE_TIMEOUT_MS=15000
+FACE_EMBEDDING_ENCRYPTION_KEY=your_random_32_plus_char_secret
+```
+
+Note:
+- Face service runs in OpenCV fallback mode by default on Python 3.13.
+- DeepFace/FaceNet mode is used automatically when DeepFace is installed in a compatible Python environment.
 
 ## Application Features
 

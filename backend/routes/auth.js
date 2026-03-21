@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { body } = require("express-validator");
-const { auth } = require("../controllers");
+const { auth, faceAuth } = require("../controllers");
 const { validate, authLimiter } = require("../middleware");
 
 /**
@@ -41,6 +41,35 @@ router.post(
   ],
   validate,
   auth.login,
+);
+
+/**
+ * @route   POST /api/auth/face/enroll
+ * @desc    Enroll user face embedding
+ * @access  Private
+ */
+router.post(
+  "/face/enroll",
+  require("../middleware").protect,
+  [body("faceImage").notEmpty().withMessage("Face image is required")],
+  validate,
+  faceAuth.enrollFace,
+);
+
+/**
+ * @route   POST /api/auth/face/login
+ * @desc    Login user using face verification
+ * @access  Public
+ */
+router.post(
+  "/face/login",
+  authLimiter,
+  [
+    body("email").isEmail().withMessage("Please provide a valid email"),
+    body("faceImage").notEmpty().withMessage("Face image is required"),
+  ],
+  validate,
+  faceAuth.loginWithFace,
 );
 
 /**
