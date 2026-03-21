@@ -28,6 +28,19 @@ exports.authLimiter = rateLimit({
 });
 
 /**
+ * Registration limiter (less strict than login limiter)
+ */
+exports.registerLimiter = rateLimit({
+  windowMs: (process.env.AUTH_RATE_LIMIT_WINDOW || 15) * 60 * 1000,
+  max: process.env.REGISTER_RATE_LIMIT_MAX || 60,
+  skipSuccessfulRequests: true,
+  message: {
+    success: false,
+    message: "Too many registration attempts, please try again shortly.",
+  },
+});
+
+/**
  * Rate limiter for creating resources (campaigns, businesses)
  */
 exports.createLimiter = rateLimit({
