@@ -32,48 +32,12 @@ const normalizeUser = (row) => ({
  * @access  Public
  */
 exports.register = asyncHandler(async (req, res, next) => {
-  const { name, email, password, phoneNumber, role } = req.body;
-  const supabase = getSupabase();
-
-  const { data: existing, error: existingError } = await supabase
-    .from("users")
-    .select("id")
-    .eq("email", email)
-    .maybeSingle();
-
-  if (existingError) {
-    throw new ErrorResponse(existingError.message, 500);
-  }
-
-  if (existing) {
-    return next(new ErrorResponse("User already exists", 400));
-  }
-
-  const passwordHash = await bcrypt.hash(password, 12);
-  const { data: created, error } = await supabase
-    .from("users")
-    .insert({
-      name,
-      email,
-      password_hash: passwordHash,
-      phone_number: phoneNumber,
-      role: role || "entrepreneur",
-    })
-    .select("id, name, email, role, credit_score")
-    .single();
-
-  if (error) {
-    throw new ErrorResponse(error.message, 500);
-  }
-
-  const token = signToken(created.id);
-
-  res.status(201).json({
-    success: true,
-    message: "User registered successfully",
-    token,
-    user: normalizeUser(created),
-  });
+  return next(
+    new ErrorResponse(
+      "Email/password register is disabled. Use Google sign-in.",
+      403,
+    ),
+  );
 });
 
 /**
@@ -82,44 +46,12 @@ exports.register = asyncHandler(async (req, res, next) => {
  * @access  Public
  */
 exports.login = asyncHandler(async (req, res, next) => {
-  const { email, password } = req.body;
-  const supabase = getSupabase();
-
-  // Validate email & password
-  if (!email || !password) {
-    return next(new ErrorResponse("Please provide email and password", 400));
-  }
-
-  const { data: user, error } = await supabase
-    .from("users")
-    .select("id, name, email, role, credit_score, password_hash")
-    .eq("email", email)
-    .maybeSingle();
-
-  if (error) {
-    throw new ErrorResponse(error.message, 500);
-  }
-
-  if (!user) {
-    return next(new ErrorResponse("Invalid credentials", 401));
-  }
-
-  // Check if password matches
-  const isMatch = await bcrypt.compare(password, user.password_hash || "");
-
-  if (!isMatch) {
-    return next(new ErrorResponse("Invalid credentials", 401));
-  }
-
-  // Generate token
-  const token = signToken(user.id);
-
-  res.status(200).json({
-    success: true,
-    message: "Login successful",
-    token,
-    user: normalizeUser(user),
-  });
+  return next(
+    new ErrorResponse(
+      "Email/password login is disabled. Use Google sign-in.",
+      403,
+    ),
+  );
 });
 
 /**
