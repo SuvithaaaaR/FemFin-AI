@@ -8,7 +8,9 @@ const JWT_SECRET =
   process.env.JWT_SECRET ||
   "FemFin_AI_JWT_2026_Production_Ready_Key_At_Least_32_Chars";
 
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
+const GOOGLE_CLIENT_ID =
+  process.env.GOOGLE_CLIENT_ID ||
+  "16460401558-ic9l2egc0bhas466a42os55pj1l5i02a.apps.googleusercontent.com";
 const googleClient = new OAuth2Client();
 
 const signToken = (id) =>
