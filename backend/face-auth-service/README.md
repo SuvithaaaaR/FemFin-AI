@@ -1,42 +1,50 @@
-# Face Authentication Service
+# Face Auth System
 
-Python Flask microservice for face embedding and verification.
+Simple structure:
 
-## Stack
+```text
+face-auth-system/
+|
+|- app.py
+|- register.py
+|- verify.py
+`- faces/
+```
 
-- Flask
-- OpenCV
-- DeepFace (FaceNet512, optional when environment supports it)
-
-## Endpoints
-
-- `GET /health`
-- `POST /embed` with `{ "image": "<base64-or-data-url>" }`
-- `POST /verify` with `{ "image": "<base64-or-data-url>", "stored_embedding": [ ... ] }`
-
-## Run locally
+## Install
 
 ```bash
-cd backend/face-auth-service
-python -m venv .venv
-# Windows PowerShell
-.\.venv\Scripts\Activate.ps1
+pip install deepface opencv-python flask
+```
+
+Or:
+
+```bash
 pip install -r requirements.txt
+```
+
+## Files
+
+- `register.py`: captures and saves registered face image to `faces/<user_id>.jpg`
+- `verify.py`: runs liveness detection + FaceNet512 verification against saved image
+- `app.py`: Flask API wrapper for register/verify endpoints
+
+## Liveness Detection Included
+
+- Blink detection (eyes visible -> eyes missing -> eyes visible)
+- Head movement detection (left-right shift)
+- Depth check (face area changes from moving closer/farther)
+
+## Run
+
+```bash
 python app.py
 ```
 
-Default URL: `http://127.0.0.1:8000`
+API:
 
-## Environment variables
+- `GET /health`
+- `POST /register` with body `{ "user_id": "alice" }`
+- `POST /verify` with body `{ "user_id": "alice" }`
 
-- `PORT` (default `8000`)
-- `FACE_MODEL_NAME` (default `Facenet512`)
-- `FACE_DETECTOR_BACKEND` (default `opencv`)
-- `FACE_MATCH_THRESHOLD` (default `0.35`)
-
-## Runtime modes
-
-- `deepface` mode: enabled automatically when `deepface` is installed and importable.
-- `opencv-fallback` mode: used otherwise (compatible with Python 3.13 without TensorFlow).
-
-Health endpoint includes `engine` so you can verify active mode.
+`verify.py` uses `Facenet512` model.
