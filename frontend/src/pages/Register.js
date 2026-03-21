@@ -20,6 +20,9 @@ import { notifications } from "@mantine/notifications";
 import authService from "../services/authService";
 import { useAuth } from "../contexts/AuthContext";
 import FaceCapture from "../components/Auth/FaceCapture";
+import GoogleSignInButton from "../components/Auth/GoogleSignInButton";
+
+const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || "";
 
 function Register() {
   const navigate = useNavigate();
@@ -95,6 +98,36 @@ function Register() {
         err.response?.data?.message ||
           err.message ||
           "Registration failed. Please try again.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleRegister = async (idToken) => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await authService.loginWithGoogle({
+        idToken,
+        role: form.values.role || "entrepreneur",
+      });
+
+      login(response.user, response.token);
+
+      notifications.show({
+        title: "Success",
+        message: "Google account connected successfully!",
+        color: "green",
+      });
+
+      navigate("/dashboard");
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Google sign-up failed. Please try again.",
       );
     } finally {
       setLoading(false);
@@ -215,6 +248,19 @@ function Register() {
         <Text c="dimmed" size="xs" ta="center" mt="md">
           By signing up, you agree to our Terms of Service and Privacy Policy
         </Text>
+
+        <Text c="dimmed" size="xs" ta="center" mt="md" mb="xs">
+          Or continue with Google
+        </Text>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <GoogleSignInButton
+            clientId={GOOGLE_CLIENT_ID}
+            onSuccess={handleGoogleRegister}
+            onError={(msg) => setError(msg)}
+            text="signup_with"
+            width={300}
+          />
+        </div>
       </Paper>
     </Container>
   );

@@ -1,11 +1,15 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { OAuth2Client } = require("google-auth-library");
 const { getSupabase } = require("../config/supabase");
 const { asyncHandler, ErrorResponse } = require("../middleware/errorHandler");
 
 const JWT_SECRET =
   process.env.JWT_SECRET ||
   "FemFin_AI_JWT_2026_Production_Ready_Key_At_Least_32_Chars";
+
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
+const googleClient = new OAuth2Client();
 
 const signToken = (id) =>
   jwt.sign({ id }, JWT_SECRET, {
@@ -113,6 +117,90 @@ exports.login = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: "Login successful",
+    token,
+    user: normalizeUser(user),
+  });
+});
+
+/**
+ * @desc    Login/Register using Google Sign-In
+ * @route   POST /api/auth/google
+ * @access  Public
+ */
+exports.googleAuth = asyncHandler(async (req, res, next) => {
+  const { idToken, role } = req.body;
+  const supabase = getSupabase();
+
+  if (!GOOGLE_CLIENT_ID) {
+    return next(new ErrorResponse("Google auth is not configured", 500));
+  }
+
+  if (!idToken) {
+    return next(new ErrorResponse("Google idToken is required", 400));
+  }
+
+  let payload;
+  try {
+    const ticket = await googleClient.verifyIdToken({
+      idToken,
+      audience: GOOGLE_CLIENT_ID,
+    });
+    payload = ticket.getPayload();
+  } catch (error) {
+    return next(new ErrorResponse("Invalid Google token", 401));
+  }
+
+  if (!payload?.email || payload.email_verified !== true) {
+    return next(new ErrorResponse("Google account email is not verified", 401));
+  }
+
+  const email = String(payload.email).toLowerCase();
+  const name = payload.name || email.split("@")[0];
+
+  const { data: existingUser, error: existingError } = await supabase
+    .from("users")
+    .select("id, name, email, role, credit_score, phone_number, profile")
+    .eq("email", email)
+    .maybeSingle();
+
+  if (existingError) {
+    throw new ErrorResponse(existingError.message, 500);
+  }
+
+  let user = existingUser;
+  let isNewUser = false;
+
+  if (!user) {
+    const passwordHash = await bcrypt.hash(`google-oauth-${payload.sub}`, 12);
+    const { data: createdUser, error: createError } = await supabase
+      .from("users")
+      .insert({
+        name,
+        email,
+        password_hash: passwordHash,
+        role: role || "entrepreneur",
+        profile: {
+          authProvider: "google",
+          googleSub: payload.sub,
+          picture: payload.picture || null,
+        },
+      })
+      .select("id, name, email, role, credit_score, phone_number, profile")
+      .single();
+
+    if (createError) {
+      throw new ErrorResponse(createError.message, 500);
+    }
+
+    user = createdUser;
+    isNewUser = true;
+  }
+
+  const token = signToken(user.id);
+
+  res.status(200).json({
+    success: true,
+    message: isNewUser ? "Google sign-up successful" : "Google login successful",
     token,
     user: normalizeUser(user),
   });

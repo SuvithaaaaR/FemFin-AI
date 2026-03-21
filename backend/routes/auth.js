@@ -44,6 +44,25 @@ router.post(
 );
 
 /**
+ * @route   POST /api/auth/google
+ * @desc    Login/Register with Google
+ * @access  Public
+ */
+router.post(
+  "/google",
+  authLimiter,
+  [
+    body("idToken").notEmpty().withMessage("Google idToken is required"),
+    body("role")
+      .optional()
+      .isIn(["entrepreneur", "investor", "admin"])
+      .withMessage("Invalid role"),
+  ],
+  validate,
+  auth.googleAuth,
+);
+
+/**
  * @route   POST /api/auth/face/enroll
  * @desc    Enroll user face embedding
  * @access  Private

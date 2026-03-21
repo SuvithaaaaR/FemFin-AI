@@ -120,6 +120,7 @@ app.get("/api", (req, res) => {
       auth: {
         register: "POST /api/auth/register",
         login: "POST /api/auth/login",
+        google: "POST /api/auth/google",
         faceEnroll: "POST /api/auth/face/enroll",
         faceLogin: "POST /api/auth/face/login",
         me: "GET /api/auth/me",

@@ -21,6 +21,9 @@ import { notifications } from "@mantine/notifications";
 import authService from "../services/authService";
 import { useAuth } from "../contexts/AuthContext";
 import FaceCapture from "../components/Auth/FaceCapture";
+import GoogleSignInButton from "../components/Auth/GoogleSignInButton";
+
+const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || "";
 
 function Login() {
   const navigate = useNavigate();
@@ -85,6 +88,30 @@ function Login() {
         err.response?.data?.message ||
           err.message ||
           "Login failed. Please check your credentials.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async (idToken) => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await authService.loginWithGoogle({ idToken });
+      login(response.user, response.token);
+      notifications.show({
+        title: "Success",
+        message: `Google sign-in successful. Welcome, ${response.user.name}!`,
+        color: "green",
+      });
+      navigate("/dashboard");
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Google sign-in failed. Please try again.",
       );
     } finally {
       setLoading(false);
@@ -200,6 +227,16 @@ function Login() {
         </form>
 
         <Divider label="Or continue with" labelPosition="center" my="lg" />
+
+        <Group justify="center" mb="md">
+          <GoogleSignInButton
+            clientId={GOOGLE_CLIENT_ID}
+            onSuccess={handleGoogleLogin}
+            onError={(msg) => setError(msg)}
+            text="signin_with"
+            width={300}
+          />
+        </Group>
 
         <Text c="dimmed" size="xs" ta="center">
           By signing in, you agree to our Terms of Service and Privacy Policy
