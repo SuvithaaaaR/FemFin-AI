@@ -9,6 +9,8 @@ import {
   Select,
   Alert,
   Stack,
+  Checkbox,
+  Button,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { IconAlertCircle } from "@tabler/icons-react";
@@ -16,13 +18,19 @@ import { notifications } from "@mantine/notifications";
 import authService from "../services/authService";
 import { useAuth } from "../contexts/AuthContext";
 import GoogleSignInButton from "../components/Auth/GoogleSignInButton";
+import FaceCapture from "../components/Auth/FaceCapture";
 
 const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || "";
+const isGoogleConfigured =
+  Boolean(GOOGLE_CLIENT_ID) &&
+  !GOOGLE_CLIENT_ID.includes("your_google_oauth_client_id");
 
 function Register() {
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
   const [error, setError] = useState("");
+  const [enableFaceLogin, setEnableFaceLogin] = useState(false);
+  const [faceImage, setFaceImage] = useState("");
 
   // Redirect if already logged in
   useEffect(() => {
@@ -48,9 +56,15 @@ function Register() {
 
       login(response.user, response.token);
 
+      if (enableFaceLogin && faceImage) {
+        await authService.enrollFace({ faceImage });
+      }
+
       notifications.show({
         title: "Success",
-        message: "Google account connected successfully!",
+        message: enableFaceLogin
+          ? "Google account connected and face verification enabled."
+          : "Google account connected successfully!",
         color: "green",
       });
 
@@ -106,15 +120,47 @@ function Register() {
             {...form.getInputProps("role")}
           />
 
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <GoogleSignInButton
-              clientId={GOOGLE_CLIENT_ID}
-              onSuccess={handleGoogleRegister}
-              onError={(msg) => setError(msg)}
-              text="signup_with"
-              width={300}
+          <Checkbox
+            label="Enable Face Verification"
+            checked={enableFaceLogin}
+            onChange={(event) => {
+              setEnableFaceLogin(event.currentTarget.checked);
+              setError("");
+            }}
+          />
+
+          {enableFaceLogin && (
+            <FaceCapture
+              title="Capture Face For Enrollment"
+              onCapture={(image) => {
+                setFaceImage(image);
+                setError("");
+              }}
             />
-          </div>
+          )}
+
+          {!isGoogleConfigured ? (
+            <Alert color="yellow" variant="light" title="Google Not Configured">
+              Google OAuth client ID is not configured. Add a real
+              REACT_APP_GOOGLE_CLIENT_ID to enable Google sign-up.
+            </Alert>
+          ) : (
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <GoogleSignInButton
+                clientId={GOOGLE_CLIENT_ID}
+                onSuccess={handleGoogleRegister}
+                onError={(msg) => setError(msg)}
+                text="signup_with"
+                width={300}
+              />
+            </div>
+          )}
+
+          {enableFaceLogin && !faceImage && (
+            <Button variant="light" color="gray" disabled>
+              Capture face to enable verification
+            </Button>
+          )}
         </Stack>
 
         <Text c="dimmed" size="xs" ta="center" mt="md">
