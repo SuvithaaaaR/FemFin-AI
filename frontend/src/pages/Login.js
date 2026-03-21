@@ -6,6 +6,7 @@ import {
   Title,
   Text,
   TextInput,
+  PasswordInput,
   Button,
   Anchor,
   Stack,
@@ -16,13 +17,7 @@ import { IconAlertCircle, IconFaceId } from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
 import authService from "../services/authService";
 import { useAuth } from "../contexts/AuthContext";
-import GoogleSignInButton from "../components/Auth/GoogleSignInButton";
 import FaceCapture from "../components/Auth/FaceCapture";
-
-const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || "";
-const isGoogleConfigured =
-  Boolean(GOOGLE_CLIENT_ID) &&
-  !GOOGLE_CLIENT_ID.includes("your_google_oauth_client_id");
 
 function Login() {
   const navigate = useNavigate();
@@ -30,6 +25,7 @@ function Login() {
   const [error, setError] = useState("");
   const [useFaceLogin, setUseFaceLogin] = useState(false);
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [faceImage, setFaceImage] = useState("");
 
   // Redirect if already logged in
@@ -39,15 +35,20 @@ function Login() {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleGoogleLogin = async (idToken) => {
+  const handleLogin = async () => {
+    if (!email || !password) {
+      setError("Email and password are required.");
+      return;
+    }
+
     setError("");
 
     try {
-      const response = await authService.loginWithGoogle({ idToken });
+      const response = await authService.login({ email, password });
       login(response.user, response.token);
       notifications.show({
         title: "Success",
-        message: `Google sign-in successful. Welcome, ${response.user.name}!`,
+        message: `Login successful. Welcome back, ${response.user.name}!`,
         color: "green",
       });
       navigate("/dashboard");
@@ -55,7 +56,7 @@ function Login() {
       setError(
         err.response?.data?.message ||
           err.message ||
-          "Google sign-in failed. Please try again.",
+          "Login failed. Please try again.",
       );
     }
   };
@@ -113,7 +114,7 @@ function Login() {
                 setError("");
               }}
             >
-              Google Login
+              Password Login
             </Button>
             <Button
               variant={useFaceLogin ? "filled" : "light"}
@@ -140,25 +141,23 @@ function Login() {
 
           {!useFaceLogin && (
             <>
-              <Text ta="center" c="dimmed" size="sm">
-                Continue using your Google account.
-              </Text>
-              {!isGoogleConfigured ? (
-                <Alert color="yellow" variant="light" title="Google Not Configured">
-                  Google OAuth client ID is not configured. Add a real
-                  REACT_APP_GOOGLE_CLIENT_ID to enable Google login.
-                </Alert>
-              ) : (
-                <Group justify="center">
-                  <GoogleSignInButton
-                    clientId={GOOGLE_CLIENT_ID}
-                    onSuccess={handleGoogleLogin}
-                    onError={(msg) => setError(msg)}
-                    text="signin_with"
-                    width={300}
-                  />
-                </Group>
-              )}
+              <TextInput
+                label="Email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(event) => setEmail(event.currentTarget.value)}
+                required
+              />
+              <PasswordInput
+                label="Password"
+                placeholder="Your password"
+                value={password}
+                onChange={(event) => setPassword(event.currentTarget.value)}
+                required
+              />
+              <Button onClick={handleLogin} disabled={!email || !password}>
+                Sign in
+              </Button>
             </>
           )}
 

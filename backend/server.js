@@ -112,23 +112,14 @@ app.get("/api/health", (req, res) => {
 
 // API documentation endpoint
 app.get("/api", (req, res) => {
-  const googleConfigured = Boolean(
-    process.env.GOOGLE_CLIENT_ID &&
-      !String(process.env.GOOGLE_CLIENT_ID).includes("your_google_oauth_client_id"),
-  );
-
   res.json({
     success: true,
     message: "Welcome to FemFin AI API",
     version: "1.0.0",
-    authConfig: {
-      googleConfigured,
-    },
     endpoints: {
       auth: {
         register: "POST /api/auth/register",
         login: "POST /api/auth/login",
-        google: "POST /api/auth/google",
         faceEnroll: "POST /api/auth/face/enroll",
         faceLogin: "POST /api/auth/face/login",
         me: "GET /api/auth/me",

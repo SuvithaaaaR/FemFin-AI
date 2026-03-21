@@ -18,8 +18,6 @@ services:
         sync: false
       - key: JWT_SECRET
         sync: false
-      - key: GOOGLE_CLIENT_ID
-        value: 16460401558-ic9l2egc0bhas466a42os55pj1l5i02a.apps.googleusercontent.com
       - key: CLIENT_URL
         value: https://femfin.app
       - key: AI_PROVIDER

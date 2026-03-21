@@ -1,17 +1,11 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { OAuth2Client } = require("google-auth-library");
 const { getSupabase } = require("../config/supabase");
 const { asyncHandler, ErrorResponse } = require("../middleware/errorHandler");
 
 const JWT_SECRET =
   process.env.JWT_SECRET ||
   "FemFin_AI_JWT_2026_Production_Ready_Key_At_Least_32_Chars";
-
-const GOOGLE_CLIENT_ID =
-  process.env.GOOGLE_CLIENT_ID ||
-  "16460401558-ic9l2egc0bhas466a42os55pj1l5i02a.apps.googleusercontent.com";
-const googleClient = new OAuth2Client();
 
 const signToken = (id) =>
   jwt.sign({ id }, JWT_SECRET, {
@@ -34,12 +28,50 @@ const normalizeUser = (row) => ({
  * @access  Public
  */
 exports.register = asyncHandler(async (req, res, next) => {
-  return next(
-    new ErrorResponse(
-      "Email/password register is disabled. Use Google sign-in.",
-      403,
-    ),
-  );
+  const { name, email, password, role, phoneNumber } = req.body;
+  const supabase = getSupabase();
+
+  const { data: existingUser, error: existingError } = await supabase
+    .from("users")
+    .select("id")
+    .eq("email", String(email).toLowerCase())
+    .maybeSingle();
+
+  if (existingError) {
+    throw new ErrorResponse(existingError.message, 500);
+  }
+
+  if (existingUser) {
+    return next(new ErrorResponse("User already exists", 400));
+  }
+
+  const passwordHash = await bcrypt.hash(password, 12);
+
+  const { data: user, error } = await supabase
+    .from("users")
+    .insert({
+      name,
+      email: String(email).toLowerCase(),
+      password_hash: passwordHash,
+      role: role || "entrepreneur",
+      phone_number: phoneNumber || null,
+      profile: {},
+    })
+    .select("id, name, email, role, credit_score, phone_number, profile")
+    .single();
+
+  if (error) {
+    throw new ErrorResponse(error.message, 500);
+  }
+
+  const token = signToken(user.id);
+
+  res.status(201).json({
+    success: true,
+    message: "User registered successfully",
+    token,
+    user: normalizeUser(user),
+  });
 });
 
 /**
@@ -48,95 +80,44 @@ exports.register = asyncHandler(async (req, res, next) => {
  * @access  Public
  */
 exports.login = asyncHandler(async (req, res, next) => {
-  return next(
-    new ErrorResponse(
-      "Email/password login is disabled. Use Google sign-in.",
-      403,
-    ),
-  );
-});
-
-/**
- * @desc    Login/Register using Google Sign-In
- * @route   POST /api/auth/google
- * @access  Public
- */
-exports.googleAuth = asyncHandler(async (req, res, next) => {
-  const { idToken, role } = req.body;
+  const { email, password } = req.body;
   const supabase = getSupabase();
 
-  if (!GOOGLE_CLIENT_ID) {
-    return next(new ErrorResponse("Google auth is not configured", 500));
-  }
-
-  if (!idToken) {
-    return next(new ErrorResponse("Google idToken is required", 400));
-  }
-
-  let payload;
-  try {
-    const ticket = await googleClient.verifyIdToken({
-      idToken,
-      audience: GOOGLE_CLIENT_ID,
-    });
-    payload = ticket.getPayload();
-  } catch (error) {
-    return next(new ErrorResponse("Invalid Google token", 401));
-  }
-
-  if (!payload?.email || payload.email_verified !== true) {
-    return next(new ErrorResponse("Google account email is not verified", 401));
-  }
-
-  const email = String(payload.email).toLowerCase();
-  const name = payload.name || email.split("@")[0];
-
-  const { data: existingUser, error: existingError } = await supabase
+  const { data: user, error } = await supabase
     .from("users")
-    .select("id, name, email, role, credit_score, phone_number, profile")
-    .eq("email", email)
+    .select("id, name, email, role, credit_score, phone_number, profile, password_hash")
+    .eq("email", String(email).toLowerCase())
     .maybeSingle();
 
-  if (existingError) {
-    throw new ErrorResponse(existingError.message, 500);
+  if (error) {
+    throw new ErrorResponse(error.message, 500);
   }
 
-  let user = existingUser;
-  let isNewUser = false;
-
   if (!user) {
-    const passwordHash = await bcrypt.hash(`google-oauth-${payload.sub}`, 12);
-    const { data: createdUser, error: createError } = await supabase
-      .from("users")
-      .insert({
-        name,
-        email,
-        password_hash: passwordHash,
-        role: role || "entrepreneur",
-        profile: {
-          authProvider: "google",
-          googleSub: payload.sub,
-          picture: payload.picture || null,
-        },
-      })
-      .select("id, name, email, role, credit_score, phone_number, profile")
-      .single();
+    return next(new ErrorResponse("Invalid credentials", 401));
+  }
 
-    if (createError) {
-      throw new ErrorResponse(createError.message, 500);
-    }
-
-    user = createdUser;
-    isNewUser = true;
+  const isMatch = await bcrypt.compare(password, user.password_hash || "");
+  if (!isMatch) {
+    return next(new ErrorResponse("Invalid credentials", 401));
   }
 
   const token = signToken(user.id);
+  const safeUser = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    credit_score: user.credit_score,
+    phone_number: user.phone_number,
+    profile: user.profile,
+  };
 
   res.status(200).json({
     success: true,
-    message: isNewUser ? "Google sign-up successful" : "Google login successful",
+    message: "Login successful",
     token,
-    user: normalizeUser(user),
+    user: normalizeUser(safeUser),
   });
 });
 

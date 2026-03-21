@@ -5,6 +5,8 @@ import {
   Paper,
   Title,
   Text,
+  TextInput,
+  PasswordInput,
   Anchor,
   Select,
   Alert,
@@ -17,13 +19,7 @@ import { IconAlertCircle } from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
 import authService from "../services/authService";
 import { useAuth } from "../contexts/AuthContext";
-import GoogleSignInButton from "../components/Auth/GoogleSignInButton";
 import FaceCapture from "../components/Auth/FaceCapture";
-
-const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || "";
-const isGoogleConfigured =
-  Boolean(GOOGLE_CLIENT_ID) &&
-  !GOOGLE_CLIENT_ID.includes("your_google_oauth_client_id");
 
 function Register() {
   const navigate = useNavigate();
@@ -41,16 +37,41 @@ function Register() {
 
   const form = useForm({
     initialValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      phoneNumber: "",
       role: "entrepreneur",
+    },
+    validate: {
+      name: (value) => (value.trim() ? null : "Name is required"),
+      email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
+      password: (value) =>
+        value.length >= 6 ? null : "Password must be at least 6 characters",
+      confirmPassword: (value, values) =>
+        value === values.password ? null : "Passwords do not match",
+      phoneNumber: (value) =>
+        !value || /^[0-9]{10}$/.test(value)
+          ? null
+          : "Phone number must be 10 digits",
     },
   });
 
-  const handleGoogleRegister = async (idToken) => {
+  const handleRegister = async () => {
+    const validation = form.validate();
+    if (validation.hasErrors) {
+      return;
+    }
+
     setError("");
 
     try {
-      const response = await authService.loginWithGoogle({
-        idToken,
+      const response = await authService.register({
+        name: form.values.name,
+        email: form.values.email,
+        password: form.values.password,
+        phoneNumber: form.values.phoneNumber || undefined,
         role: form.values.role || "entrepreneur",
       });
 
@@ -63,8 +84,8 @@ function Register() {
       notifications.show({
         title: "Success",
         message: enableFaceLogin
-          ? "Google account connected and face verification enabled."
-          : "Google account connected successfully!",
+          ? "Account created and face verification enabled."
+          : "Account created successfully!",
         color: "green",
       });
 
@@ -73,7 +94,7 @@ function Register() {
       setError(
         err.response?.data?.message ||
           err.message ||
-          "Google sign-up failed. Please try again.",
+          "Registration failed. Please try again.",
       );
     }
   };
@@ -120,6 +141,40 @@ function Register() {
             {...form.getInputProps("role")}
           />
 
+          <TextInput
+            label="Full name"
+            placeholder="Your name"
+            required
+            {...form.getInputProps("name")}
+          />
+
+          <TextInput
+            label="Email"
+            placeholder="you@example.com"
+            required
+            {...form.getInputProps("email")}
+          />
+
+          <TextInput
+            label="Phone number (optional)"
+            placeholder="9876543210"
+            {...form.getInputProps("phoneNumber")}
+          />
+
+          <PasswordInput
+            label="Password"
+            placeholder="At least 6 characters"
+            required
+            {...form.getInputProps("password")}
+          />
+
+          <PasswordInput
+            label="Confirm password"
+            placeholder="Re-enter password"
+            required
+            {...form.getInputProps("confirmPassword")}
+          />
+
           <Checkbox
             label="Enable Face Verification"
             checked={enableFaceLogin}
@@ -139,22 +194,7 @@ function Register() {
             />
           )}
 
-          {!isGoogleConfigured ? (
-            <Alert color="yellow" variant="light" title="Google Not Configured">
-              Google OAuth client ID is not configured. Add a real
-              REACT_APP_GOOGLE_CLIENT_ID to enable Google sign-up.
-            </Alert>
-          ) : (
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <GoogleSignInButton
-                clientId={GOOGLE_CLIENT_ID}
-                onSuccess={handleGoogleRegister}
-                onError={(msg) => setError(msg)}
-                text="signup_with"
-                width={300}
-              />
-            </div>
-          )}
+          <Button onClick={handleRegister}>Create account</Button>
 
           {enableFaceLogin && !faceImage && (
             <Button variant="light" color="gray" disabled>
