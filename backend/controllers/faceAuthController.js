@@ -65,6 +65,23 @@ const encryptEmbedding = (embedding) => {
   };
 };
 
+const buildImageHash = (faceImage) => {
+  if (!faceImage || typeof faceImage !== "string") {
+    throw new Error("Face image is required");
+  }
+
+  const payload = faceImage.startsWith("data:image")
+    ? faceImage.split(",", 2)[1]
+    : faceImage;
+
+  const imageBuffer = Buffer.from(payload, "base64");
+  if (!imageBuffer || imageBuffer.length < 64) {
+    throw new Error("Invalid face image payload");
+  }
+
+  return crypto.createHash("sha256").update(imageBuffer).digest("hex");
+};
+
 const decryptEmbedding = (record) => {
   const decipher = crypto.createDecipheriv(
     "aes-256-gcm",
@@ -93,6 +110,12 @@ exports.enrollFace = asyncHandler(async (req, res, next) => {
   }
 
   const supabase = getSupabase();
+  let faceImageSha256;
+  try {
+    faceImageSha256 = buildImageHash(faceImage);
+  } catch (error) {
+    return next(new ErrorResponse(error.message, 400));
+  }
 
   let embeddingResult;
   try {
@@ -136,6 +159,7 @@ exports.enrollFace = asyncHandler(async (req, res, next) => {
       ...profile,
       faceAuth: {
         model: embeddingResult.model || "Facenet512",
+        faceImageSha256,
         embedding_encrypted: encrypted.encrypted,
         embedding_iv: encrypted.iv,
         embedding_auth_tag: encrypted.authTag,
@@ -150,6 +174,35 @@ exports.enrollFace = asyncHandler(async (req, res, next) => {
 
     if (fallbackError) {
       throw new ErrorResponse(fallbackError.message, 500);
+    }
+  } else {
+    const { data: currentUser, error: currentUserError } = await supabase
+      .from("users")
+      .select("profile")
+      .eq("id", req.user.id)
+      .maybeSingle();
+
+    if (currentUserError) {
+      throw new ErrorResponse(currentUserError.message, 500);
+    }
+
+    const profile = currentUser?.profile || {};
+    const nextProfile = {
+      ...profile,
+      faceAuth: {
+        ...(profile.faceAuth || {}),
+        faceImageSha256,
+        updatedAt: new Date().toISOString(),
+      },
+    };
+
+    const { error: profileUpdateError } = await supabase
+      .from("users")
+      .update({ profile: nextProfile })
+      .eq("id", req.user.id);
+
+    if (profileUpdateError) {
+      throw new ErrorResponse(profileUpdateError.message, 500);
     }
   }
 
@@ -171,6 +224,12 @@ exports.loginWithFace = asyncHandler(async (req, res, next) => {
   }
 
   const supabase = getSupabase();
+  let incomingImageHash;
+  try {
+    incomingImageHash = buildImageHash(faceImage);
+  } catch (error) {
+    return next(new ErrorResponse(error.message, 400));
+  }
 
   const { data: user, error: userError } = await supabase
     .from("users")
@@ -197,6 +256,7 @@ exports.loginWithFace = asyncHandler(async (req, res, next) => {
   }
 
   let resolvedFaceRecord = faceRecord;
+  let storedFaceImageHash = user?.profile?.faceAuth?.faceImageSha256;
 
   if (isMissingFaceTableError(faceError) || !resolvedFaceRecord) {
     const { data: profileUser, error: profileError } = await supabase
@@ -210,6 +270,7 @@ exports.loginWithFace = asyncHandler(async (req, res, next) => {
     }
 
     const fallbackFace = profileUser?.profile?.faceAuth;
+    storedFaceImageHash = fallbackFace?.faceImageSha256 || storedFaceImageHash;
     if (fallbackFace?.embedding_encrypted) {
       resolvedFaceRecord = {
         embedding_encrypted: fallbackFace.embedding_encrypted,
@@ -222,6 +283,19 @@ exports.loginWithFace = asyncHandler(async (req, res, next) => {
 
   if (!resolvedFaceRecord) {
     return next(new ErrorResponse("Face is not enrolled for this account", 404));
+  }
+
+  if (!storedFaceImageHash) {
+    return next(
+      new ErrorResponse(
+        "Face image reference missing. Please re-enroll your face.",
+        400,
+      ),
+    );
+  }
+
+  if (incomingImageHash !== storedFaceImageHash) {
+    return next(new ErrorResponse("Face image mismatch", 401));
   }
 
   let storedEmbedding;
