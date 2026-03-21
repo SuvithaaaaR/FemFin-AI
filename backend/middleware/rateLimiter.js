@@ -1,5 +1,15 @@
 const rateLimit = require("express-rate-limit");
 
+const normalizeIdentifier = (value) =>
+  typeof value === "string" ? value.trim().toLowerCase() : "";
+
+const authKeyGenerator = (req) => {
+  const email = normalizeIdentifier(req?.body?.email);
+  const username = normalizeIdentifier(req?.body?.username);
+  const identifier = email || username || "anonymous";
+  return `${req.ip}:${identifier}`;
+};
+
 /**
  * General API rate limiter
  */
@@ -21,6 +31,7 @@ exports.authLimiter = rateLimit({
   windowMs: (process.env.AUTH_RATE_LIMIT_WINDOW || 15) * 60 * 1000, // 15 minutes default
   max: process.env.AUTH_RATE_LIMIT_MAX || 20, // Default 20 attempts per window
   skipSuccessfulRequests: true, // Don't count successful requests
+  keyGenerator: authKeyGenerator,
   message: {
     success: false,
     message: "Too many auth attempts, please try again in a few minutes.",
@@ -34,6 +45,7 @@ exports.registerLimiter = rateLimit({
   windowMs: (process.env.AUTH_RATE_LIMIT_WINDOW || 15) * 60 * 1000,
   max: process.env.REGISTER_RATE_LIMIT_MAX || 60,
   skipSuccessfulRequests: true,
+  keyGenerator: authKeyGenerator,
   message: {
     success: false,
     message: "Too many registration attempts, please try again shortly.",

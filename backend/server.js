@@ -20,6 +20,9 @@ dotenv.config({ path: path.resolve(__dirname, ".env") });
 // Initialize express app
 const app = express();
 
+// Trust first proxy so req.ip is resolved correctly behind Render/load balancers
+app.set("trust proxy", Number(process.env.TRUST_PROXY || 1));
+
 // CORS configuration
 const defaultAllowedOrigins = [
   "http://localhost:3000",
