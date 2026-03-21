@@ -28,8 +28,18 @@ const isMissingFaceTableError = (error) => {
     return false;
   }
 
+  const code = String(error.code || "").toUpperCase();
   const message = String(error.message || "").toLowerCase();
-  return message.includes("user_face_embeddings") && message.includes("does not exist");
+
+  if (code === "PGRST205") {
+    return true;
+  }
+
+  const mentionsTable = message.includes("user_face_embeddings");
+  return (
+    mentionsTable &&
+    (message.includes("does not exist") || message.includes("schema cache"))
+  );
 };
 
 const getEncryptionKey = () => {
