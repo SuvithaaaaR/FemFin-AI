@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AppShell, Container } from "@mantine/core";
 import Header from "./components/Layout/Header";
+import SmartChatbot from "./components/SmartChatbot";
 import ProtectedRoute from "./components/ProtectedRoute";
 import HomePage from "./pages/HomePage";
 import FundDetails from "./pages/FundDetails";
@@ -88,6 +89,7 @@ function App() {
               />
             </Routes>
           </Container>
+          <SmartChatbot />
         </AppShell.Main>
       </AppShell>
     </Router>

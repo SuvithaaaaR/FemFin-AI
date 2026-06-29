@@ -1,4 +1,5 @@
 const rateLimit = require("express-rate-limit");
+const { ipKeyGenerator } = rateLimit;
 
 const normalizeIdentifier = (value) =>
   typeof value === "string" ? value.trim().toLowerCase() : "";
@@ -7,7 +8,7 @@ const authKeyGenerator = (req) => {
   const email = normalizeIdentifier(req?.body?.email);
   const username = normalizeIdentifier(req?.body?.username);
   const identifier = email || username || "anonymous";
-  return `${req.ip}:${identifier}`;
+  return `${ipKeyGenerator(req.ip)}:${identifier}`;
 };
 
 /**

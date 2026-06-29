@@ -188,22 +188,44 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
+const shouldAllowStartWithoutDb = () => {
+  if (process.env.ALLOW_START_WITHOUT_DB === "true") {
+    return true;
+  }
+
+  const isDevelopment = (process.env.NODE_ENV || "development") !== "production";
+  const hasSupabaseConfig =
+    Boolean(process.env.SUPABASE_URL) &&
+    Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+  return isDevelopment && !hasSupabaseConfig;
+};
+
+const startHttpServer = () => {
+  app.listen(PORT, () => {
+    console.log(`🚀 FemFin AI Server running on port ${PORT}`);
+    console.log(`📍 Health check: http://localhost:${PORT}/api/health`);
+    console.log(`📚 API documentation: http://localhost:${PORT}/api`);
+  });
+};
+
 const startServer = async () => {
   try {
     await connectDB();
     getSupabase();
-
-    app.listen(PORT, () => {
-      console.log(`🚀 FemFin AI Server running on port ${PORT}`);
-      console.log(`📍 Health check: http://localhost:${PORT}/api/health`);
-      console.log(`📚 API documentation: http://localhost:${PORT}/api`);
-    });
+    startHttpServer();
   } catch (error) {
-    console.error("❌ Unable to start server: ", error.message);
-    console.error(
-      "   Ensure Supabase is reachable and env vars are configured.",
-    );
-    process.exit(1);
+    if (!shouldAllowStartWithoutDb()) {
+      console.error("❌ Unable to start server: ", error.message);
+      console.error(
+        "   Ensure Supabase is reachable and env vars are configured.",
+      );
+      process.exit(1);
+    }
+
+    console.warn("⚠️ Starting without database connection in local development.");
+    console.warn(`   Supabase error: ${error.message}`);
+    startHttpServer();
   }
 };
 
